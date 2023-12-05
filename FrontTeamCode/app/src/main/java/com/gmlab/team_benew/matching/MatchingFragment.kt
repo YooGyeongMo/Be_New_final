@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.gmlab.team_benew.R
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -15,13 +17,14 @@ import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
 import kotlinx.coroutines.*
 
-class MatchingFragment: Fragment(), MatchingPostView {
+class MatchingFragment : Fragment(), MatchingPostView {
     private lateinit var matchingService: MatchingService
     lateinit var cardStackAdapter: CardStackAdapter
-    lateinit var manager : CardStackLayoutManager
+    lateinit var manager: CardStackLayoutManager
     private val matchingProfiles = mutableListOf<Profile>() // 프로필 정보를 담을 리스트
     private lateinit var cardStackView: CardStackView // 카드 스택 뷰
-//    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private lateinit var progressBar: ProgressBar // 프로그레스바 초기화
+    //    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var userCount = 0;
 
     override fun onCreateView(
@@ -34,33 +37,41 @@ class MatchingFragment: Fragment(), MatchingPostView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 프로그레스바 초기화
+        progressBar = view.findViewById(R.id.pg_matchingCheck_progressBar)
         // MatchingService 싱글톤 인스턴스 초기화
         matchingService = MatchingService.getInstance(requireContext())
         matchingService.setMatchingPostView(this)
         fetchMatchingProfiles()
 
         cardStackView = view.findViewById<CardStackView>(R.id.cardstackView)
-        manager = CardStackLayoutManager(requireContext(), object : CardStackListener{
+        manager = CardStackLayoutManager(requireContext(), object : CardStackListener {
             override fun onCardDragging(direction: Direction?, ratio: Float) {
 
             }
 
             override fun onCardSwiped(direction: Direction?) {
-                if(direction == Direction.Right){
-                    Toast.makeText(requireContext(),"right",Toast.LENGTH_LONG).show()
+                if (direction == Direction.Right) {
+                    Toast.makeText(requireContext(), "right", Toast.LENGTH_LONG).show()
                 }
 
-                if(direction == Direction.Left){
-                    Toast.makeText(requireContext(),"left",Toast.LENGTH_LONG).show()
+                if (direction == Direction.Left) {
+                    Toast.makeText(requireContext(), "left", Toast.LENGTH_LONG).show()
                 }
 
                 userCount += 1
+                if (matchingProfiles.size - userCount <= 5) { // 남은 카드 수가 임계값에 도달하면
+                    fetchMatchingProfiles() // 추가 데이터 로드
 
-                if(userCount == matchingProfiles.count()){
-                    // 매칭 프로필을 서버로부터 불러오는 함수를 호출
-                    fetchMatchingProfiles()
-                    userCount = 0
                 }
+
+//                userCount += 1
+//
+//                if (userCount == matchingProfiles.count()) {
+//                    // 매칭 프로필을 서버로부터 불러오는 함수를 호출
+//                    fetchMatchingProfiles()
+//                    userCount = 0
+//                }
             }
 
             override fun onCardRewound() {
@@ -68,7 +79,7 @@ class MatchingFragment: Fragment(), MatchingPostView {
             }
 
             override fun onCardCanceled() {
-                Log.d("CARDCANCELED","매칭/거절")
+                Log.d("CARDCANCELED", "매칭/거절")
             }
 
             override fun onCardAppeared(view: View?, position: Int) {
@@ -92,19 +103,25 @@ class MatchingFragment: Fragment(), MatchingPostView {
     }
 
     // MatchingFragment 내부
-    private fun fetchMatchingProfiles() {
+    private fun fetchMatchingProfiles(preload: Boolean = false) {
+        if(preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
         val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
         matchingProfiles.clear()
-        for (i in 1..3) {
-            val matchRequestDto = MatchRequestDto(uid1 = userId)
-            matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
-                val profile = matchingResponse.profile
-                matchingProfiles.add(profile)
-                if (matchingProfiles.size == 3) {
-                    updateUI(matchingProfiles)
-                    Log.d("MATCHING/POST/CARD/DATA","SUCCESS")
-                }
-            })
+        lifecycleScope.launch {
+            for (i in 1..10) {
+                val matchRequestDto = MatchRequestDto(uid1 = userId)
+                matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
+                    val profile = matchingResponse.profile
+                    matchingProfiles.add(profile)
+                    if (matchingProfiles.size % 10 == 0 || matchingProfiles.size == 10) {
+                        updateUI(matchingProfiles)
+                        userCount = 0 //초기화
+                        if (preload) hideProgressBar() // 데이터 로딩 완료 시 프로그레스바 숨김
+                        Log.d("MATCHING/POST/CARD/DATA", "SUCCESS")
+                    }
+                })
+                delay(100)
+            }
         }
     }
 
@@ -136,4 +153,11 @@ class MatchingFragment: Fragment(), MatchingPostView {
         return sharedPref.getInt("loginId", -1).takeIf { it != -1 }
     }
 
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
