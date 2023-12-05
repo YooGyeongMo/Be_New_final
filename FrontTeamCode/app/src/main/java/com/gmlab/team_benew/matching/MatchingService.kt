@@ -9,10 +9,18 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class MatchingService(private val context: Context) {
-
+class MatchingService private constructor(private val context: Context) {
     private lateinit var matchingPostView: MatchingPostView
 
+    companion object {
+        @Volatile private var instance: MatchingService? = null
+
+        fun getInstance(context: Context): MatchingService {
+            return instance ?: synchronized(this) {
+                instance ?: MatchingService(context).also { instance = it }
+            }
+        }
+    }
 
     fun setMatchingPostView(matchingPostView: MatchingPostView){
         this.matchingPostView = matchingPostView

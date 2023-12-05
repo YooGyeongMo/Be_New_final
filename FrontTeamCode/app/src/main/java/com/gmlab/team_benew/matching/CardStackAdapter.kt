@@ -9,7 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 
-class CardStackAdapter(val context: Context, val items: List<Profile>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>(){
+class CardStackAdapter(val context: Context, items: List<Profile>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>(){
+    var items: List<Profile> = items
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardStackAdapter.ViewHolder {
 
         val inflater = LayoutInflater.from(parent.context)
