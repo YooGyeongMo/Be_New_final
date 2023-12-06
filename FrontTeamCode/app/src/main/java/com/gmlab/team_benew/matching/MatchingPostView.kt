@@ -5,4 +5,13 @@ interface MatchingPostView {
     fun onMatchingPostSuccess()
 
     fun onMatchingPostFailure()
+
+    fun onMatchingLikePatchSuccess()
+
+    fun onMatchingLikePatchFailure()
+
+    fun onMatchingUnLikePatchSuccess()
+
+    fun onMatchingUnLikePatchFailure()
+
 }

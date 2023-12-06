@@ -5,9 +5,13 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Query
 interface MatchingRetrofitInterface {
     @POST("/api/post/match")
     fun postCreateMatch(@Header("Authorization") bearerToken: String, @Body matchRequestDto: MatchRequestDto): Call<MatchingResponse>
+
+//    @PATCH("/api/patch/match/success")
+//    fun patchLikeMatch(@Header("Authorization"))
 }

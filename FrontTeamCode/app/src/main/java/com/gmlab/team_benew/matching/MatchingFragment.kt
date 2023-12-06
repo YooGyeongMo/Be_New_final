@@ -26,6 +26,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
     private lateinit var progressBar: ProgressBar // 프로그레스바 초기화
     //    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var userCount = 0;
+    private var isFetching = false // 데이터 요청 중인지 표시하는 플래그
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +43,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
         // MatchingService 싱글톤 인스턴스 초기화
         matchingService = MatchingService.getInstance(requireContext())
         matchingService.setMatchingPostView(this)
-        fetchMatchingProfiles()
+        fetchMatchingProfiles(true) // -> 첫번째 함수일때
 
         cardStackView = view.findViewById<CardStackView>(R.id.cardstackView)
         manager = CardStackLayoutManager(requireContext(), object : CardStackListener {
@@ -60,9 +61,8 @@ class MatchingFragment : Fragment(), MatchingPostView {
                 }
 
                 userCount += 1
-                if (matchingProfiles.size - userCount <= 5) { // 남은 카드 수가 임계값에 도달하면
+                if (matchingProfiles.size - userCount <= 5 && !isFetching) {
                     fetchMatchingProfiles() // 추가 데이터 로드
-
                 }
 
 //                userCount += 1
@@ -104,24 +104,38 @@ class MatchingFragment : Fragment(), MatchingPostView {
 
     // MatchingFragment 내부
     private fun fetchMatchingProfiles(preload: Boolean = false) {
+        if (isFetching) return
+        isFetching = true // 데이터 요청시작
         if(preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
         val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
-        matchingProfiles.clear()
+
         lifecycleScope.launch {
+            val newProfiles = mutableListOf<Profile>() //담는용 뮤터블리스트
             for (i in 1..10) {
                 val matchRequestDto = MatchRequestDto(uid1 = userId)
                 matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
-                    val profile = matchingResponse.profile
-                    matchingProfiles.add(profile)
-                    if (matchingProfiles.size % 10 == 0 || matchingProfiles.size == 10) {
+                    newProfiles.add(matchingResponse.profile)
+//                    val profile = matchingResponse.profile
+                    if (newProfiles.size == 10) {
+
+                        // 기존 리스트에서 이미 스와이프된 프로필 제거
+                        if (userCount > 0 && matchingProfiles.size > userCount) {
+                            matchingProfiles.subList(0, userCount).clear()
+                        }
+
+                        matchingProfiles.addAll(newProfiles)
                         updateUI(matchingProfiles)
-                        userCount = 0 //초기화
+                        userCount = 0 // 새 데이터 로드 후 userCount 초기화
+                        isFetching = false // 데이터 요청완료
                         if (preload) hideProgressBar() // 데이터 로딩 완료 시 프로그레스바 숨김
                         Log.d("MATCHING/POST/CARD/DATA", "SUCCESS")
                     }
                 })
-                delay(100)
+                delay(200)
             }
+//            // 최소 1초 동안 프로그레스바 표시 보장
+//            delay(5000)
+
         }
     }
 
@@ -146,6 +160,22 @@ class MatchingFragment : Fragment(), MatchingPostView {
 
     override fun onMatchingPostFailure() {
         Log.d("MATCHING/POST/FAILURE", "유저매칭POST 실패")
+    }
+
+    override fun onMatchingLikePatchSuccess() {
+        Log.d("MATCHINGLIKE/PATCH/SUCCESS", "유저매칭 좋아요 성공~")
+    }
+
+    override fun onMatchingLikePatchFailure() {
+        Log.d("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 좋아요 실패 ㅠㅠ")
+    }
+
+    override fun onMatchingUnLikePatchSuccess() {
+        Log.d("MATCHINGUNLIKE/PATCH/SUCCESS", "유저매칭 싫어요 성공~")
+    }
+
+    override fun onMatchingUnLikePatchFailure() {
+        Log.d("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 싫어요 실패 ㅠㅠ ")
     }
 
     private fun getIdFromSharedPreferences(context: Context): Int? {
