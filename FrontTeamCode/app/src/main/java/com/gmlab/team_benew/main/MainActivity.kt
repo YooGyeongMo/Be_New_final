@@ -66,12 +66,12 @@ class MainActivity : AppCompatActivity() { //compat 호환성을 해준다는 �
     {
         AlertDialog.Builder(this)
             .setTitle("알림")
-            .setMessage("알림창입니다.")
-            .setPositiveButton("확인") { dialog, which ->
-                // "확인" 버튼 클릭 시 수행할 동작
-            }
-            .setNegativeButton("취소") { dialog, which ->
+            .setMessage("유경모님에게 프로젝트 요청이 왔습니다.함께 하시겠습니까?")
+            .setNegativeButton("거절") { dialog, which ->
                 // "취소" 버튼 클릭 시 수행할 동작
+            }
+            .setPositiveButton("수락") { dialog, which ->
+                // "확인" 버튼 클릭 시 수행할 동작
             }
             .show()
     }
