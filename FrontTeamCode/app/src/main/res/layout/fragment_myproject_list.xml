@@ -16,12 +16,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_welcome_myProject_list"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:text="내 프로젝트 목록이에요!"
-        android:textSize="25sp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="10dp"
+        android:text="내 프로젝트 목록"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +37,7 @@
         app:cardCornerRadius="20dp"
         app:cardElevation="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/tv_welcome_myProject_list"
         tools:layout_editor_absoluteX="16dp" />
 
 
