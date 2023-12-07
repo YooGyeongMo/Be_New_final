@@ -50,6 +50,11 @@ class MatchingService private constructor(private val context: Context) {
                            Log.e("MatchingService", "Response body is null")
                        }
                    }
+                   204 -> {
+                       Log.e("MATHCING/POST/NOCONTENT","204,서버에서 보낼 유저가 없음")
+                   }
+
+
                    401-> {
                        matchingPostView.onMatchingPostFailure()
                    }

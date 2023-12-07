@@ -52,19 +52,39 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
         }
     }
     private fun getUserInfo() {
-        val token = getTokenFromSharedPreferences()
-        val account = getAccountFromSharedPreferences()
-        if (token != null && account != null) {
-            val homeService = MainAuthService(this) // HomeService는 네트워크 요청을 처리하는 클래스
-            homeService.setMainView(this)
-            homeService.setUserNameCallback(this)
-            homeService.getUserName(token,account)
+        val cachedUserName = getCachedUserName()
+        if (cachedUserName != null) {
+            updateUserNameUI(cachedUserName)
+        } else {
+            val token = getTokenFromSharedPreferences()
+            val account = getAccountFromSharedPreferences()
+            if (token != null && account != null) {
+                val homeService = MainAuthService(this) // homeservice 네트워크 요청을 처리하는 클래스
+                homeService.setMainView(this)
+                homeService.setUserNameCallback(this)
+                homeService.getUserName(token, account)
+            }
         }
     }
 
     override fun onUserNameReceived(userName: String) {
+        cacheUserName(userName)
+        updateUserNameUI(userName)
+    }
+
+    private fun updateUserNameUI(userName: String) {
         val tvUserData = view?.findViewById<TextView>(R.id.tv_username_data)
         tvUserData?.text = userName
+    }
+
+    private fun cacheUserName(userName: String) {
+        val sharedPref = activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        sharedPref?.edit()?.putString("cachedUserName", userName)?.apply()
+    }
+
+    private fun getCachedUserName(): String? {
+        val sharedPref = activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return sharedPref?.getString("cachedUserName", null)
     }
 
     private fun getTokenFromSharedPreferences(): String? {
