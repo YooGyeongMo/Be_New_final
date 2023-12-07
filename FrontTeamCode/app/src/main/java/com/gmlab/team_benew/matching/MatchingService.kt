@@ -2,6 +2,7 @@ package com.gmlab.team_benew.matching
 
 
 import android.content.Context
+import android.service.autofill.FieldClassification.Match
 import android.util.Log
 import com.gmlab.team_benew.auth.getRetrofit
 import retrofit2.Call
@@ -26,6 +27,7 @@ class MatchingService private constructor(private val context: Context) {
         this.matchingPostView = matchingPostView
     }
 
+    // 1개씩 Post 매칭 만들고 유저 데이터 받아오는 함수
     fun getUserData(matchRequestDto: MatchRequestDto, onResponse: (MatchingResponse) -> Unit){
         val token = getTokenFromSharedPreferences(context) ?: return
         val userid = getIdFromSharedPreferences(context) ?: return //문자열을 정수형으로 반환
@@ -69,6 +71,86 @@ class MatchingService private constructor(private val context: Context) {
             }
         })
     }
+
+    fun likeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit) {
+        val token = getTokenFromSharedPreferences(context) ?: return
+        val bearerToken = "Bearer $token"
+
+        val matchingLikePatchService = getRetrofit().create(MatchingRetrofitInterface::class.java)
+
+        matchingLikePatchService.patchLikeMatch(bearerToken, matchId).enqueue(object : Callback<MatchingResponse>
+        {
+            override fun onResponse(call: Call<MatchingResponse>, response: Response<MatchingResponse>)
+            {
+                Log.d("NETWORK_MATCHING_PATCH_SUCCESS","USER_MATCHING_LIKE")
+
+                when(response.code()){
+                    200 -> {
+                        val patchResponse = response.body()
+                        patchResponse?.let{
+                            onResponse(it)
+                            matchingPostView.onMatchingLikePatchSuccess()
+                        } ?: run {
+                            Log.e("PATCHING/SERVICE", "Response body is null")
+                        }
+                    }
+                    401 -> {
+                        matchingPostView.onMatchingLikePatchFailure()
+                    }
+
+                    else -> {
+                        Log.e("PatchService", "Error with response code: ${response.code()}")
+
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
+                Log.d("NETWORK_MATCHING_PATCH_Failure","USER_MATCHING_LIKE")
+            }
+        })
+    }
+
+    fun disLikeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit){
+        val token = getTokenFromSharedPreferences(context) ?: return
+        val bearerToken = "Bearer $token"
+
+        val matchingLikePatchService = getRetrofit().create(MatchingRetrofitInterface::class.java)
+
+        matchingLikePatchService.patchDisLikeMatch(bearerToken, matchId).enqueue(object : Callback<MatchingResponse>
+        {
+            override fun onResponse(call: Call<MatchingResponse>, response: Response<MatchingResponse>)
+            {
+                Log.d("NETWORK_MATCHING_PATCH_SUCCESS","USER_MATCHING_DISLIKE")
+
+                when(response.code()){
+                    200 -> {
+                        val patchResponse = response.body()
+                        patchResponse?.let{
+                            onResponse(it)
+                            matchingPostView.onMatchingUnLikePatchSuccess()
+                        } ?: run {
+                            Log.e("PATCHING/SERVICE", "Response body is null")
+                        }
+                    }
+                    401 -> {
+                        matchingPostView.onMatchingUnLikePatchFailure()
+                    }
+
+                    else -> {
+                        Log.e("PatchService", "Error with response code: ${response.code()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
+                Log.d("NETWORK_MATCHING_PATCH_Failure","USER_MATCHING_DISLIKE")
+            }
+        })
+
+    }
+
+
 
     private fun getTokenFromSharedPreferences(context: Context): String? {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)

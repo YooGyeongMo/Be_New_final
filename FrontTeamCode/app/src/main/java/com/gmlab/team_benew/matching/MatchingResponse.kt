@@ -3,10 +3,10 @@ package com.gmlab.team_benew.matching
 data class MatchingResponse(
     val isUid2Team: Boolean,
     val links: Links,
-    val matchId: Int,
+    val matchId: Long,
     val matchSuccess: Boolean,
     val matchingDate: String,
-    val matchingRequest: Boolean,
+    val matchingRequest: String,
     val profile: Profile,
     val uid1: Int
 )
@@ -16,6 +16,7 @@ data class Links(
 )
 
 data class Profile(
+    val matchId: Long, // 서버 응답에 따라 추가
     val id: Int,
     val instruction: String,
     val member: Member,

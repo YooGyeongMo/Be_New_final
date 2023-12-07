@@ -22,8 +22,10 @@ class MatchingFragment : Fragment(), MatchingPostView {
     lateinit var cardStackAdapter: CardStackAdapter
     lateinit var manager: CardStackLayoutManager
     private val matchingProfiles = mutableListOf<Profile>() // 프로필 정보를 담을 리스트
+    private val matchingId = mutableListOf<Long>()// 매칭Id담을 리스트
     private lateinit var cardStackView: CardStackView // 카드 스택 뷰
     private lateinit var progressBar: ProgressBar // 프로그레스바 초기화
+
     //    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var userCount = 0;
     private var isFetching = false // 데이터 요청 중인지 표시하는 플래그
@@ -52,12 +54,19 @@ class MatchingFragment : Fragment(), MatchingPostView {
             }
 
             override fun onCardSwiped(direction: Direction?) {
+
+                val currentMatchId = matchingId[manager.topPosition - 1]
+
                 if (direction == Direction.Right) {
-                    Toast.makeText(requireContext(), "right", Toast.LENGTH_LONG).show()
+                    matchingService.likeMatch(currentMatchId) { response ->
+                        Toast.makeText(context, "매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 if (direction == Direction.Left) {
-                    Toast.makeText(requireContext(), "left", Toast.LENGTH_LONG).show()
+                    matchingService.disLikeMatch(currentMatchId) { response ->
+                        Toast.makeText(context, "매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 userCount += 1
@@ -106,15 +115,19 @@ class MatchingFragment : Fragment(), MatchingPostView {
     private fun fetchMatchingProfiles(preload: Boolean = false) {
         if (isFetching) return
         isFetching = true // 데이터 요청시작
-        if(preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
+        if (preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
         val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
 
         lifecycleScope.launch {
-            val newProfiles = mutableListOf<Profile>() //담는용 뮤터블리스트
+            val newProfiles = mutableListOf<Pair<Long,Profile>>() //담는용 뮤터블리스트
             for (i in 1..10) {
                 val matchRequestDto = MatchRequestDto(uid1 = userId)
                 matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
-                    newProfiles.add(matchingResponse.profile)
+                    val profile = matchingResponse.profile
+                    val matchId = matchingResponse.matchId
+
+                    val profilePair = Pair(matchId, profile)
+                    newProfiles.add(profilePair)
 //                    val profile = matchingResponse.profile
                     if (newProfiles.size == 10) {
 
@@ -123,7 +136,8 @@ class MatchingFragment : Fragment(), MatchingPostView {
                             matchingProfiles.subList(0, userCount).clear()
                         }
 
-                        matchingProfiles.addAll(newProfiles)
+                        matchingProfiles.addAll(newProfiles.map { it.second }) // Profile만을 matchingProfiles에 추가
+                        matchingId.addAll(newProfiles.map { it.first })
                         updateUI(matchingProfiles)
                         userCount = 0 // 새 데이터 로드 후 userCount 초기화
                         isFetching = false // 데이터 요청완료
@@ -138,6 +152,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
 
         }
     }
+
 
     // 받아온 프로필 정보로 UI를 업데이트하는 함수
     private fun updateUI(profiles: List<Profile>) {
