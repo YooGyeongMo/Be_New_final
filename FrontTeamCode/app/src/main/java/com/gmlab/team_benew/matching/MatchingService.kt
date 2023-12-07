@@ -104,7 +104,6 @@ class MatchingService private constructor(private val context: Context) {
                     }
                 }
             }
-
             override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
                 Log.d("NETWORK_MATCHING_PATCH_Failure","USER_MATCHING_LIKE")
             }

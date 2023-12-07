@@ -1,5 +1,6 @@
 package com.gmlab.team_benew.main.mypage
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -12,5 +13,5 @@ interface putMypagePhoneNumberRequest {
         @Header("Authorization") token: String,
         @Path("id") memberId: Int,
         @Body request: putMypagePhoneNumberData
-    ): Call<String>
+    ): Call<ResponseBody>
 }

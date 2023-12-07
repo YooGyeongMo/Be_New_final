@@ -22,6 +22,7 @@ import com.gmlab.team_benew.profile.getProfileDetailData
 import com.gmlab.team_benew.profile.getProfileDetailRequest
 import com.gmlab.team_benew.profile.postProfileDetailData
 import com.gmlab.team_benew.profile.postProfileDetailRequest
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -143,15 +144,20 @@ class MypageFragment: Fragment() {
 
         val call = apiService.putMypagePhoneNumber("Bearer $token", memberId, request)
 
-        call.enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show()
-                } else{
-                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show()
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                when(response.code()){
+                    200 -> {
+                        Log.d("PUT/SUCCESS","${response.code()}휴대폰번호 변경성공")
+                    }
                 }
+//                if (response.isSuccessful) {
+//                    Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show()
+//                } else{
+//                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show()
+//                }
             }
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Log.e("API_CALL_FAILURE", "API Call Failed", t)
                 Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show()
             }
