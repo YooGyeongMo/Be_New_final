@@ -6,7 +6,7 @@ data class getProfileDetailData(
     @SerializedName("instruction")
     val instruction: String,
     @SerializedName("member")
-    val member: Member,
+    val member: ProfileMember,
     @SerializedName("nickname")
     val nickname: String,
     @SerializedName("personalLink")
@@ -21,7 +21,7 @@ data class getProfileDetailData(
     val peer: Int
 )
 
-data class Member(
+data class ProfileMember(
     @SerializedName("birthday")
     val birthday: String,
     @SerializedName("email")

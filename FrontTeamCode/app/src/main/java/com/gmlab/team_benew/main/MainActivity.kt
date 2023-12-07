@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() { //compat 호환성을 해준다는 �
     {
         AlertDialog.Builder(this)
             .setTitle("알림")
-            .setMessage("유경모님에게 프로젝트 요청이 왔습니다.함께 하시겠습니까?")
+            .setMessage("유경모님으로부터 프로젝트 요청이 왔습니다.함께 하시겠습니까?")
             .setNegativeButton("거절") { dialog, which ->
                 // "취소" 버튼 클릭 시 수행할 동작
             }

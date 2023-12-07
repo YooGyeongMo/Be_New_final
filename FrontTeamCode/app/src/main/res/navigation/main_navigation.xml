@@ -31,7 +31,7 @@
         android:label="MyteamListFragment" />
     <fragment
         android:id="@+id/navigation_mypage"
-        android:name="com.gmlab.team_benew.main.MypageFragment"
+        android:name="com.gmlab.team_benew.main.mypage.MypageFragment"
         android:label="MypageFragment" />
     <fragment
         android:id="@+id/navigation_profile_deatil"

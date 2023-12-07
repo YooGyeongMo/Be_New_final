@@ -58,6 +58,7 @@ class ProfileDetailFragment: Fragment() {
     private lateinit var skillSpinner : Spinner
     private lateinit var LevelSpinner : Spinner
 
+    private lateinit var technologyIdList : MutableList<Long>
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,6 +71,8 @@ class ProfileDetailFragment: Fragment() {
         val token = sharedPref?.getString("userToken", "")
         val account = sharedPref?.getString("userAccount", "")
         val memberId = sharedPref?.getInt("loginId", 0)
+
+        technologyIdList = mutableListOf()
 
         cv_bottom = view.findViewById(R.id.cv_profilecardDetail_bottom)
         imgb_picture = view.findViewById(R.id.imgb_profilecardDetail_picture)
@@ -120,7 +123,9 @@ class ProfileDetailFragment: Fragment() {
                 btn_addSkill.text = "추가"
                 if (account != null) {
                     if (token != null) {
-                        skillFinish(token, account)
+                        if (memberId != null) {
+                            skillFinish(token, account, memberId)
+                        }
                     }
                 }
             }
@@ -154,10 +159,12 @@ class ProfileDetailFragment: Fragment() {
 
     private fun handleLinkClick(){
         try {
-            val link = et_link.text.toString()
+            if(et_link.text.isNotEmpty()) {
+                val link = et_link.text.toString()
 
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-            startActivity(intent)
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                startActivity(intent)
+            }
         }
         catch(e : Exception)
         {
@@ -302,6 +309,7 @@ class ProfileDetailFragment: Fragment() {
 
     private fun getTechnology(token : String, account : String)
     {
+        technologyIdList.clear()
         if (account == null) {
             return
         }
@@ -321,13 +329,15 @@ class ProfileDetailFragment: Fragment() {
                     val technologyDataList: List<getTechnologyData>? = response.body()
                     technologyDataList?.let {
                         for (technologyData in it) {
-                            val id = technologyData.id
+                            val id = technologyData.technology.id
                             val level = technologyData.level ?: 0
                             val name = technologyData.technology?.name ?: ""
 
                             val textView = TextView(requireContext())
                             textView.text = "$name level : $level"
                             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
+
+                            technologyIdList.add(id)
 
                             // 생성된 TextView를 LinearLayout에 추가
                             linear_skill.addView(textView)
@@ -411,7 +421,9 @@ class ProfileDetailFragment: Fragment() {
         linear_skill.addView(LevelSpinner)
     }
 
-    private fun skillFinish(token : String, account : String) {
+    private fun skillFinish(token : String, account : String, profileId : Int) {
+        var count = 0
+
         var skill_value = skillSpinner.selectedItem.toString()
         var level_value = LevelSpinner.selectedItem.toString()
 
@@ -433,38 +445,78 @@ class ProfileDetailFragment: Fragment() {
             "level5" -> { level = 5}
         }
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://15.164.217.105:32000/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        technologyIdList.forEach { techId ->
+            if(techId == technologyId){
+                count++
+            }
+        }
 
-        val apiService = retrofit.create(postTechnologyRequest::class.java)
+        if(count == 0) {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("http://15.164.217.105:32000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-        val request = postTechnologyData(level, technologyId)
+            val apiService = retrofit.create(postTechnologyRequest::class.java)
 
-        val call: Call<Boolean> = apiService.postTechnology("Bearer $token", account, request)
+            val request = postTechnologyData(level, technologyId)
 
-        call.enqueue(object : Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show();
+            val call: Call<Boolean> = apiService.postTechnology("Bearer $token", account, request)
+
+            call.enqueue(object : Callback<Boolean> {
+                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show();
+                        linear_skill.removeAllViews()
+
+                        getTechnology(token, account)
+                    } else {
+                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                override fun onFailure(call: Call<Boolean>, t: Throwable) {
                     linear_skill.removeAllViews()
 
                     getTechnology(token, account)
-                } else{
-                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show();
                 }
-            }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                linear_skill.removeAllViews()
+            })
+        }
+        else
+        {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("http://15.164.217.105:32000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-                getTechnology(token, account)
-            }
+            val apiService = retrofit.create(putTechnologyRequest::class.java)
 
-        })
+            val request = putTechnologyData(level)
+
+            val call : Call<Boolean> = apiService.putTechnology("Bearer $token", profileId, technologyId, request)
+
+            call.enqueue(object : Callback<Boolean> {
+                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show();
+                        linear_skill.removeAllViews()
+
+                        getTechnology(token, account)
+                    } else {
+                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                    linear_skill.removeAllViews()
+
+                    getTechnology(token, account)
+                }
+
+            })
+        }
     }
-
     fun compressAndEncodeBitmap(bitmap: Bitmap, quality: Int = 100): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         // 이미지 크기를 줄이고 JPEG 형식으로 압축

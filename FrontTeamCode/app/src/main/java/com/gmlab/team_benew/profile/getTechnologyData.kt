@@ -12,6 +12,8 @@ data class getTechnologyData(
 )
 
 data class Technology(
+    @SerializedName("id")
+    val id: Long,
     @SerializedName("name")
     val name: String
 )
