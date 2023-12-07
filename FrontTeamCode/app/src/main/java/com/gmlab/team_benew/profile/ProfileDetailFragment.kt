@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -40,15 +41,12 @@ class ProfileDetailFragment: Fragment() {
     private lateinit var cv_bottom : CardView
     private lateinit var imgb_picture: ImageButton
     private lateinit var et_nickname: EditText
-    private lateinit var et_email: EditText
     private lateinit var et_introduce: EditText
     private lateinit var btn_modify: Button
     private lateinit var tv_gender : TextView
-    private lateinit var tv_birthday : TextView
     private lateinit var spn_experience : Spinner
     private lateinit var et_role : EditText
     private lateinit var et_link : EditText
-    private lateinit var tv_phone : TextView
     private lateinit var tv_major : TextView
     private lateinit var btn_addSkill : Button
     private lateinit var img_peer : ImageView
@@ -77,15 +75,12 @@ class ProfileDetailFragment: Fragment() {
         cv_bottom = view.findViewById(R.id.cv_profilecardDetail_bottom)
         imgb_picture = view.findViewById(R.id.imgb_profilecardDetail_picture)
         et_nickname = view.findViewById(R.id.et_profilecardDetail_nickname)
-        et_email = view.findViewById(R.id.et_profilecardDetail_email)
         et_introduce = view.findViewById(R.id.et_profilecardDetail_introduce)
         btn_modify = view.findViewById(R.id.btn_profilecardDetail_modify)
         tv_gender = view.findViewById(R.id.tv_profilecardDetail_gender)
-        tv_birthday = view.findViewById(R.id.tv_profilecardDetail_birthday)
         spn_experience = view.findViewById(R.id.spn_profilecardDetail_projectExperience)
         et_role = view.findViewById(R.id.et_profilecardDetail_role)
         et_link = view.findViewById(R.id.et_profilecardDetail_link)
-        tv_phone = view.findViewById(R.id.tv_profilecardDetail_phone)
         tv_major = view.findViewById(R.id.tv_profilecardDetail_major)
         linear_skill = view.findViewById(R.id.linear_profilecarddetail_skill)
         btn_addSkill = view.findViewById(R.id.btn_profilecard_addskill)
@@ -95,6 +90,11 @@ class ProfileDetailFragment: Fragment() {
         imgb_picture.visibility = View.VISIBLE
 
         disableInputFields()
+
+        val selectedView = spn_experience.selectedView as? TextView
+        if (selectedView != null) {
+            selectedView.setTextColor(Color.BLACK)
+        }
 
         if (memberId != null) {
             if (token != null) {
@@ -249,11 +249,8 @@ class ProfileDetailFragment: Fragment() {
                         val peer = it.peer ?: 50
                         val photo = it.photo ?: ""
 
-                        val birthday = it.member?.birthday ?: ""
-                        val email = it.member?.email ?: ""
                         val gender = it.member?.gender ?: ""
                         val major = it.member?.major ?: ""
-                        val phoneNumber = it.member?.phoneNumber ?: ""
 
                         //사진저장
                         if(photo != "") {
@@ -263,13 +260,10 @@ class ProfileDetailFragment: Fragment() {
                         //UI에 저장()
 
                         et_nickname.setText(nickname)
-                        et_email.setText(email)
                         et_introduce.setText(instruction)
                         tv_gender.text = gender
-                        tv_birthday.text = birthday
                         et_role.setText(role)
                         et_link.setText(personalLink)
-                        tv_phone.text = phoneNumber
                         tv_major.text = major
 
                         if(projectExperience == true)
@@ -293,6 +287,28 @@ class ProfileDetailFragment: Fragment() {
                         }
 
                         img_peer.setImageDrawable(drawableResource)
+
+                        if(et_nickname.text.isNotEmpty())
+                        {
+                            et_nickname.hint = ""
+                        }
+                        else{
+                            et_nickname.hint = "닉네임"
+                        }
+
+                        if(et_introduce.text.isNotEmpty()){
+                            et_introduce.hint = ""
+                        }
+                        else{
+                            et_introduce.hint = "나의 다짐"
+                        }
+
+                        if(et_role.text.isNotEmpty()){
+                            et_role.hint=""
+                        }
+                        else{
+                            et_role.hint="예)프론트엔드"
+                        }
 
                     }
                 }
@@ -366,14 +382,13 @@ class ProfileDetailFragment: Fragment() {
 
     private fun disableInputFields() {
         val originalNicknameTextColor = et_nickname.currentTextColor
-        val originalEmailTextColor = et_email.currentTextColor
         val originalIntroduceTextColor = et_introduce.currentTextColor
         val originalLinkTextColor = et_link.currentTextColor
         val originalRoleTextColor = et_role.currentTextColor
 
+
         imgb_picture.isEnabled = false
         et_nickname.isEnabled = false
-        et_email.isEnabled = false
         et_introduce.isEnabled = false
         spn_experience.isEnabled = false
         et_role.isEnabled = false
@@ -381,10 +396,14 @@ class ProfileDetailFragment: Fragment() {
         btn_addSkill.isEnabled = false
 
         et_nickname.setTextColor(originalNicknameTextColor)
-        et_email.setTextColor(originalEmailTextColor)
         et_introduce.setTextColor(originalIntroduceTextColor)
         et_link.setTextColor(originalLinkTextColor)
         et_role.setTextColor(originalRoleTextColor)
+
+        val selectedView = spn_experience.selectedView as? TextView
+        selectedView?.let {
+            it.setTextColor(Color.BLACK)
+        }
 
         cv_bottom.isEnabled = true
     }
@@ -396,7 +415,6 @@ class ProfileDetailFragment: Fragment() {
         spn_experience.isEnabled = true
         et_role.isEnabled = true
         et_link.isEnabled = true
-        et_email.isEnabled = true
         btn_addSkill.isEnabled = true
 
         cv_bottom.isEnabled = false

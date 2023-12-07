@@ -12,5 +12,5 @@ interface putMypageEmailRequest {
         @Header("Authorization") token: String,
         @Path("id") memberId: Int,
         @Body request: putMypageEmailData
-    ): Call<Boolean>
+    ): Call<String>
 }

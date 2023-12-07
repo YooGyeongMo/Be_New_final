@@ -173,10 +173,10 @@ class MypageFragment: Fragment() {
 
         val request = putMypageEmailData(et_email.text.toString())
 
-        val call: Call<Boolean> = apiService.putMypageEmail("Bearer $token", memberId, request)
+        val call: Call<String> = apiService.putMypageEmail("Bearer $token", memberId, request)
 
-        call.enqueue(object : Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
                     Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show();
                 } else{
@@ -184,7 +184,7 @@ class MypageFragment: Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+            override fun onFailure(call: Call<String>, t: Throwable) {
                 Log.e("API_CALL_FAILURE", "API Call Failed", t)
                 Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show()
             }
