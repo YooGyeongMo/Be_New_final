@@ -70,18 +70,14 @@
                 app:layout_constraintStart_toStartOf="@id/tv_matching_profile_role_data"
                 app:layout_constraintEnd_toEndOf="@id/tv_matching_profile_role_data"
                 />
-            <TextView
-                android:id="@+id/tv_matching_peerReview_data"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:layout_marginTop="40dp"
+            <ImageView
+                android:id="@+id/iv_matching_peerReview_data"
+                android:layout_width="70dp"
+                android:layout_height="69dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_matching_profile_instruction_data"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tv_matching_project_booleanCheck_data"
+                android:src="@drawable/profilecard_detail_peer40_59"
                 />
             <TextView
                 android:id="@+id/tv_matching_peerReview"
@@ -90,9 +86,9 @@
                 android:text="동료평가"
                 android:textSize="15sp"
                 android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@id/tv_matching_peerReview_data"
-                app:layout_constraintStart_toStartOf="@id/tv_matching_peerReview_data"
-                app:layout_constraintEnd_toEndOf="@id/tv_matching_peerReview_data"
+                app:layout_constraintTop_toBottomOf="@id/iv_matching_peerReview_data"
+                app:layout_constraintStart_toStartOf="@id/iv_matching_peerReview_data"
+                app:layout_constraintEnd_toEndOf="@id/iv_matching_peerReview_data"
                 />
 
             <TextView
@@ -104,7 +100,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/black"
                 app:layout_constraintTop_toBottomOf="@id/tv_matching_profile_instruction_data"
-                app:layout_constraintStart_toEndOf="@id/tv_matching_peerReview_data"
+                app:layout_constraintStart_toEndOf="@id/iv_matching_peerReview_data"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="40dp"
                 />
