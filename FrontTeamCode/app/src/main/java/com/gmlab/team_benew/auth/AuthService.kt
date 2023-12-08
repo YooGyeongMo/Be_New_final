@@ -65,7 +65,7 @@ class AuthService {
                         response.body()?.let{ result->
                             val currentToken = getCurrentToken(context)
                             if( currentToken != result.token) {
-                            saveLoginInfo(context, result.id, result.account, result.token)
+                            saveLoginInfo(context, result.id, result.account, result.token, result.name)
                         }
                             loginView.onLoginSuccess()
                         }
@@ -96,7 +96,7 @@ class AuthService {
                 if(response.isSuccessful){
                     response.body()?.let{
                         //새로운 로그인정보를 SharedPreferences에 저장
-                        saveLoginInfo(context, it.id, it.account, it.token)
+                        saveLoginInfo(context, it.id, it.account, it.token,it.name)
                         reloginView.onReLoginSuccess()
                     }
                 }
@@ -113,13 +113,14 @@ class AuthService {
 
     // null 이 아닐 때 let 구분이 실행되도록 설정 요청 후 응답받는 값이 null이 아닐때 설정.
     // 최초 로그인시 저장됩니다.
-    private fun saveLoginInfo(context: Context, id: Int?, account: String?, token: String?)
+    private fun saveLoginInfo(context: Context, id: Int?, account: String?, token: String?, name: String?)
     {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             id?.let { putInt("loginId", it) }
             account?.let { putString("userAccount", it) }
             token?.let { putString("userToken", it) }
+            name?.let {putString("cachedUserName", it)}
             apply()
         }
     }

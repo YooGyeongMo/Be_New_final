@@ -53,23 +53,31 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
     }
     private fun getUserInfo() {
         val cachedUserName = getCachedUserName()
-        if (cachedUserName != null) {
-            updateUserNameUI(cachedUserName)
-        } else {
+        if (cachedUserName == null) {
+            // 서버에서 정보를 가져올 때까지 기본 텍스트를 표시하지 않음
+            // 필요한 경우 로딩 인디케이터를 표시할 수 있습니다.
             val token = getTokenFromSharedPreferences()
             val account = getAccountFromSharedPreferences()
             if (token != null && account != null) {
-                val homeService = MainAuthService(this) // homeservice 네트워크 요청을 처리하는 클래스
+                val homeService = MainAuthService(this)
                 homeService.setMainView(this)
                 homeService.setUserNameCallback(this)
                 homeService.getUserName(token, account)
             }
         }
+        else {
+            // 캐시된 사용자 이름이 있으면 UI 업데이트
+            updateUserNameUI(cachedUserName)
+        }
     }
 
     override fun onUserNameReceived(userName: String) {
-        cacheUserName(userName)
+        val cachedUserName = getCachedUserName()
+        if (cachedUserName != userName) {
+            cacheUserName(userName)
+        }
         updateUserNameUI(userName)
+
     }
 
     private fun updateUserNameUI(userName: String) {
