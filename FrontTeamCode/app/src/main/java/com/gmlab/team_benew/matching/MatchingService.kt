@@ -2,6 +2,7 @@ package com.gmlab.team_benew.matching
 
 
 import android.content.Context
+import android.hardware.camera2.CaptureFailure
 import android.os.Handler
 import android.os.Looper
 import android.service.autofill.FieldClassification.Match
@@ -14,6 +15,7 @@ import retrofit2.Response
 
 class MatchingService private constructor(private val context: Context) {
     private lateinit var matchingPostView: MatchingPostView
+    private lateinit var matchingAlarmsPostView: MatchingAlarmsPostView
 
     companion object {
         @Volatile private var instance: MatchingService? = null
@@ -27,6 +29,10 @@ class MatchingService private constructor(private val context: Context) {
 
     fun setMatchingPostView(matchingPostView: MatchingPostView){
         this.matchingPostView = matchingPostView
+    }
+
+    fun setMatchingAlarmsPostView(matchingAlarmsPostView: MatchingAlarmsPostView){
+        this.matchingAlarmsPostView = matchingAlarmsPostView
     }
 
 
@@ -154,6 +160,42 @@ class MatchingService private constructor(private val context: Context) {
 
     }
 
+    fun sendMatchingAlrams(matchingAlarmsRequest: MatchingAlarmRequest, onResponse: (MatchingAlarmResponse) -> Unit, onFailure: (Throwable)-> Unit){
+
+        val getToken = getTokenFromSharedPreferences(context)
+        val matchingAlramsSendService = getRetrofit().create(MatchingAlarmsRetrofitInterface:: class.java)
+        val bearerToken = "Bearer ${getToken}"
+
+        matchingAlramsSendService.matchingAlarmsSend(bearerToken, matchingAlarmsRequest).enqueue(object: Callback<MatchingAlarmResponse>{
+            override fun onResponse(
+                call: Call<MatchingAlarmResponse>,
+                response: Response<MatchingAlarmResponse>
+            ) {
+                Log.d("NETWORK/SUCCESS/MATCHINGALRAMS","네트워크 매칭 알람 통신 성공")
+                when(response.code()){
+                    201 -> {
+                        response.body()?.let{
+                            onResponse(it)
+                            matchingPostView.onMatchingPostSuccess()
+                        }
+                    }
+                    401 ->{
+                        matchingPostView.onMatchingPostFailure()
+                    }
+                    else -> {
+                        Log.e("POSTSERVICE/POST/FAILURE", "Error with response code: ${response.code()}")
+                    }
+
+                }
+            }
+
+            override fun onFailure(call: Call<MatchingAlarmResponse>, t: Throwable) {
+                Log.e("NETWORK/FAILURE/MATCHINGALRAMS","네트워크 매칭 알람 통신 실패")
+            }
+
+
+        })
+    }
 
 
     private fun getTokenFromSharedPreferences(context: Context): String? {

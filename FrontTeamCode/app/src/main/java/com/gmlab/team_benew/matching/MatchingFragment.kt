@@ -20,7 +20,7 @@ import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
 import kotlinx.coroutines.*
 
-class MatchingFragment : Fragment(), MatchingPostView {
+class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
     private lateinit var matchingService: MatchingService
     lateinit var cardStackAdapter: CardStackAdapter
     lateinit var manager: CardStackLayoutManager
@@ -48,6 +48,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
         // MatchingService 싱글톤 인스턴스 초기화
         matchingService = MatchingService.getInstance(requireContext())
         matchingService.setMatchingPostView(this)
+        matchingService.setMatchingAlarmsPostView(this)
         fetchMatchingProfiles(true) // -> 첫번째 함수일때
 
         cardStackView = view.findViewById<CardStackView>(R.id.cardstackView)
@@ -59,16 +60,45 @@ class MatchingFragment : Fragment(), MatchingPostView {
             override fun onCardSwiped(direction: Direction?) {
 
                 val currentMatchId = matchingId[manager.topPosition - 1]
+                val currentProfile = matchingProfiles[manager.topPosition - 1] // 현재 스와이프한 프로필
+
 
                 if (direction == Direction.Right) {
+
+                    val receiverId = currentProfile.id.toLong() // 받는 사람의 ID를 얻어오는 로직
+                    val myUserId = getIdFromSharedPreferences(requireContext())?.toLong() ?: return // 현재 사용자의 ID를 얻어오는 로직
+                    val myName = getNameFromSharedPreferences(requireContext()) ?: return
+
+                    val message = "${myName}님이 프로젝트 요청을 보냈습니다." // 알림 메시지 설정
+
+                    val matchingAlarmRequest = MatchingAlarmRequest(
+                        message = message,
+                        receiverId = receiverId,
+                        myUserId = myUserId
+                    )
+
+                    matchingService.sendMatchingAlrams(matchingAlarmRequest,
+                        onResponse = { response ->
+                            // 알람 전송 성공시 처리 로직
+                            Toast.makeText(context, "알림 전송 성공: ${response.message}", Toast.LENGTH_SHORT).show()
+                        },
+                        onFailure = { throwable ->
+                            // 알람 전송 실패시 처리 로직
+                            Log.e("MatchingAlarm", "알람 전송 실패", throwable)
+                        }
+                    )
+
                     matchingService.likeMatch(currentMatchId) { response ->
                         Toast.makeText(context, "${currentMatchId}매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(context, "매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+
                     }
                 }
 
                 if (direction == Direction.Left) {
                     matchingService.disLikeMatch(currentMatchId) { response ->
                         Toast.makeText(context, "${currentMatchId}매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(context, "매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -91,7 +121,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
             }
 
             override fun onCardCanceled() {
-                Log.d("CARDCANCELED", "매칭/거절")
+                Log.d("CARDCANCELED", "카드 놓침")
             }
 
             override fun onCardAppeared(view: View?, position: Int) {
@@ -137,6 +167,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
                         // 기존 리스트에서 이미 스와이프된 프로필 제거
                         if (userCount > 0 && matchingProfiles.size > userCount) {
                             matchingProfiles.subList(0, userCount).clear()
+                            matchingId.subList(0, userCount).clear()
                         }
 
                         matchingProfiles.addAll(newProfiles.map { it.second }) // Profile만을 matchingProfiles에 추가
@@ -155,6 +186,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
 
         }
     }
+
 
 
     // 받아온 프로필 정보로 UI를 업데이트하는 함수
@@ -195,6 +227,13 @@ class MatchingFragment : Fragment(), MatchingPostView {
     override fun onMatchingUnLikePatchFailure() {
         Log.e("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 싫어요 실패 ㅠㅠ ")
     }
+    override fun onMatchingAlarmsSuccess() {
+        Log.d("MATCHINGALARMS/POST/SUCCESS", "유저매칭 알람 성공!")
+    }
+
+    override fun onMatchingAlarmsFailure() {
+        Log.e("MATCHINGALARMS/POST/FAILURE", "유저매칭 알람 실패!")
+    }
 
     override fun onMatchingRequestFailure() {
         Log.e("NETWORK_MATCHING_FAILURE_GOBACK","네트워크 요청이 실패하여 이전 화면으로 이동합니다. ")
@@ -212,6 +251,11 @@ class MatchingFragment : Fragment(), MatchingPostView {
         }
     }
 
+    private fun getNameFromSharedPreferences(context: Context): String? {
+        val shardPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return shardPref.getString("cachedUserName",null)
+    }
+
     private fun getIdFromSharedPreferences(context: Context): Int? {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref.getInt("loginId", -1).takeIf { it != -1 }
@@ -224,4 +268,5 @@ class MatchingFragment : Fragment(), MatchingPostView {
     private fun hideProgressBar() {
         progressBar.visibility = View.GONE
     }
+
 }
