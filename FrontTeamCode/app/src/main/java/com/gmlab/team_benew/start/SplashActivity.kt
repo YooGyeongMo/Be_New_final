@@ -77,7 +77,7 @@ class SplashActivity: AppCompatActivity(),SplashView{
     }
 
     override fun onTokenCheckFailure() {
-        Log.d("TokenCheck/FAILURE", "토큰이 유효하지 않습니다")
+        Log.d("TokenCheck/FAILURE", "401 토큰이 유효하지 않습니다")
         startActivity(Intent(this, IntroActivity::class.java))
         //토큰 유효하지 않을 시 sharedpreferences 새로운 토큰으로 패치
         finish()

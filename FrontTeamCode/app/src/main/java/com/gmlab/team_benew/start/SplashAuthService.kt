@@ -39,19 +39,24 @@ class SplashAuthService(private  val context: Context) {
                             splashView.onTokenCheckSuccess()
                             //
                         }
+                        else {
+                            Log.e("TOKEN/UNEQUAL/ERROR" , "서버 토큰과 기존의 토큰이 맞지않음")
+                        }
                     }
-
                     401 -> {
                         splashView.onTokenCheckFailure()
                     }
                     else -> {
-                        response.code()
+                        Log.e("TokenCheck/FAILURE" , "${response.code()}스플래쉬 네트워크 오류 에러")
                     }
                 }
             }
 
             override fun onFailure(call: Call<TokenGet>, t: Throwable) {
-                Log.d("NETWORK_VERIFY_USER/FAILURE" , "스플래쉬 네트워크 오류 에러")
+                Log.e("NETWORK_VERIFY_USER/FAILURE" , "스플래쉬 네트워크 오류 에러")
+                // 네트워크 오류 발생 시 IntroActivity로 이동
+                val intent = Intent(context, IntroActivity::class.java)
+                context.startActivity(intent)
             }
         })
     }

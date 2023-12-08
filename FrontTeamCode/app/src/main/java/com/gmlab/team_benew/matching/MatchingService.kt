@@ -2,6 +2,8 @@ package com.gmlab.team_benew.matching
 
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.service.autofill.FieldClassification.Match
 import android.util.Log
 import com.gmlab.team_benew.auth.getRetrofit
@@ -26,6 +28,8 @@ class MatchingService private constructor(private val context: Context) {
     fun setMatchingPostView(matchingPostView: MatchingPostView){
         this.matchingPostView = matchingPostView
     }
+
+
 
     // 1개씩 Post 매칭 만들고 유저 데이터 받아오는 함수
     fun getUserData(matchRequestDto: MatchRequestDto, onResponse: (MatchingResponse) -> Unit){
@@ -56,7 +60,6 @@ class MatchingService private constructor(private val context: Context) {
                        Log.e("MATHCING/POST/NOCONTENT","204,서버에서 보낼 유저가 없음")
                    }
 
-
                    401-> {
                        matchingPostView.onMatchingPostFailure()
                    }
@@ -67,7 +70,9 @@ class MatchingService private constructor(private val context: Context) {
             }
 
             override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
-                Log.d("NETWORK_MATCHING_USER_FAILURE","USER_MATCHING_DATA_FAILURE")
+                Log.e("NETWORK_MATCHING_USER_FAILURE","USER_MATCHING_DATA_FAILURE")
+                // 실패시 처리 로직 호출
+                matchingPostView.onMatchingRequestFailure()
             }
         })
     }

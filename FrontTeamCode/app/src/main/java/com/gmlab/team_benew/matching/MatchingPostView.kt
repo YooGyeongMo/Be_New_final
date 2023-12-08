@@ -14,4 +14,7 @@ interface MatchingPostView {
 
     fun onMatchingUnLikePatchFailure()
 
+    // 네트워크 요청시 뒤 프레그먼트로 가게할예정
+    fun onMatchingRequestFailure()
+
 }

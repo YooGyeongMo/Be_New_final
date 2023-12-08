@@ -1,5 +1,6 @@
 package com.gmlab.team_benew.matching
 
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.gmlab.team_benew.R
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -174,7 +177,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
     }
 
     override fun onMatchingPostFailure() {
-        Log.d("MATCHING/POST/FAILURE", "유저매칭POST 실패")
+        Log.e("MATCHING/POST/FAILURE", "유저매칭POST 실패")
     }
 
     override fun onMatchingLikePatchSuccess() {
@@ -182,7 +185,7 @@ class MatchingFragment : Fragment(), MatchingPostView {
     }
 
     override fun onMatchingLikePatchFailure() {
-        Log.d("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 좋아요 실패 ㅠㅠ")
+        Log.e("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 좋아요 실패 ㅠㅠ")
     }
 
     override fun onMatchingUnLikePatchSuccess() {
@@ -190,7 +193,23 @@ class MatchingFragment : Fragment(), MatchingPostView {
     }
 
     override fun onMatchingUnLikePatchFailure() {
-        Log.d("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 싫어요 실패 ㅠㅠ ")
+        Log.e("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 싫어요 실패 ㅠㅠ ")
+    }
+
+    override fun onMatchingRequestFailure() {
+        Log.e("NETWORK_MATCHING_FAILURE_GOBACK","네트워크 요청이 실패하여 이전 화면으로 이동합니다. ")
+        // 이전 프래그먼트로 돌아감
+        findNavController().navigateUp()
+        // AlertDialog 생성 및 표시
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("네트워크 오류")
+            setMessage("네트워크 요청이 실패했습니다.")
+            setPositiveButton("확인") { dialog, which ->
+                // 여기서 아무 것도 하지 않음
+            }
+            create()
+            show()
+        }
     }
 
     private fun getIdFromSharedPreferences(context: Context): Int? {
