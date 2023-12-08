@@ -62,13 +62,13 @@ class MatchingFragment : Fragment(), MatchingPostView {
 
                 if (direction == Direction.Right) {
                     matchingService.likeMatch(currentMatchId) { response ->
-                        Toast.makeText(context, "매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "${currentMatchId}매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 if (direction == Direction.Left) {
                     matchingService.disLikeMatch(currentMatchId) { response ->
-                        Toast.makeText(context, "매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "${currentMatchId}매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
