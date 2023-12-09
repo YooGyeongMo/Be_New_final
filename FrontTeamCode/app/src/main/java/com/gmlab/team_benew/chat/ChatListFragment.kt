@@ -19,6 +19,9 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ChatListFragment: Fragment() {
+    private lateinit var chatAdapter:ChatlistAdapter
+
+
 
     private var listSize:Int=0
     //private lateint var recyclerView: RecyclerView
@@ -26,10 +29,12 @@ class ChatListFragment: Fragment() {
     //private var getMymodel?
     //val binding by lazy{ FragmentChatlistBinding.inflate(layoutInflater)}
 
-
     private var binding:FragmentChatlistBinding?=null
 
-    override fun onCreateView(//뷰가 처음 시작될 때
+    //private lateinit var userId : Int
+    private var userId: Int? = null
+    private var token : String? = null
+    override fun onCreateView(//뷰가 처음 시작될 때, 일단 얘는 앱에서 실행됨
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState:Bundle?
@@ -37,7 +42,18 @@ class ChatListFragment: Fragment() {
        //binding = FragmentChatlistBinding.inflate(inflater,container,false)
         //return binding?.root
         binding = FragmentChatlistBinding.inflate(inflater, container, false)
+
+
+
+
+
+
         return binding?.root
+
+        //if(userId!=null){
+        //    getChatRoomList(userId)
+        //}
+
         //return inflater.inflate(R.layout.fragment_chatlist, container, false)
         //val binding=FragmentChatlistBinding.inflate(inflater,container,false)
         //return binding.root
@@ -49,8 +65,30 @@ class ChatListFragment: Fragment() {
         //return binding.root
        // return inflater.inflate(R.layout.fragment_chatlist, container, false)
         //loadData()
-
         //return binding.root
+    }
+
+
+    //onViewCreated는 onCreateView에 의해 완전히 생성된 뷰가 준비된 후 호출되므로, 이 메서드에서 뷰와 관련된 초기화 및 설정 작업을 수행
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if(isAdded){
+            chatAdapter=ChatlistAdapter()
+            binding?.myRecyclerViewChat?.apply{
+                adapter = chatAdapter
+                binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
+            }
+        }
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+
+        token = sharedPref?.getString("userToken", "")
+        userId = sharedPref?.getInt("loginId", 0)
+
+     userId?.let{
+
+         getChatRoomList(it)
+     }
     }
 
 
@@ -62,11 +100,11 @@ class ChatListFragment: Fragment() {
 
     // }
 
-    private fun setAdapter(chatList:List<chatdata>){
-        val chatAdapter=ChatlistAdapter(chatList,requireContext())//여기서 데이터를 바인딩 함
-        binding?.myRecyclerViewChat?.adapter=chatAdapter
-        binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
-    }
+    //private fun setAdapter(chatList:List<chatdata>){
+        //val chatAdapter=ChatlistAdapter(chatList,requireContext())//여기서 데이터를 바인딩 함
+        //binding?.myRecyclerViewChat?.adapter=chatAdapter
+        //binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
+    //}
     //카드뷰 동적으로 생성하기
     //여기서 레트로핏 통신으로 get 해서 데이터 불러오기
 
@@ -74,7 +112,7 @@ class ChatListFragment: Fragment() {
 
     //chatroomlist가져오는 함수
     private fun getChatRoomList(userId: Int) {
-        val token = getTokenFromSharedPreferences()
+
         val service = getRetrofit().create(ChatListRoomGet_Interface::class.java)
         if (userId != null && token != null) {
             val call: Call<List<ChatRoomListModelItem>> = service.getChatRoomList("Bearer $token", userId)
@@ -83,8 +121,10 @@ class ChatListFragment: Fragment() {
                     call: Call<List<ChatRoomListModelItem>>,
                     response: Response<List<ChatRoomListModelItem>>
                 ) {
+                    Log.d("network success","통신 성공")
                     when (response.code()) {
                         200 -> {
+
                             val jsonStringList:List<ChatRoomListModelItem>?=response.body()
 
                             jsonStringList?.let{
@@ -94,8 +134,17 @@ class ChatListFragment: Fragment() {
 
                                     val chatItem=chatdata(roomId=chatRoomItem.roomId, name=chatRoomItem.name)
                                     chatDataList.add(chatItem)
+
+                                    updateUIChatlst(chatDataList)
                                     // 변환된 데이터 리스트를 어댑터에 전달
-                                    setAdapter(chatDataList)
+
+
+
+                                    //그러면 이거 또 써야함//
+                                    //chatAdapter.modelList=chatDataList
+                                    //chatAdapter.notifyDataSetChanged()
+
+                                    //setAdapter(chatDataList)
                                 }
                             }
 
@@ -116,21 +165,27 @@ class ChatListFragment: Fragment() {
         }
     }
 
+    fun updateUIChatlst(chatList: MutableList<chatdata>)
+    {
+        chatAdapter.modelList = chatList
+        chatAdapter.notifyDataSetChanged()
+    }
+
 
 //여기까지가 레트로핏 통신 함수임
     private fun getLoginIdFromSharedPreferences():Int?{
-        val sharedPref=activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val sharedPref=context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref?.getInt("loginId",-1)
-
     }
     private fun getTokenFromSharedPreferences(): String? {
-        val sharedPref = activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref?.getString("userToken", null)
     }
 
     // SharedPreferences에서 account 가져오는 함수
     private fun getAccountFromSharedPreferences(): String? {
-        val sharedPref = activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref?.getString("userAccount", null)
     }
 
