@@ -85,9 +85,16 @@
         android:id="@+id/navigation_chat"
         android:name="com.gmlab.team_benew.chat.ChatFragment"
         android:label="ChatFragment" />
+
     <fragment
         android:id="@+id/navigation_notification"
         android:name="com.gmlab.team_benew.main.notification.NotificationFragment"
         android:label="NotificationFragment" />
 
+    <fragment
+        android:id="@+id/chatListFragment"
+        android:name="com.gmlab.team_benew.teamproject.ProjectListFragment"
+        android:label="project_list_fragment" />
+    <fragment android:id="@+id/placeholder" />
 </navigation>
+
