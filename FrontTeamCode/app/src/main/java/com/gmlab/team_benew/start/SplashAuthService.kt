@@ -40,7 +40,8 @@ class SplashAuthService(private  val context: Context) {
                             //
                         }
                         else {
-                            Log.e("TOKEN/UNEQUAL/ERROR" , "서버 토큰과 기존의 토큰이 맞지않음")
+                            splashView.onTokenCheckFailure()
+                            Log.e("TOKEN/UNEQUAL/ERROR","서버 토큰과 기존의 토큰이 맞지않음")
                         }
                     }
                     401 -> {
