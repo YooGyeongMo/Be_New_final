@@ -77,7 +77,14 @@ class SplashActivity: AppCompatActivity(),SplashView{
     }
 
     override fun onTokenCheckFailure() {
-        Log.d("TokenCheck/FAILURE", "401 토큰이 유효하지 않습니다")
+        Toast.makeText(this, "인증이 되지 않은 사용자입니다. 401 에러입니다.", Toast.LENGTH_LONG).show()
+        startActivity(Intent(this, IntroActivity::class.java))
+        //토큰 유효하지 않을 시 sharedpreferences 새로운 토큰으로 패치
+        finish()
+    }
+
+    override fun onTokenCheckElseFailure() {
+        Toast.makeText(this, "알 수 없는 에러입니다.", Toast.LENGTH_LONG).show()
         startActivity(Intent(this, IntroActivity::class.java))
         //토큰 유효하지 않을 시 sharedpreferences 새로운 토큰으로 패치
         finish()

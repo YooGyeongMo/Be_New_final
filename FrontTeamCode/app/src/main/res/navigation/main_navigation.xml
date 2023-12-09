@@ -89,4 +89,5 @@
         android:id="@+id/navigation_notification"
         android:name="com.gmlab.team_benew.main.notification.NotificationFragment"
         android:label="NotificationFragment" />
+
 </navigation>

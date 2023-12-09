@@ -3,6 +3,7 @@ package com.gmlab.team_benew.start
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import com.gmlab.team_benew.auth.AuthResponse
 import com.gmlab.team_benew.auth.AuthRetrofitInterface
 import com.gmlab.team_benew.auth.LoginActivity
@@ -40,14 +41,17 @@ class SplashAuthService(private  val context: Context) {
                             //
                         }
                         else {
-                            Log.e("TOKEN/UNEQUAL/ERROR" , "서버 토큰과 기존의 토큰이 맞지않음")
+                            splashView.onTokenCheckFailure()
                         }
                     }
                     401 -> {
+                        Log.e("TOKEN/AUTHORIZATION/ERROR" , "${response.code()} 인증되지 않은 사용자 오류 에러")
                         splashView.onTokenCheckFailure()
+
                     }
                     else -> {
                         Log.e("TokenCheck/FAILURE" , "${response.code()}스플래쉬 네트워크 오류 에러")
+                        splashView.onTokenCheckElseFailure()
                     }
                 }
             }
