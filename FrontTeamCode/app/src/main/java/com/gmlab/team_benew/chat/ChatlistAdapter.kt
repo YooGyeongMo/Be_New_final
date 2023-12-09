@@ -40,9 +40,10 @@ class ChatlistAdapter:RecyclerView.Adapter<Holder>() {
             bundle.putString("roomId", modelList[position].roomId)
 
             val chatFragment = ChatFragment()
-            chatFragment.arguments = bundle parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_bundle, ChatFragment())
-                .commit()
+            //chatFragment.arguments = bundle parentFragmentManager.beginTransaction()
+              //  .replace(R.id.fragment_container_bundle, ChatFragment())
+                //
+        // .commit()
 
             //val transaction = supportFragmentManager.beginTransaction()
 
