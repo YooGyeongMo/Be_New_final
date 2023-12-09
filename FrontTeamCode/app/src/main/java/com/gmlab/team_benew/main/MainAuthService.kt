@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.Log
 import com.gmlab.team_benew.auth.AuthRetrofitInterface
 
-import com.gmlab.team_benew.auth.TokenGet
 import com.gmlab.team_benew.auth.UserGet
 import com.gmlab.team_benew.auth.getRetrofit
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,11 +15,13 @@ import retrofit2.Response
 class MainAuthService(private val context: HomeFragment) {
 
     private lateinit var mainView: MainView
+
     private var userNameCallback: UserNameCallback? = null
 
     fun setMainView(mainView: MainView) {
         this.mainView = mainView
     }
+
 
     fun setUserNameCallback(callback: UserNameCallback) {
         this.userNameCallback = callback
@@ -52,5 +54,6 @@ class MainAuthService(private val context: HomeFragment) {
 
         })
     }
+
 
 }

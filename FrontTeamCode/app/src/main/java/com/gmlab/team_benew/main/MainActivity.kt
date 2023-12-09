@@ -5,15 +5,22 @@
     import android.util.Log
     import android.view.Menu
     import android.view.MenuItem
+    import android.view.View
     import androidx.appcompat.app.AppCompatActivity
     import androidx.navigation.findNavController
     import androidx.navigation.fragment.findNavController
     import androidx.navigation.ui.setupWithNavController
     import com.gmlab.team_benew.R
     import com.google.android.material.bottomnavigation.BottomNavigationView
+    import kotlinx.coroutines.*
+    import okhttp3.ResponseBody
 
 
-    class MainActivity : AppCompatActivity() { //compat 호환성을 해준다는 이야기
+    class MainActivity : AppCompatActivity(),MainLiveAlarmsView { //compat 호환성을 해준다는 이야기
+
+        private var redDot: View? = null
+
+        private lateinit var mainAlarmsGetService: MainAlarmsGetService
 
         //lifecycle 콜백함수
         override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,28 +40,79 @@
                 ?.findNavController() // 참조를 반환, find or get 존재하지않을수 있으니 safe call 컨트롤러
             navController?.let {
                 bottomNavigationView.setupWithNavController(it) //navHostFragment에서 관리하는 controller
+
+            }
+
+
+            mainAlarmsGetService = MainAlarmsGetService(this)
+            mainAlarmsGetService.setMainLiveAlarmsView(this)
+
+            // 5초 후에 폴링 시작
+            startPolling()
+
+        }
+        private fun checkAlarmsOnce() {
+            mainAlarmsGetService.getUserAlarms(this)
+        }
+
+        private fun startPolling(){
+            GlobalScope.launch(Dispatchers.IO) {
+                while (isActive) {
+                    delay(5000) // 5초마다 반복
+                    mainAlarmsGetService.getUserAlarms(this@MainActivity)
+                }
             }
         }
 
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
-            menuInflater.inflate(com.gmlab.team_benew.R.menu.menu_toolbar, menu)
+            // 액티비티 시작 시 처음으로 알람 확인
+            checkAlarmsOnce()
+            menuInflater.inflate(R.menu.menu_toolbar, menu)
+
+            val notificationItem = menu.findItem(R.id.item1)
+            val chatItem = menu.findItem(R.id.item2)
+
+            val notificationActionView = notificationItem.actionView
+            redDot = notificationActionView?.findViewById(R.id.red_dot_notification)
+            val chatActionView = chatItem.actionView
+
+            notificationActionView?.setOnClickListener { navigateToFragment(R.id.navigation_notification) }
+            chatActionView?.setOnClickListener { navigateToFragment(R.id.navigation_chatList) }
+
             return true
         }
 
+        private fun navigateToFragment(fragmentId: Int) {
+            findNavController(R.id.Fragment_container).navigate(fragmentId)
+        }
 
-        override fun onOptionsItemSelected(item: MenuItem): Boolean {
-            if (item.itemId == com.gmlab.team_benew.R.id.item1) {
-                // notification 프래그먼트로 이동
-                val navController = findNavController(com.gmlab.team_benew.R.id.Fragment_container)
-                navController.navigate(com.gmlab.team_benew.R.id.navigation_notification)
-                return true
+        private fun updateRedDot(body: ResponseBody) {
+            val count = parseResponse(body)
+            GlobalScope.launch(Dispatchers.Main) {
+                if (count > 0) {
+                    redDot?.visibility = View.VISIBLE
+                    Log.d("MAIN/LIVE/ALARMS/SUCCESS","알람 갯수 데이터 1개이상 정상성공")
+                } else {
+                    redDot?.visibility = View.GONE
+                    Log.d("MAIN/LIVE/ALARMS/SUCCESS","알람 갯수 데이터 0개 정상성공")
+                }
             }
-            else if(item.itemId==R.id.item2){
-                val navController=findNavController(R.id.Fragment_container)
-                navController.navigate(R.id.navigation_chatList)
-                return true
-            }
-            return super.onOptionsItemSelected(item)
+        }
+
+
+        private fun parseResponse(body: ResponseBody): Int {
+            // 서버 응답에서 알람 개수를 파싱하는 로직 구현
+            return body.string().toIntOrNull() ?: 0
+        }
+
+        // MainAlarmsGetService에서 알람 확인이 성공적일 때 호출되는 함수
+        override fun onMainLiveAlarmsGetSuccess(responseBody: ResponseBody) {
+            updateRedDot(responseBody)
+        }
+
+
+        override fun onMainLiveAlarmsGetFailure() {
+            Log.e("MAIN/LIVE/ALARMS/FAILURE","알람 갯수 데이터 실패")
         }
 
 //        private fun showAlertDialog()

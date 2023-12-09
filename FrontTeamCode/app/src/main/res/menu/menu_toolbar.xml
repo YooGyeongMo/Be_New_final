@@ -5,15 +5,14 @@
         android:id="@+id/item1"
         android:enabled="true"
         android:title="메뉴1"
-        android:icon="@drawable/notification_bell"
+        app:actionLayout="@layout/menuitem_notification_setting"
         app:showAsAction="always"/>
 
     <item
         android:id="@+id/item2"
         android:enabled="true"
-        android:icon="@drawable/comments"
+        app:actionLayout="@layout/menuitem_comments_chat_setting"
         android:title="메뉴2"
         app:showAsAction="always"/>
-
 
 </menu>
