@@ -19,7 +19,6 @@ class ChatlistAdapter(private val mainActivity: MainActivity):RecyclerView.Adapt
     var modelList=mutableListOf<chatdata>()
 
 
-
     //뷰홀더에 쓰일 레이아웃 인플레이트
     //뷰그룹의 context써서
     //뷰홀더 새로 만들때마다 이거 호출
@@ -34,51 +33,27 @@ class ChatlistAdapter(private val mainActivity: MainActivity):RecyclerView.Adapt
     //뷰홀더를 데이터와 연결할때 호출함
     override fun onBindViewHolder(holder: Holder, position: Int) {
        val item=modelList[position]
-        holder.bind(item)
-        //val item=holder.bind(modelList[position])//이거는 데이터 연결하는 거
-        //holder.bind(item)
+        //val item=holder.bind(modelList[position])
         //holder.bind(this.modelList[position])
+        holder.bind(item)
         holder.itemView.setOnClickListener{
            // Toast.makeText(holder.itemView.context, "Clicked: ${modelList[position].name},${modelList[position].roomId}", Toast.LENGTH_SHORT).show()
 
 
+<<<<<<< HEAD
             val chatFragment= ChatFragment().apply {
+=======
+            //이부분이 bundle사용해서 roomId저장하는 부분
+            val chatFragment=ChatFragment().apply {
+>>>>>>> c6195be3975d61204f63185255138cfb730eaace
                 arguments=Bundle().apply {
-                    //val x="hello"
                     putString("roomId",modelList[position].roomId)
-                    //modelList[position].roomId
                     //holder.chatRoomId.toString()
 
                 }
             }
             mainActivity.fragmentChange_for_adapter(chatFragment)
 
-
-           // var fragment: Fragment =ChatFragment()
-           // var bundle:Bundle=Bundle()
-           // bundle.putString("roomId",holder.chatroomtext.toString())
-
-           // fragment.arguments=bundle parentFragmentManager.
-            //fragment.arguments=bundle//이거는 chatFragment()에 arguments를 이용해서 bundle을 설정함
-            //Log.d("카드뷰 클릭됨","카드뷰 클릭됨")
-           // Log.d("토스트메세지 출력됨","토스트메세지 출력됨")
-            //onItemClick(item)
-            //Log.d("람다함수 호출됨","람다함수 호출됨")
-
-            //val bundle = Bundle()
-            //bundle.putString("roomId", modelList[position].roomId)
-
-            //val chatFragment = ChatFragment()
-            //chatFragment.arguments = bundle parentFragmentManager.beginTransaction()
-              //  .replace(R.id.fragment_container_bundle, ChatFragment())
-
-         //.commit()
-
-            //val transaction = supportFragmentManager.beginTransaction()
-
-           // val chatFragment : ChatFragment = ChatFragment()
-         //   transaction.replace(R.id.fragmentContainer, chatFragment)
-           // transaction.commit()
         }
     }
 

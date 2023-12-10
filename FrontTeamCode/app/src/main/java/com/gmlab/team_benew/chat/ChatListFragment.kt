@@ -22,17 +22,12 @@ import retrofit2.Response
 class ChatListFragment: Fragment() {
     private lateinit var chatAdapter:ChatlistAdapter
 
-
-
     private var listSize:Int=0
-    //private lateint var recyclerView: RecyclerView
 
-    //private var getMymodel?
     //val binding by lazy{ FragmentChatlistBinding.inflate(layoutInflater)}
 
     private var binding:FragmentChatlistBinding?=null
 
-    //private lateinit var userId : Int
     private var userId: Int? = null
     private var token : String? = null
     override fun onCreateView(//뷰가 처음 시작될 때, 일단 얘는 앱에서 실행됨
@@ -47,22 +42,6 @@ class ChatListFragment: Fragment() {
         binding = FragmentChatlistBinding.inflate(inflater, container, false)
         return binding?.root
 
-        //if(userId!=null){
-        //    getChatRoomList(userId)
-        //}
-
-        //return inflater.inflate(R.layout.fragment_chatlist, container, false)
-        //val binding=FragmentChatlistBinding.inflate(inflater,container,false)
-        //return binding.root
-        //val mymodellist=  //여기에 레트로핏 통신한 걸 리턴해야함
-        //val adapter1 = ChatlistAdapter()//어댑터 적용
-        //adapter1.modelList=mymodellist
-        //binding.myRecyclerViewChat.adapter=adapter1
-        //binding.myRecyclerViewChat.layoutManager= LinearLayoutManager(context)
-        //return binding.root
-       // return inflater.inflate(R.layout.fragment_chatlist, container, false)
-        //loadData()
-        //return binding.root
     }
 
 
@@ -121,25 +100,6 @@ class ChatListFragment: Fragment() {
      }
     }
 
-
-    //override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    // super.onViewCreated(view, savedInstanceState)
-
-    // setAdapter()
-
-
-    // }
-
-    //private fun setAdapter(chatList:List<chatdata>){
-        //val chatAdapter=ChatlistAdapter(chatList,requireContext())//여기서 데이터를 바인딩 함
-        //binding?.myRecyclerViewChat?.adapter=chatAdapter
-        //binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
-    //}
-    //카드뷰 동적으로 생성하기
-    //여기서 레트로핏 통신으로 get 해서 데이터 불러오기
-
-
-
     //chatroomlist가져오는 함수
     private fun getChatRoomList(userId: Int) {
 
@@ -166,20 +126,8 @@ class ChatListFragment: Fragment() {
                                     chatDataList.add(chatItem)
 
                                     updateUIChatlst(chatDataList)
-                                    // 변환된 데이터 리스트를 어댑터에 전달
-
-
-
-                                    //그러면 이거 또 써야함//
-                                    //chatAdapter.modelList=chatDataList
-                                    //chatAdapter.notifyDataSetChanged()
-
-                                    //setAdapter(chatDataList)
                                 }
                             }
-
-
-
                         }
                         else -> {
                             // 다른 HTTP 응답 코드에 대한 처리

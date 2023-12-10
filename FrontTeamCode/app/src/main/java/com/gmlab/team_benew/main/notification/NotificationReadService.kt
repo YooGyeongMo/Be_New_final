@@ -16,38 +16,41 @@ class NotificationReadService {
         this.notificationReadView = notificationReadView
     }
 
-    fun alarmsRead(context: Context, alaramId: Long){
+    suspend fun alarmsRead(context: Context, alaramId: Long): Response<ResponseBody>{
         val token = getTokenFromSharedPreferences(context)
         val bearerToken = "Bearer $token"
         val userId = getIdFromSharedPreferences(context)?.toLong() ?: -1L
 
         val notificationService = getRetrofit().create(NotificationPutRetrofitInterface::class.java)
-        notificationService.alarmsPut(bearerToken, userId, alaramId).enqueue(object:
-            Callback<ResponseBody>{
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                Log.d("NETWORK_SUCCESS_ALARMS_READ","USER_MATCHING_READ_ALARMS_네트워크성공")
-                when(response.code()){
-                    200 -> {
-                        notificationReadView.onNotificationReadSuccess()
-                    }
-                    401-> {
-                        Log.e("NotificationRead/401", "401 ERROR ${response.code()}")
-                        notificationReadView.onNotificationReadFailure()
-                    }
-                    else-> {
-                        Log.e("NotificationRead/ERROR", "ERROR ${response.code()}")
-                        notificationReadView.onNotificationReadFailure()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("NETWORK_FAILURE_ALARMS_READ","USER_MATCHING_READ_ALARMS_네트워크실패")
-                notificationReadView.onNotificationReadFailure()
-            }
-
-        })
+        return notificationService.alarmsPut(bearerToken, userId, alaramId).execute()
     }
+
+
+
+//    Callback<ResponseBody>{
+//        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+//            Log.d("NETWORK_SUCCESS_ALARMS_READ","USER_MATCHING_READ_ALARMS_네트워크성공")
+//            when(response.code()){
+//                200 -> {
+//                    notificationReadView.onNotificationReadSuccess()
+//                }
+//                401-> {
+//                    Log.e("NotificationRead/401", "401 ERROR ${response.code()}")
+//                    notificationReadView.onNotificationReadFailure()
+//                }
+//                else-> {
+//                    Log.e("NotificationRead/ERROR", "ERROR ${response.code()}")
+//                    notificationReadView.onNotificationReadFailure()
+//                }
+//            }
+//        }
+//
+//        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+//            Log.e("NETWORK_FAILURE_ALARMS_READ","USER_MATCHING_READ_ALARMS_네트워크실패")
+//            notificationReadView.onNotificationReadFailure()
+//        }
+//
+//    })
 
     private fun getTokenFromSharedPreferences(context: Context): String? {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
