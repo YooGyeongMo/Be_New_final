@@ -14,23 +14,19 @@ class ChatFragment:Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //val roomId = arguments?.getString("roomId")
 
-        //val roomId_bundle=view.findViewById<TextView>(R.id.hello)
-
-        //roomId_bundle.setText(roomId)
         return inflater.inflate(R.layout.fragment_chatting, container, false)
 
-        //val view:View=inflater.inflate(R.layout.fragment_chatting, container, false)
+
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    //override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //super.onViewCreated(view, savedInstanceState)
 
-        val room=arguments?.getString("roomId")
+        //val room=arguments?.getString("roomId")
 
-        val roomIdTextView=view.findViewById<TextView>(R.id.hello)
-        roomIdTextView.text=room
-    }
+       // val roomIdTextView=view.findViewById<TextView>(R.id.hello)
+        //roomIdTextView.text=room
+   // }
 
 }
