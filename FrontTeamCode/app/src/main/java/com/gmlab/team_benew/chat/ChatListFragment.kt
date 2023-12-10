@@ -14,6 +14,7 @@ import com.gmlab.team_benew.chat.retrofit.ChatListRoomGet_Interface
 import com.gmlab.team_benew.chat.retrofit.ChatRoomListModelItem
 import com.gmlab.team_benew.chat.retrofit.chatdata
 import com.gmlab.team_benew.databinding.FragmentChatlistBinding
+import com.gmlab.team_benew.main.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,15 +40,11 @@ class ChatListFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState:Bundle?
     ): View?{
-       //binding = FragmentChatlistBinding.inflate(inflater,container,false)
+        Log.d("oncreateview","oncreateview 시작")
+
+        //binding = FragmentChatlistBinding.inflate(inflater,container,false)
         //return binding?.root
         binding = FragmentChatlistBinding.inflate(inflater, container, false)
-
-
-
-
-
-
         return binding?.root
 
         //if(userId!=null){
@@ -69,17 +66,50 @@ class ChatListFragment: Fragment() {
     }
 
 
-    //onViewCreated는 onCreateView에 의해 완전히 생성된 뷰가 준비된 후 호출되므로, 이 메서드에서 뷰와 관련된 초기화 및 설정 작업을 수행
+    //onViewCreated는 onCreateView에 의해 완전히 생성된 뷰가 준비된 후 호출되므로, 이 메서드에서 뷰와 관련된 초기화 및 설정 작업을 수행ㅐㅜㅍ
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(isAdded){
+        val mainActivity=activity as? MainActivity
+        mainActivity?.let{
+            chatAdapter= ChatlistAdapter(it)
+            binding?.myRecyclerViewChat?.apply {
+                adapter=chatAdapter
+                layoutManager=LinearLayoutManager(requireContext())
+            }
+        }
+       //Log.d("onViewCreated","onViewCreated")
+
+        //Log.d("이제 람다함수 실행됨","이제 람다함수 실행됨")
+
+        /*chatAdapter= ChatlistAdapter {
+            chatItem->
+            val bundle=Bundle().apply{
+                putString("roomId",chatItem.roomId)
+            }
+            val chatFragment=ChatFragment().apply {
+                arguments=bundle
+            }
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.Fragment_container,chatFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+        Log.d("전환됨","전환됨")*/
+
+       /*if(isAdded){
             chatAdapter=ChatlistAdapter()
             binding?.myRecyclerViewChat?.apply{
                 adapter = chatAdapter
-                binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
+                //binding?.myRecyclerViewChat?.layoutManager=LinearLayoutManager(requireContext())
+                layoutManager=LinearLayoutManager(requireContext())
             }
-        }
+        }*/
+        /*binding?.myRecyclerViewChat?.apply {
+            //adapter=chatAdapter
+            adapter=this@ChatListFragment.chatAdapter
+            layoutManager=LinearLayoutManager(requireContext())
+        }*/
         val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
         token = sharedPref?.getString("userToken", "")

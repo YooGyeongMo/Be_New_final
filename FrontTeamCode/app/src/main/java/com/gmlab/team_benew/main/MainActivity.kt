@@ -7,6 +7,7 @@
     import android.view.MenuItem
     import android.view.View
     import androidx.appcompat.app.AppCompatActivity
+    import androidx.fragment.app.Fragment
     import androidx.navigation.findNavController
     import androidx.navigation.fragment.findNavController
     import androidx.navigation.ui.setupWithNavController
@@ -114,6 +115,12 @@
         override fun onMainLiveAlarmsGetFailure() {
             Log.e("MAIN/LIVE/ALARMS/FAILURE","알람 갯수 데이터 실패")
         }
+
+        fun fragmentChange_for_adapter(frag: Fragment){
+            supportFragmentManager.beginTransaction().replace(R.id.Fragment_container,frag).commit()
+
+        }
+
 
 //        private fun showAlertDialog()
 //        {
