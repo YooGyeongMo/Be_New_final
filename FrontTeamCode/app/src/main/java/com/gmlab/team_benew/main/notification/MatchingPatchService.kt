@@ -24,7 +24,7 @@ class MatchingPatchService {
         val token = getTokenFromSharedPreferences(context)
         val bearerToken = "Bearer $token"
         val service = getRetrofit().create(MatchingAlarmsReadRetrofitInterface::class.java)
-        return service.matchingAlarmsAccess(bearerToken, senderId, receiverId)
+        return service.matchingAlarmsAccess(bearerToken, senderId, receiverId).execute()
         //비동기 로직
         //        service.matchingAlarmsAccess(bearerToken, senderId, receiverId).enqueue(object: Callback<MatchingAlarmResponse> {
 //            override fun onResponse(call: Call<MatchingAlarmResponse>, response: Response<MatchingAlarmResponse>) {
@@ -55,7 +55,7 @@ class MatchingPatchService {
         val bearerToken = "Bearer $token"
         val service = getRetrofit().create(MatchingAlarmsReadRetrofitInterface::class.java)
 //동기로직
-        return service.matchingAlarmsReject(bearerToken, senderId, receiverId)
+        return service.matchingAlarmsReject(bearerToken, senderId, receiverId).execute()
         //비동기 로직
         //        service.matchingAlarmsReject(bearerToken, senderId, receiverId).enqueue(object:
 //            Callback<MatchingAlarmResponse> {

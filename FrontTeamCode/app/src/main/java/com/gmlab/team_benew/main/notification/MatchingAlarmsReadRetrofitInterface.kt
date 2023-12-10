@@ -14,7 +14,7 @@ interface MatchingAlarmsReadRetrofitInterface {
     fun matchingAlarmsAccess(
         @Header("Authorization") bearerToken: String,
         @Path("sender") sender: Long,
-        @Path("receiver") receiver: Long): Response<MatchingAlarmResponse>
+        @Path("receiver") receiver: Long): Call<MatchingAlarmResponse>
     //        @Path("receiver") receiver: Long): Call<MatchingAlarmResponse> 비동기
 
     //알람매칭거절 동기로 바꿈 PutAlarams과 동기적으로 작동해야함 그래서 Call로 받는것이 아닌Reponse로 던져줌
@@ -22,6 +22,6 @@ interface MatchingAlarmsReadRetrofitInterface {
     fun matchingAlarmsReject(
         @Header("Authorization") bearerToken: String,
         @Path("sender") sender: Long,
-        @Path("receiver") receiver: Long): Response<MatchingAlarmResponse>
+        @Path("receiver") receiver: Long): Call<MatchingAlarmResponse>
 //        @Path("receiver") receiver: Long): Call<MatchingAlarmResponse> 비동기
 }

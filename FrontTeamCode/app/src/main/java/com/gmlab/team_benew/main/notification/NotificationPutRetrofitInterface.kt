@@ -14,6 +14,6 @@ interface NotificationPutRetrofitInterface {
     @PUT("/alarms/{userId}/{alarmId}/read")
     fun alarmsPut(@Header("Authorization") bearerToken: String,
                   @Path("userId") userId: Long,
-                  @Path("alarmId") alarmId: Long): Response<ResponseBody>
+                  @Path("alarmId") alarmId: Long): Call<ResponseBody>
 
 }

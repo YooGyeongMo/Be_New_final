@@ -22,7 +22,7 @@ class NotificationReadService {
         val userId = getIdFromSharedPreferences(context)?.toLong() ?: -1L
 
         val notificationService = getRetrofit().create(NotificationPutRetrofitInterface::class.java)
-        return notificationService.alarmsPut(bearerToken, userId, alaramId)
+        return notificationService.alarmsPut(bearerToken, userId, alaramId).execute()
     }
 
 

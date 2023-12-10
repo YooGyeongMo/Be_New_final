@@ -115,7 +115,10 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
                 }
             } catch (e: Exception) {
                 Log.e("NETWORK_FAILURE_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크실패")
-                onNotificationReadFailure()
+                Log.e("NETWORK_FAILURE_ALARMS_READ", "Error during network call", e)
+                withContext(Dispatchers.Main) {
+                    onNotificationReadFailure()
+                }
             } finally {
                 //어쨋든 이 함수하다가 실패하거나 성공안해도 버튼 중복은 false가 되어야하기에
                 requestLock = false
@@ -179,7 +182,7 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
             try {
                 val readResponse =
                     notificationReadService.alarmsRead(requireContext(), notification.id)
-                Log.d("NETWORK_SUCCESS_ALARMS_PATCH_수락", "USER_MATCHING_PATCH_수락_네트워크성공")
+                Log.d("NETWORK_SUCCESS_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크성공")
                 when (readResponse.code()) {
                     200 -> {
                         onNotificationReadSuccess() // 읽기성공
@@ -205,7 +208,9 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
                 }
             } catch (e: Exception) {
                 Log.e("NETWORK_FAILURE_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크실패")
-                onNotificationReadFailure()
+                withContext(Dispatchers.Main) {
+                    onNotificationReadFailure()
+                }
             } finally {
                 //어쨋든 이 함수하다가 실패하거나 성공안해도 버튼 중복은 false가 되어야하기에
                 requestLock = false
@@ -225,18 +230,18 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
                 }
 
                 401 -> {
-                    Log.e("NotificationPATCH/수락/ERROR", "401 ERROR ${matchResponse.code()}")
+                    Log.e("NotificationPATCH/거절/ERROR", "401 ERROR ${matchResponse.code()}")
                     onMatchingAlarmsRejectFailure()
 
                 }
 
                 500 -> {
-                    Log.e("NotificationPATCH/수락/ERROR", "500 ERROR ${matchResponse.code()}")
+                    Log.e("NotificationPATCH/거절/ERROR", "500 ERROR ${matchResponse.code()}")
                     onMatchingAlarmsRejectFailure()
                 }
 
                 else -> {
-                    Log.e("NotificationPATCH/수락/ERROR", " ERROR ${matchResponse.code()}")
+                    Log.e("NotificationPATCH/거절/ERROR", " ERROR ${matchResponse.code()}")
                     onMatchingAlarmsRejectFailure()
                 }
             }
@@ -272,16 +277,18 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
     }
 
     override fun onNotificationReadFailure() {
-        findNavController().navigateUp()
-        // AlertDialog 생성 및 표시
-        AlertDialog.Builder(requireContext()).apply {
-            setTitle("네트워크 오류")
-            setMessage("네트워크 요청이 실패했습니다.")
-            setPositiveButton("확인") { dialog, which ->
-                // 여기서 아무 것도 하지 않음
+        CoroutineScope(Dispatchers.Main).launch {
+            findNavController().navigateUp()
+            // AlertDialog 생성 및 표시
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle("네트워크 오류")
+                setMessage("네트워크 요청이 실패했습니다.")
+                setPositiveButton("확인") { dialog, which ->
+                    // 여기서 아무 것도 하지 않음
+                }
+                create()
+                show()
             }
-            create()
-            show()
         }
     }
 
