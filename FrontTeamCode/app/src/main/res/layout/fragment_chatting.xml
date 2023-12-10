@@ -19,9 +19,9 @@
         android:id="@+id/btn_chatting_send"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="#9500FF"
-        android:textColor="@color/white"
+        android:background="#673AB7"
         android:text="보내기"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/et_chatting_sendMsg" />
