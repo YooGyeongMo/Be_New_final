@@ -16,17 +16,15 @@ class ChatFragment:Fragment() {
     ): View? {
 
         return inflater.inflate(R.layout.fragment_chatting, container, false)
-
-
     }
 
     //override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //super.onViewCreated(view, savedInstanceState)
 
-        //val room=arguments?.getString("roomId")
+        //val room=arguments?.getString("roomId") 이거는 chatFragment 에서 putstring한 roomId가져오는거
 
-       // val roomIdTextView=view.findViewById<TextView>(R.id.hello)
-        //roomIdTextView.text=room
+       // val roomIdTextView=view.findViewById<TextView>(R.id.hello) 이거랑 밑에 줄은 가져온 roomId를 fragment_chat에 띄워보는 거
+    //roomIdTextView.text=room
    // }
 
 }
