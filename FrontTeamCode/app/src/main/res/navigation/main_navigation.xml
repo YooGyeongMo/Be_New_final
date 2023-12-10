@@ -83,7 +83,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_chat"
-        android:name="com.gmlab.team_benew.chat.ChatFragment"
+        android:name="com.gmlab.team_benew.chat.socket.ChatFragment"
         android:label="ChatFragment" />
 
     <fragment

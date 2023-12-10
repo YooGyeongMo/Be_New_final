@@ -1,15 +1,11 @@
 package com.gmlab.team_benew.chat
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
-import android.util.Log
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.gmlab.team_benew.R
 import com.gmlab.team_benew.chat.retrofit.chatdata
+import com.gmlab.team_benew.chat.socket.ChatFragment
 import com.gmlab.team_benew.databinding.ChatRecyclerItemBinding
 import com.gmlab.team_benew.main.MainActivity
 
@@ -46,7 +42,7 @@ class ChatlistAdapter(private val mainActivity: MainActivity):RecyclerView.Adapt
            // Toast.makeText(holder.itemView.context, "Clicked: ${modelList[position].name},${modelList[position].roomId}", Toast.LENGTH_SHORT).show()
 
 
-            val chatFragment=ChatFragment().apply {
+            val chatFragment= ChatFragment().apply {
                 arguments=Bundle().apply {
                     //val x="hello"
                     putString("roomId",modelList[position].roomId)
