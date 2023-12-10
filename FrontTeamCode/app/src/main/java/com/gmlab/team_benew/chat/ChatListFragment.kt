@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.auth.getRetrofit
@@ -49,14 +50,15 @@ class ChatListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val mainActivity=activity as? MainActivity
-        mainActivity?.let{
-            chatAdapter= ChatlistAdapter(it)
-            binding?.myRecyclerViewChat?.apply {
-                adapter=chatAdapter
-                layoutManager=LinearLayoutManager(requireContext())
-            }
+        // ChatlistAdapter 생성시 NavController에 전달
+        chatAdapter = ChatlistAdapter(findNavController())
+
+        //RecyclerView 설정
+        binding?.myRecyclerViewChat?.apply {
+            adapter = chatAdapter
+            layoutManager = LinearLayoutManager(requireContext())
         }
+
        //Log.d("onViewCreated","onViewCreated")
 
         //Log.d("이제 람다함수 실행됨","이제 람다함수 실행됨")

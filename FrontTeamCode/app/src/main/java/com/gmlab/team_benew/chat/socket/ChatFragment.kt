@@ -12,7 +12,9 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
@@ -23,10 +25,14 @@ import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class ChatFragment:Fragment() {
+class ChatFragment:Fragment(),ChatLogView {
     private lateinit var btn_send : Button
     private lateinit var et_sendMsg : EditText
     private lateinit var  chatView : RecyclerView
@@ -40,6 +46,33 @@ class ChatFragment:Fragment() {
 
     val binding by lazy{ FragmentChatlistBinding.inflate(layoutInflater)}
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val memberId = sharedPref?.getInt("loginId", 0) ?: 0  // 현재 사용자의 ID
+
+        // Adapter 초기화
+        adapter = ChatAdapter(chatList, memberId)
+
+        // RecyclerView 설정
+        chatView.layoutManager = LinearLayoutManager(requireContext())
+        chatView.adapter = adapter
+
+        // SimpleDateFormat을 사용하여 현재 날짜를 "년-월-일" 형식으로 변환
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val currentDate = dateFormat.format(Date())
+
+        // roomId는 번들에서 받아온 값을 사용
+        val roomId = arguments?.getString("roomId") ?: ""
+
+        // 채팅 로그 서비스 초기화 및 로그 가져오기 요청
+        val chatLogService = ChatLogService()
+        chatLogService.setChatLogView(this)
+        chatLogService.getChatLog(requireContext(), currentDate, roomId)
+
+    }
+
     private val webSocketListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
             // 연결이 열렸을 때의 동작
@@ -51,20 +84,26 @@ class ChatFragment:Fragment() {
                 Log.d("CHAT", "Received message: $text")
 
                 val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-                val memberId = sharedPref?.getInt("loginId", 0)
+                val memberId = sharedPref?.getInt("loginId", 0)?: 0
 
                 val gson = Gson()
                 val jsonMessage = gson.fromJson(text, onMessageData::class.java)
 
+//                val chatMessage = ChatMessage(
+//                    jsonMessage.senderName,
+//                    jsonMessage.message,
+//                    jsonMessage.sender.toInt(),
+//                    memberId
+//                )
                 val chatMessage = ChatMessage(
-                    jsonMessage.senderName,
-                    jsonMessage.message,
-                    jsonMessage.sender.toInt(),
-                    memberId
+                    sender = jsonMessage.senderName,
+                    message = jsonMessage.message,
+                    userId = memberId,  // 현재 사용자의 ID
+                    senderId = jsonMessage.sender.toInt()  // 메시지 송신자의 ID
                 )
                 chatList.add(chatMessage)
                 adapter.notifyItemInserted(chatList.size - 1)
-                chatView.scrollToPosition(adapter.itemCount - 1)
+                chatView.scrollToPosition(chatList.size - 1)
             }
         }
 
@@ -72,14 +111,34 @@ class ChatFragment:Fragment() {
             // 연결이 닫혔을 때의 동작
             // 예: "연결이 닫혔습니다. 코드: $code, 이유: $reason"
             Log.e("CHAT", "연결 닫힘, 코드 : $code, 이유 : $reason")
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().navigateUp()
+            // AlertDialog 생성 및 표시
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle("연결 닫힘")
+                setMessage("웹소켓 연결이 닫혔습니다.")
+                setPositiveButton("확인") { dialog, which ->
+                    // 여기서 아무 것도 하지 않음
+                }
+                create()
+                show()
+            }
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
             // 연결이 실패했을 때의 동작
             // 예: "연결 실패. 이유: ${t.message}"
             Log.e("CHAT", "실패 사유 : ${t.message}")
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().navigateUp()
+            // AlertDialog 생성 및 표시
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle("네트워크 오류")
+                setMessage("네트워크 요청이 실패했습니다.")
+                setPositiveButton("확인") { dialog, which ->
+                    // 여기서 아무 것도 하지 않음
+                }
+                create()
+                show()
+            }
 
         }
     }
@@ -111,7 +170,7 @@ class ChatFragment:Fragment() {
 
         val token = sharedPref?.getString("userToken", "")
         val name = sharedPref?.getString("cachedUserName", "")
-        val memberId = sharedPref?.getInt("loginId", 0)
+        val memberId = sharedPref?.getInt("loginId", 0) ?: 0
 
         val getRoomId = (arguments?.getString("roomId")).toString()
 
@@ -121,9 +180,10 @@ class ChatFragment:Fragment() {
         et_sendMsg = view.findViewById(R.id.et_chatting_sendMsg)
         chatView = view.findViewById(R.id.Recycler_chatting_chat)
 
-        adapter = ChatAdapter(chatList)
+        adapter = ChatAdapter(chatList, memberId)
 
-        chatView.layoutManager = LinearLayoutManager(requireContext())
+        chatView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+
         chatView.adapter = adapter
 
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -168,5 +228,28 @@ class ChatFragment:Fragment() {
         """.trimIndent()
 
         webSocket.send(jsonMessage)
+    }
+
+    override fun onGetChattingLogSuccess(chatLogs: MutableList<ChatMessage>) {
+        chatList.clear()
+        chatList.addAll(chatLogs.reversed())
+        adapter.notifyDataSetChanged()
+        chatView.scrollToPosition(chatList.size - 1) // 최신 메시지로 스크롤
+    }
+
+    override fun onGetChattingLogFailure() {
+
+        findNavController().navigateUp()
+        // AlertDialog 생성 및 표시
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("사용자 채팅 로그 불러오기 네트워크 오류")
+            setMessage("네트워크 요청이 실패했습니다.")
+            setPositiveButton("확인") { dialog, which ->
+                // 여기서 아무 것도 하지 않음
+            }
+            create()
+            show()
+        }
+        Log.d("CHATTING/POST/실패", "유저에 대한 채팅방 만들기 실패")
     }
 }

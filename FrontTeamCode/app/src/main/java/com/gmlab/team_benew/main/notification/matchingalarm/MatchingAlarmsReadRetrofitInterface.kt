@@ -1,4 +1,4 @@
-package com.gmlab.team_benew.main.notification
+package com.gmlab.team_benew.main.notification.matchingalarm
 
 import com.gmlab.team_benew.matching.MatchingAlarmResponse
 import retrofit2.Call

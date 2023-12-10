@@ -1,4 +1,4 @@
-package com.gmlab.team_benew.main.notification
+package com.gmlab.team_benew.main.notification.matchingalarm
 
 import com.gmlab.team_benew.matching.Profile
 import com.google.gson.annotations.SerializedName

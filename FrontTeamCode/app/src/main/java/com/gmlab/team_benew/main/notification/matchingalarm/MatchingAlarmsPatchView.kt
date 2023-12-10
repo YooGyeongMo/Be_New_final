@@ -1,4 +1,4 @@
-package com.gmlab.team_benew.main.notification
+package com.gmlab.team_benew.main.notification.matchingalarm
 
 interface MatchingAlarmsPatchView {
 

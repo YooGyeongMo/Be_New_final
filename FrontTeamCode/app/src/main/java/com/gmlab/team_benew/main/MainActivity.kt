@@ -78,7 +78,7 @@
             val chatActionView = chatItem.actionView
 
             notificationActionView?.setOnClickListener { navigateToFragment(R.id.navigation_notification) }
-            chatActionView?.setOnClickListener { navigateToFragment(R.id.navigation_chatList) }
+            chatActionView?.setOnClickListener { navigateToFragment(R.id.navigation_chatListFragment) }
 
             return true
         }
@@ -117,11 +117,6 @@
         }
 
 
-        //이 부분이 chatlistFragment에서 chatFragment받아서 프레그먼트 전환 
-        fun fragmentChange_for_adapter(frag: Fragment){
-            supportFragmentManager.beginTransaction().replace(R.id.Fragment_container,frag).commit()
-
-        }
 
 
 //        private fun showAlertDialog()

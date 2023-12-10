@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import android.util.Log
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.chat.retrofit.chatdata
@@ -14,11 +16,8 @@ import com.gmlab.team_benew.chat.socket.ChatFragment
 import com.gmlab.team_benew.databinding.ChatRecyclerItemBinding
 import com.gmlab.team_benew.main.MainActivity
 
-interface OnChatItemClickListener {
-    fun onChatItemClick(roomId: String)
-}
 //context=ChatlistAdapter 클래스의 인스턴스를 생성할 때, context 매개변수를 통해 Android 애플리케이션 환경에 액세스할 수 있
-class ChatlistAdapter(private val mainActivity: MainActivity):RecyclerView.Adapter<Holder>() {
+class ChatlistAdapter(private val navController: NavController) : RecyclerView.Adapter<Holder>()  {
     //데이터들을 저장하는 변수
     var modelList=mutableListOf<chatdata>()
 
@@ -36,25 +35,15 @@ class ChatlistAdapter(private val mainActivity: MainActivity):RecyclerView.Adapt
     //뷰홀더에서 데이터 묶는 함수 실행 됨
     //뷰홀더를 데이터와 연결할때 호출함
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        val item=modelList[position]
-        //val item=holder.bind(modelList[position])
-        //holder.bind(this.modelList[position])
-        holder.bind(item)
-        holder.itemView.setOnClickListener{
-            // Toast.makeText(holder.itemView.context, "Clicked: ${modelList[position].name},${modelList[position].roomId}", Toast.LENGTH_SHORT).show()
-
-
-            //이부분이 bundle사용해서 roomId저장하는 부분
-            val chatFragment= ChatFragment().apply {
-                arguments=Bundle().apply {
-                    putString("roomId",modelList[position].roomId)
-                    //holder.chatRoomId.toString()
-
-                }
+        val chatItem = modelList[position]
+        holder.bind(chatItem)
+        holder.itemView.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("roomId", chatItem.roomId)
             }
-            mainActivity.fragmentChange_for_adapter(chatFragment)
-
+            navController.navigate(R.id.action_chatListFragment_to_chatRoomFragment, bundle)
         }
+
     }
 
     override fun getItemCount(): Int {

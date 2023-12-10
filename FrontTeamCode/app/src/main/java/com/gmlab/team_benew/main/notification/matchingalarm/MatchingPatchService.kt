@@ -1,11 +1,8 @@
-package com.gmlab.team_benew.main.notification
+package com.gmlab.team_benew.main.notification.matchingalarm
 
 import android.content.Context
-import android.util.Log
 import com.gmlab.team_benew.auth.getRetrofit
 import com.gmlab.team_benew.matching.MatchingAlarmResponse
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
 class MatchingPatchService {

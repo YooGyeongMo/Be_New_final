@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 
-class ChatAdapter(private val messages: List<ChatMessage>) :
-    RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(private val messages: List<ChatMessage>, private val currentUserId: Int) :
+    RecyclerView.Adapter<ChatAdapter.ViewHolder>()  {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val messageText: TextView = itemView.findViewById(R.id.tv_chat_message)
@@ -25,16 +26,16 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
         holder.messageText.text = message.message
+        holder.senderText.text = message.sender  // 발신자의 이름 설정
 
-        if (message.userId == message.senderId) {
-            holder.senderText.gravity = Gravity.END
-            holder.messageText.gravity = Gravity.END
-        } else {
-            holder.senderText.gravity = Gravity.START
-            holder.messageText.gravity = Gravity.START
-        }
+        // 현재 사용자의 ID와 메시지 송신자의 ID 비교
+        val isCurrentUser = message.userId == currentUserId
 
-        holder.senderText.text = message.sender
+        holder.messageText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
+        holder.senderText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
+
+
+
     }
 
     override fun getItemCount(): Int {
