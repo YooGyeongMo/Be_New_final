@@ -25,12 +25,10 @@ import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 import java.util.concurrent.TimeUnit
+
 
 class ChatFragment:Fragment(),ChatLogView {
     private lateinit var btn_send : Button
@@ -59,9 +57,21 @@ class ChatFragment:Fragment(),ChatLogView {
         chatView.layoutManager = LinearLayoutManager(requireContext())
         chatView.adapter = adapter
 
-        // SimpleDateFormat을 사용하여 현재 날짜를 "년-월-일" 형식으로 변환
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val currentDate = dateFormat.format(Date())
+        // 현재 날짜 및 시간을 LocalDateTime 객체로 가져옴
+        // 현재 날짜 및 시간을 LocalDateTime 객체로 가져옴
+        val currentDateTime = LocalDateTime.now()
+
+// 날짜 및 시간을 "2023-12-11T06:33:41.423397" 형식으로 포맷팅
+
+// 날짜 및 시간을 "2023-12-11T06:33:41.423397" 형식으로 포맷팅
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+        val currentDate = currentDateTime.format(formatter)
+
+// formattedDateTime에는 "2023-12-11T06:33:41.423397" 형식의 날짜 및 시간 정보가 포함됨
+
+//        // SimpleDateFormat을 사용하여 현재 날짜를 "년-월-일" 형식으로 변환
+//        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+//        val currentDate = dateFormat.format(Date())
 
         // roomId는 번들에서 받아온 값을 사용
         val roomId = arguments?.getString("roomId") ?: ""

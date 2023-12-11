@@ -77,8 +77,8 @@ class MatchingService private constructor(private val context: Context) {
 
             override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
                 Log.e("NETWORK_MATCHING_USER_FAILURE","USER_MATCHING_DATA_FAILURE")
-                // 실패시 처리 로직 호출
-                matchingPostView.onMatchingRequestFailure()
+                // 기타 오류 처리
+                matchingPostView.onMatchingRequestFailure("유저 매칭 받아오는 중 네트워크 통신 에러.")
             }
         })
     }
@@ -106,12 +106,18 @@ class MatchingService private constructor(private val context: Context) {
                         }
                     }
                     401 -> {
-                        matchingPostView.onMatchingLikePatchFailure()
+                        // 401 Unauthorized 오류 처리
+                        matchingPostView.onMatchingRequestFailure("Unauthorized access.")
                     }
 
-                    else -> {
-                        Log.e("PatchService", "Error with response code: ${response.code()}")
+                    500 -> {
+                        // 500 Internal Server Error 오류 처리
+                        matchingPostView.onMatchingRequestFailure("Server error.")
 
+                    }
+                    else -> {
+                        // 기타 오류 처리
+                        matchingPostView.onMatchingRequestFailure("Unknown error occurred.")
                     }
                 }
             }
@@ -121,7 +127,7 @@ class MatchingService private constructor(private val context: Context) {
         })
     }
 
-    fun disLikeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit){
+    fun disLikeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit, onFailure: (Throwable) -> Unit){
         val token = getTokenFromSharedPreferences(context) ?: return
         val bearerToken = "Bearer $token"
 

@@ -8,5 +8,5 @@ import retrofit2.http.Path
 interface ChatListRoomGet_Interface {
     @GET("/chat/rooms/{userId}")
     fun getChatRoomList(@Header("Authorization") token:String, @Path("userId") userId:Int
-    ): Call<List<ChatRoomListModelItem>>
+    ): Call<MutableList<ChatRoomListModelItem>>
 }

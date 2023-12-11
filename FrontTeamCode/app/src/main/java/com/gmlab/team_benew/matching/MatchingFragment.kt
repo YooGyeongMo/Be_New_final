@@ -66,7 +66,8 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
                 if (direction == Direction.Right) {
 
                     val receiverId = currentProfile.id.toLong() // 받는 사람의 ID를 얻어오는 로직
-                    val myUserId = getIdFromSharedPreferences(requireContext())?.toLong() ?: return // 현재 사용자의 ID를 얻어오는 로직
+                    val myUserId = getIdFromSharedPreferences(requireContext())?.toLong()
+                        ?: return // 현재 사용자의 ID를 얻어오는 로직
                     val myName = getNameFromSharedPreferences(requireContext()) ?: return
 
                     val message = "${myName}님이 프로젝트 요청을 보냈습니다." // 알림 메시지 설정
@@ -80,26 +81,60 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
                     matchingService.sendMatchingAlrams(matchingAlarmRequest,
                         onResponse = { response ->
                             // 알람 전송 성공시 처리 로직
-                            Toast.makeText(context, "알림 전송 성공: ${response.message}", Toast.LENGTH_SHORT).show()
+                            // AlertDialog 생성 및 표시
+                            AlertDialog.Builder(requireContext()).apply {
+                                setTitle("프로젝트 요청")
+                                setMessage("프로젝트 요청을 성공적으로 보냈습니다.")
+                                setPositiveButton("확인") { dialog, which ->
+                                    // 여기서 아무 것도 하지 않음
+                                }
+                                create()
+                                show()
+                            }
                         },
                         onFailure = { throwable ->
-                            // 알람 전송 실패시 처리 로직
-                            Log.e("MatchingAlarm", "알람 전송 실패", throwable)
+                            // AlertDialog 생성 및 표시
+                            AlertDialog.Builder(requireContext()).apply {
+                                setTitle("프로젝트 요청 실패")
+                                setMessage("프로젝트 요청을 보내지 못했습니다.")
+                                setPositiveButton("확인") { dialog, which ->
+                                    // 여기서 아무 것도 하지 않음
+                                }
+                                create()
+                                show()
+                            }
                         }
                     )
 
                     matchingService.likeMatch(currentMatchId) { response ->
-                        Toast.makeText(context, "${currentMatchId}매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "${currentMatchId}매칭에 '좋아요'를 보냈습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
 //                        Toast.makeText(context, "매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
 
                     }
                 }
 
                 if (direction == Direction.Left) {
-                    matchingService.disLikeMatch(currentMatchId) { response ->
-                        Toast.makeText(context, "${currentMatchId}매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
-//                        Toast.makeText(context, "매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
-                    }
+
+                    matchingService.disLikeMatch(currentMatchId,
+                        onResponse = { response ->
+                            // 통신 성공 시 처리
+                            Toast.makeText(
+                                context,
+                                "${currentMatchId}매칭에 '싫어요'를 보냈습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onFailure = { throwable ->
+                            // 통신 실패 시 처리
+                            Toast.makeText(context, "매칭에 '싫어요'를 보내지 못했습니다.", Toast.LENGTH_SHORT)
+                                .show()
+                            Log.e("MatchingFragment", "disLikeMatch failed", throwable)
+                        }
+                    )
                 }
 
                 userCount += 1
@@ -152,7 +187,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
         val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
 
         lifecycleScope.launch {
-            val newProfiles = mutableListOf<Pair<Long,Profile>>() //담는용 뮤터블리스트
+            val newProfiles = mutableListOf<Pair<Long, Profile>>() //담는용 뮤터블리스트
             for (i in 1..10) {
                 val matchRequestDto = MatchRequestDto(uid1 = userId)
                 matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
@@ -186,7 +221,6 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
 
         }
     }
-
 
 
     // 받아온 프로필 정보로 UI를 업데이트하는 함수
@@ -227,6 +261,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
     override fun onMatchingUnLikePatchFailure() {
         Log.e("MATCHINGLIKE/PATCH/FAILURE", "유저매칭 싫어요 실패 ㅠㅠ ")
     }
+
     override fun onMatchingAlarmsSuccess() {
         Log.d("MATCHINGALARMS/POST/SUCCESS", "유저매칭 알람 성공!")
     }
@@ -235,25 +270,20 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
         Log.e("MATCHINGALARMS/POST/FAILURE", "유저매칭 알람 실패!")
     }
 
-    override fun onMatchingRequestFailure() {
-        Log.e("NETWORK_MATCHING_FAILURE_GOBACK","네트워크 요청이 실패하여 이전 화면으로 이동합니다. ")
-        // 이전 프래그먼트로 돌아감
-        findNavController().navigateUp()
-        // AlertDialog 생성 및 표시
+    override fun onMatchingRequestFailure(errorMessage: String) {
         AlertDialog.Builder(requireContext()).apply {
-            setTitle("네트워크 오류")
-            setMessage("네트워크 요청이 실패했습니다.")
-            setPositiveButton("확인") { dialog, which ->
-                // 여기서 아무 것도 하지 않음
+            setTitle("Error")
+            setMessage(errorMessage)
+            setPositiveButton("OK") { dialog, which ->
+                // 오류 대화상자 확인 버튼 클릭 시 수행할 동작
             }
-            create()
-            show()
+            create().show()
         }
     }
 
     private fun getNameFromSharedPreferences(context: Context): String? {
         val shardPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return shardPref.getString("cachedUserName",null)
+        return shardPref.getString("cachedUserName", null)
     }
 
     private fun getIdFromSharedPreferences(context: Context): Int? {
