@@ -36,8 +36,9 @@ class ChatLogService {
                             ChatMessage(
                                 sender = data.senderName,
                                 message = data.message,
-                                userId = data.sender.toInt(),
-                                senderId = null  // senderId가 필요한 경우 적절한 값 설정
+                                userId = data.sender,
+                                senddate = data.senddate,
+                                senderId = data.sender// senderId가 필요한 경우 적절한 값 설정
                             )
                         }.toMutableList()
 
@@ -62,8 +63,8 @@ class ChatLogService {
             }
 
             override fun onFailure(call: Call<MutableList<onMessageData>>, t: Throwable) {
-                    chatLogView.onGetChattingLogFailure()
-                }
+                chatLogView.onGetChattingLogFailure()
+            }
         })
 
     }

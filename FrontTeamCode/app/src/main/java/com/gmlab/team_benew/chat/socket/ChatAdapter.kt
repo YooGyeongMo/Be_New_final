@@ -29,12 +29,11 @@ class ChatAdapter(private val messages: List<ChatMessage>, private val currentUs
         holder.senderText.text = message.sender  // 발신자의 이름 설정
 
         // 현재 사용자의 ID와 메시지 송신자의 ID 비교
-        val isCurrentUser = message.userId == currentUserId
+        // senderId를 사용해야 좌우 정렬이 됨
+        val isCurrentUser = message.senderId == currentUserId
 
         holder.messageText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
         holder.senderText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
-
-
 
     }
 

@@ -27,6 +27,7 @@ import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
@@ -58,13 +59,10 @@ class ChatFragment:Fragment(),ChatLogView {
         chatView.adapter = adapter
 
         // 현재 날짜 및 시간을 LocalDateTime 객체로 가져옴
-        // 현재 날짜 및 시간을 LocalDateTime 객체로 가져옴
         val currentDateTime = LocalDateTime.now()
 
 // 날짜 및 시간을 "2023-12-11T06:33:41.423397" 형식으로 포맷팅
-
-// 날짜 및 시간을 "2023-12-11T06:33:41.423397" 형식으로 포맷팅
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
         val currentDate = currentDateTime.format(formatter)
 
 // formattedDateTime에는 "2023-12-11T06:33:41.423397" 형식의 날짜 및 시간 정보가 포함됨
@@ -109,7 +107,8 @@ class ChatFragment:Fragment(),ChatLogView {
                     sender = jsonMessage.senderName,
                     message = jsonMessage.message,
                     userId = memberId,  // 현재 사용자의 ID
-                    senderId = jsonMessage.sender.toInt()  // 메시지 송신자의 ID
+                    senderId = jsonMessage.sender,
+                    senddate = jsonMessage.senddate
                 )
                 chatList.add(chatMessage)
                 adapter.notifyItemInserted(chatList.size - 1)
@@ -242,7 +241,10 @@ class ChatFragment:Fragment(),ChatLogView {
 
     override fun onGetChattingLogSuccess(chatLogs: MutableList<ChatMessage>) {
         chatList.clear()
-        chatList.addAll(chatLogs.reversed())
+
+        val sortedChatLogs = chatLogs.sortedByDescending { it.senddate }
+
+        chatList.addAll(sortedChatLogs.reversed())
         adapter.notifyDataSetChanged()
         chatView.scrollToPosition(chatList.size - 1) // 최신 메시지로 스크롤
     }
