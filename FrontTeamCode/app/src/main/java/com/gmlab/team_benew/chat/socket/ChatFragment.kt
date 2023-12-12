@@ -111,6 +111,8 @@ class ChatFragment:Fragment(),ChatLogView {
                     senddate = jsonMessage.senddate
                 )
                 chatList.add(chatMessage)
+
+                //소켓이
                 adapter.notifyItemInserted(chatList.size - 1)
                 chatView.scrollToPosition(chatList.size - 1)
             }
@@ -198,7 +200,7 @@ class ChatFragment:Fragment(),ChatLogView {
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         chatView.viewTreeObserver.addOnGlobalLayoutListener {
-            chatView.scrollToPosition(adapter.itemCount - 1 )
+            //chatView.scrollToPosition(adapter.itemCount - 1 )
         }
 
         request = Request.Builder()
