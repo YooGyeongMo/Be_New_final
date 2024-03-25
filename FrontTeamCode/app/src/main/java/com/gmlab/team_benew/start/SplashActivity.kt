@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.gmlab.team_benew.R
@@ -19,9 +21,15 @@ import com.gmlab.team_benew.main.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
+import androidx.core.content.ContextCompat.startActivity
 
 class SplashActivity: AppCompatActivity(),SplashView{
     private val handler = Handler()
+    private lateinit var fadeInAnim : Animation
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -30,31 +38,36 @@ class SplashActivity: AppCompatActivity(),SplashView{
         // 프로그레스 바 초기 숨김
         binding.pgProgressBar.visibility = View.GONE
 
-        val token = getTokenFromSharedPreferences(this)
-        val account = getAccountFromSharedPreferences(this)
 
-        if (token != null && account != null) { // 토큰 유무에 따라 확인해야하기떄문에
+        // 여러 개의 애니메이션을 담을 AnimationSet 생성
+        val animationSet = AnimationSet(true)
+        fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        // AnimationSet에 애니메이션 추가
+        animationSet.addAnimation(fadeInAnim)
 
-            binding.pgProgressBar.visibility = View.VISIBLE // 프로그레스 바 보이기
-            Handler().postDelayed({
+        // 애니메이션을 시작할 뷰에 AnimationSet 적용
+//        binding.ivSplashBg.startAnimation(animationSet)
+        binding.ivSplashTitle.startAnimation(animationSet)
+        binding.ivBackgroundSplash.startAnimation(animationSet)
+
+
+        handler.postDelayed({
+            val token = getTokenFromSharedPreferences(this)
+            val account = getAccountFromSharedPreferences(this)
+
+            if (token != null && account != null) {
+                // 토큰 유무에 따라 확인
+                binding.pgProgressBar.visibility = View.VISIBLE // 프로그레스 바 보이기
 
                 val splashAuthService = SplashAuthService(this)
                 splashAuthService.setSplashView(this)
                 splashAuthService.verifyUserToken(token, account)
-
-
-            }, 2000)
-
-
-
-        }
-        else {
-            // token이 null이면 바로 로그인 화면으로 이동
-            handler.postDelayed({
+            } else {
+                // token이 null이면 바로 로그인 화면으로 이동
                 startActivity(Intent(this, IntroActivity::class.java))
                 finish()
-            }, 3000)
-        }
+            }
+        }, 4000) // 애니메이션 종료 후 3초 뒤에 토큰 체크
     }
 
 
