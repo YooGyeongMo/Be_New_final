@@ -51,17 +51,13 @@ class IntroActivity:AppCompatActivity() {
 
         handler.postDelayed({
             binding.tvIntro.visibility = View.VISIBLE
-            binding.ivIntroPic.visibility = View.VISIBLE
 
-            binding.tvIntro.startAnimation(fadeInAnim)
-            binding.ivIntroPic.startAnimation(fadeInAnim)
+            binding.tvIntro.startAnimation(animationSet)
+
         },1000)
 
         handler.postDelayed({
-            binding.tvIntro.startAnimation(moveToCenter)
-        }, 3500) // 2초뒤
-
-        handler.postDelayed({
+            binding.ivIntroPic.visibility = View.VISIBLE
             binding.tvIntroSub.visibility = View.VISIBLE
             binding.btnIntroLogin.visibility = View.VISIBLE
             binding.btnIntroRegister.visibility = View.VISIBLE
@@ -69,9 +65,8 @@ class IntroActivity:AppCompatActivity() {
             binding.btnIntroLogin.startAnimation(animationSet2)
             binding.btnIntroRegister.startAnimation(animationSet2)
             binding.tvIntroSub.startAnimation(fadeInAnimSub)
-        }, 6500) // 5.5초뒤
-
-
+            binding.ivIntroPic.startAnimation(fadeInAnim)
+        }, 3500)
 
 
 

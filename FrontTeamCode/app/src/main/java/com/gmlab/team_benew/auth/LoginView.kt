@@ -5,4 +5,6 @@ interface LoginView {
     fun onLoginSuccess()
     //로그인 실패시
     fun onLoginFailure()
+    //인증 실패시
+    fun onAuthenticationFailure()
 }

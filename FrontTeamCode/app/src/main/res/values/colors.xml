@@ -25,4 +25,8 @@
 
     <color name="gray">#808080</color>
 
+    <color name="mainBlue2">#3D72FF</color>
+    <color name="mainBg2">#F8FCFC</color>
+    <color name="mainFont2">#4E5866</color>
+
 </resources>

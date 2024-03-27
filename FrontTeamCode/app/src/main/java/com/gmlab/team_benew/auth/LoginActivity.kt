@@ -132,4 +132,12 @@ class LoginActivity : AppCompatActivity(), LoginView, ReLoginView {
         Log.d("RELOGIN/FAILURE","로그인 오류")
     }
 
+    override fun onAuthenticationFailure() {
+        Toast.makeText(
+            this,
+            "인증되지 않은 사용자입니다.",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
 }

@@ -72,7 +72,7 @@ class AuthService {
 //
                     }
                     401 -> {
-                        relogin(user,context)
+                        loginView.onAuthenticationFailure()
                     }
                     else ->
                         loginView.onLoginFailure()
@@ -88,28 +88,28 @@ class AuthService {
         Log.d("LOGIN", "비동기 함수 작동완료 ~!")
     }
 
-    private fun relogin(user: User, context: Context) {
-        val authService = getRetrofit().create(AuthRetrofitInterface::class.java)
-        authService.login(user).enqueue(object: Callback<LoginResult>{
-            override fun onResponse(call: Call<LoginResult>, response: Response<LoginResult>) {
-                Log.d("NETWORK_RELOGIN/SUCCESS", response.toString())
-                if(response.isSuccessful){
-                    response.body()?.let{
-                        //새로운 로그인정보를 SharedPreferences에 저장
-                        saveLoginInfo(context, it.id, it.account, it.token,it.name)
-                        reloginView.onReLoginSuccess()
-                    }
-                }
-                else{
-                    reloginView.onReLoginFailure()
-                }
-            }
-
-            override fun onFailure(call: Call<LoginResult>, t: Throwable) {
-                Log.d("NETWORK_RELOGIN/SUCCESS","다시 로그인 성공!")
-            }
-        })
-    }
+//    private fun relogin(user: User, context: Context) {
+//        val authService = getRetrofit().create(AuthRetrofitInterface::class.java)
+//        authService.login(user).enqueue(object: Callback<LoginResult>{
+//            override fun onResponse(call: Call<LoginResult>, response: Response<LoginResult>) {
+//                Log.d("NETWORK_RELOGIN/SUCCESS", response.toString())
+//                if(response.isSuccessful){
+//                    response.body()?.let{
+//                        //새로운 로그인정보를 SharedPreferences에 저장
+//                        saveLoginInfo(context, it.id, it.account, it.token,it.name)
+//                        reloginView.onReLoginSuccess()
+//                    }
+//                }
+//                else{
+//                    reloginView.onReLoginFailure()
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<LoginResult>, t: Throwable) {
+//                Log.d("NETWORK_RELOGIN/SUCCESS","다시 로그인 성공!")
+//            }
+//        })
+//    }
 
     // null 이 아닐 때 let 구분이 실행되도록 설정 요청 후 응답받는 값이 null이 아닐때 설정.
     // 최초 로그인시 저장됩니다.
