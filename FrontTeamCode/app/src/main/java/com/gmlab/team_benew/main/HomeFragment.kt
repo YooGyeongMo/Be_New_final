@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
@@ -37,11 +38,16 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
         val buttonNavProfile = view.findViewById<CardView>(R.id.cv_user_info_card)
         val buttonNavProject = view.findViewById<CardView>(R.id.cv_project_info_card)
         val buttonNavMyteamlist = view.findViewById<CardView>(R.id.cv_my_team_list)
+        val buttonNavTestIntro = view.findViewById<Button>(R.id.btn_do_test)
 
         // 모든 버튼에 같은 클릭 리스너 설정
         buttonNavProfile.setOnClickListener { onCardClicked(it) }
         buttonNavProject.setOnClickListener { onCardClicked(it) }
         buttonNavMyteamlist.setOnClickListener { onCardClicked(it) }
+        buttonNavTestIntro.setOnClickListener{ onCardClicked(it) }
+
+
+
     }
 
     private fun onCardClicked(view: View) {
@@ -49,6 +55,7 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
             R.id.cv_user_info_card -> findNavController().navigate(R.id.action_home_to_profileDetail) // 프로필 디테일로 이동
             R.id.cv_project_info_card -> findNavController().navigate(R.id.action_home_to_projectList) // 프로젝트 리스트로
             R.id.cv_my_team_list -> findNavController().navigate(R.id.action_home_to_teamList) // 팀 리스트로
+            R.id.btn_do_test -> findNavController().navigate(R.id.action_home_to_intro_testing) // testing 화면으로
         }
     }
     private fun getUserInfo() {
@@ -70,7 +77,6 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
             updateUserNameUI(cachedUserName)
         }
     }
-
     override fun onUserNameReceived(userName: String) {
         val cachedUserName = getCachedUserName()
         if (cachedUserName != userName) {

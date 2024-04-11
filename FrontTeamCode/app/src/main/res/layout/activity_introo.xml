@@ -15,16 +15,32 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 <!--    android:src="@drawable/splash_bg_4"-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/viewpager_intro_box"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tv_intro"
+            >
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewpager_item_slider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/viewpager_item_slider_indicator"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/viewpager_item_slider" />
 
-    <ImageView
-        android:id="@+id/iv_intro_pic"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:src="@drawable/intro_bg"
-        app:layout_constraintBottom_toBottomOf="@id/tv_intro"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <TextView
         android:id="@+id/tv_intro"
@@ -34,9 +50,9 @@
         android:textAlignment="center"
         android:textSize="30dp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@id/iv_intro_pic"
-        app:layout_constraintStart_toStartOf="@id/iv_intro_pic"
-        app:layout_constraintTop_toBottomOf="@id/iv_intro_pic" />
+        app:layout_constraintEnd_toEndOf="@id/viewpager_intro_box"
+        app:layout_constraintStart_toStartOf="@id/viewpager_intro_box"
+        app:layout_constraintTop_toBottomOf="@id/viewpager_intro_box" />
 
     <TextView
         android:id="@+id/tv_intro_sub"

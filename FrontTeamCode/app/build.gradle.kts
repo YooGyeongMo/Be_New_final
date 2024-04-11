@@ -77,4 +77,11 @@ dependencies {
     // To use constraintlayout in compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
 
+    // viewpager2
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+// 인디케이터 애니메이션
+    implementation("com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2")
+
+
+
 }

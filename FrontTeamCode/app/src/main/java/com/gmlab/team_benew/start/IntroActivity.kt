@@ -1,6 +1,5 @@
 package com.gmlab.team_benew.start
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -8,11 +7,10 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.auth.LoginActivity
-import com.gmlab.team_benew.auth.SignUpActivity
 import com.gmlab.team_benew.auth.register.RegisterActivity
 import com.gmlab.team_benew.databinding.ActivityIntroBinding
 
@@ -67,8 +65,6 @@ class IntroActivity:AppCompatActivity() {
             binding.tvIntroSub.startAnimation(fadeInAnimSub)
             binding.ivIntroPic.startAnimation(fadeInAnim)
         }, 3500)
-
-
 
 
 

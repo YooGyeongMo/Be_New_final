@@ -24,15 +24,15 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <ImageView
-        android:id="@+id/iv_intro_pic"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:src="@drawable/intro_bg"
-        app:layout_constraintBottom_toTopOf="@id/tv_intro_sub"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_intro" />
+  <ImageView
+      android:id="@+id/iv_intro_pic"
+      android:layout_width="350dp"
+      android:layout_height="350dp"
+      android:src="@drawable/intro_bg"
+      app:layout_constraintBottom_toTopOf="@id/tv_intro_sub"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/tv_intro" />
 
     <TextView
         android:id="@+id/tv_intro"
@@ -61,7 +61,8 @@
         app:layout_constraintStart_toStartOf="@id/iv_intro_pic"
         app:layout_constraintTop_toBottomOf="@id/iv_intro_pic" />
 
-    <androidx.appcompat.widget.AppCompatButton
+
+  <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_intro_login"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
@@ -69,7 +70,7 @@
         android:textColor="@color/white"
         android:background="@drawable/button_bg"
         app:layout_constraintTop_toBottomOf="@id/tv_intro_sub"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toStartOf="@id/btn_intro_register"
         app:layout_constraintStart_toStartOf="@id/tv_intro_sub"
 
@@ -84,7 +85,7 @@
         android:textColor="@color/white"
         android:background="@drawable/button_bg"
         app:layout_constraintTop_toBottomOf="@id/tv_intro_sub"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintStart_toEndOf="@id/btn_intro_login"
         app:layout_constraintEnd_toEndOf="@id/tv_intro_sub"
         />

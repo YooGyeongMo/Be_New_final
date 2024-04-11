@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_home_to_teamList"
             app:destination="@id/navigation_team_list" />
+        <action
+            android:id="@+id/action_home_to_intro_testing"
+            app:destination="@id/navigation_intro_testing" />
     </fragment>
     <fragment
         android:id="@+id/navigation_setting"
@@ -89,5 +92,24 @@
         android:id="@+id/navigation_chat"
         android:name="com.gmlab.team_benew.chat.socket.ChatFragment"
         android:label="ChatFragment" />
+
+    <fragment
+        android:id="@+id/navigation_intro_testing"
+        android:name="com.gmlab.team_benew.test.TestIntroFragment"
+        android:label="TestIntroFragment">
+        <action
+            android:id="@+id/action_intro_testing_to_testing"
+            app:destination="@id/navigation_testing">
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_testing"
+        android:name="com.gmlab.team_benew.test.TestFragment"
+        android:label="TestFragment" >
+        <argument
+            android:name="selectedLanguage"
+            app:argType="string" />
+    </fragment>
+
 </navigation>
 
