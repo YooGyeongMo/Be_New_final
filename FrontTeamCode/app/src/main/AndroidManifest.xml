@@ -21,17 +21,28 @@
             android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".start.SplashActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.SeeMeet.TransparentStatusBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".start.IntroActivity" />
-        <activity android:name=".auth.LoginActivity" />
-        <activity android:name=".auth.SignUpActivity" />
-        <activity android:name=".main.MainActivity" />
+        <activity
+            android:name=".start.IntroActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SeeMeet.TransparentStatusBar"/>
+        <activity
+            android:name=".auth.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SeeMeet.TransparentStatusBar"/>
+        <activity
+            android:name=".auth.SignUpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SeeMeet.TransparentStatusBar"/>
+        <activity
+            android:name=".main.MainActivity" />
     </application>
 
 </manifest>

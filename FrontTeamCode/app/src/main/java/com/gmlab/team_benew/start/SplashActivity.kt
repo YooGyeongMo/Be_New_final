@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
@@ -24,6 +25,7 @@ import retrofit2.Response
 import android.view.animation.AlphaAnimation
 import android.view.animation.AnimationSet
 import androidx.core.content.ContextCompat.startActivity
+import com.gmlab.team_benew.util.getStatusBarHeight
 
 class SplashActivity: AppCompatActivity(),SplashView{
     private val handler = Handler()
@@ -34,6 +36,13 @@ class SplashActivity: AppCompatActivity(),SplashView{
         super.onCreate(savedInstanceState)
         val binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.splashRootLayout.setPadding(0, getStatusBarHeight(this), 0, 0)
+
+        //status bar와 navigation bar 모두 투명하게 만드는 코드
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
         // 프로그레스 바 초기 숨김
         binding.pgProgressBar.visibility = View.GONE
@@ -48,7 +57,7 @@ class SplashActivity: AppCompatActivity(),SplashView{
         // 애니메이션을 시작할 뷰에 AnimationSet 적용
 //        binding.ivSplashBg.startAnimation(animationSet)
         binding.ivSplashTitle.startAnimation(animationSet)
-        binding.ivBackgroundSplash.startAnimation(animationSet)
+        binding.ivSplashTitleTxt.startAnimation(animationSet)
 
 
         handler.postDelayed({

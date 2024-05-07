@@ -28,5 +28,7 @@
     <color name="mainBlue2">#3D72FF</color>
     <color name="mainBg2">#F8FCFC</color>
     <color name="mainFont2">#4E5866</color>
+    <color name="mainBg3">#ECECEC</color>
+    <color name="mainBg4">#24235F</color>
 
 </resources>

@@ -88,7 +88,7 @@ class HomeFragment: Fragment(), MainView,UserNameCallback {
 
     private fun updateUserNameUI(userName: String) {
         val tvUserData = view?.findViewById<TextView>(R.id.tv_username_data)
-        tvUserData?.text = userName
+        tvUserData?.text = "${userName}님"
     }
 
     private fun cacheUserName(userName: String) {

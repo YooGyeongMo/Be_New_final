@@ -5,5 +5,8 @@
         <item name ="android:textColor">@color/white</item>
         <item name="android:windowDisablePreview">true</item>
     </style>
+    <style name ="Progressbar_color_under_api21">
+        <item name="colorAccent">@color/mainBlue2</item>
+    </style>
 
 </resources>

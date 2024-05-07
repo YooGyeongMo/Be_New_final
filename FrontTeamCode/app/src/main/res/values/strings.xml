@@ -7,4 +7,6 @@
     <string name="label_setting_icon">설정</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="join"><u>회원가입</u></string>
+    <string name="login"><u>로그인</u></string>
 </resources>

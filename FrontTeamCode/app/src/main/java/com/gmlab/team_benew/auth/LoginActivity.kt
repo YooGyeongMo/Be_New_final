@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.gmlab.team_benew.main.MainActivity
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.databinding.ActivityLoginBinding
+import com.gmlab.team_benew.util.getStatusBarHeight
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import retrofit2.Response
@@ -28,6 +30,13 @@ class LoginActivity : AppCompatActivity(), LoginView, ReLoginView {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.loginRootLayout.setPadding(0, getStatusBarHeight(this), 0, 0)
+
+        //status bar와 navigation bar 모두 투명하게 만드는 코드
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
         textWatcher()
 
@@ -113,12 +122,13 @@ class LoginActivity : AppCompatActivity(), LoginView, ReLoginView {
     }
 
     override fun onLoginSuccess() {
-        Log.d("LOGIN/SUCCESS","로그인 성공")
+        Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
         finish()
         startMainActivity()
     }
 
     override fun onLoginFailure() {
+        Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show()
         Log.d("LOGIN/FAILURE","로그인 오류")
     }
 
@@ -129,13 +139,13 @@ class LoginActivity : AppCompatActivity(), LoginView, ReLoginView {
     }
 
     override fun onReLoginFailure() {
-        Log.d("RELOGIN/FAILURE","로그인 오류")
+        Log.d("RELOGIN/FAILURE","재로그인 오류")
     }
 
     override fun onAuthenticationFailure() {
         Toast.makeText(
             this,
-            "인증되지 않은 사용자입니다.",
+            "아이디 또는 비밀번호를 잘못 입력했습니다.\n입력한 내용을 다시 확인해주세요",
             Toast.LENGTH_SHORT
         ).show()
     }
