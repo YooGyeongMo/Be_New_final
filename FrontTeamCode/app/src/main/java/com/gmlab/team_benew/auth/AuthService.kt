@@ -81,6 +81,7 @@ class AuthService {
 
             override fun onFailure(call: Call<LoginResult>, t: Throwable) {
                 Log.d("LOGIN_NETWORK/FAILURE", t.message.toString()) // 비동기 작업
+                Toast.makeText(context, "네트워크 에러... 로그인을 다시 시도하세요.", Toast.LENGTH_SHORT).show()
             }
 
         })

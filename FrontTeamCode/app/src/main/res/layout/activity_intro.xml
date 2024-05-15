@@ -11,8 +11,8 @@
     >
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager_home_banner"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:fitsSystemWindows="true"
         android:layout_marginTop="45dp"
         app:layout_constraintTop_toBottomOf="@id/tv_intro"
@@ -27,7 +27,7 @@
         android:layout_centerInParent = "true"
         app:dotsCornerRadius="10dp"
         app:dotsSize="10sp"
-        app:dotsColor="@color/gray"
+        app:dotsColor="@color/white"
         app:selectedDotColor="@color/mainBlue2"
         app:layout_constraintTop_toBottomOf="@id/viewpager_home_banner"
         app:layout_constraintStart_toStartOf="parent"

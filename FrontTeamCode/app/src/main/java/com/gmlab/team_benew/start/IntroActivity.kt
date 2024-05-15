@@ -3,14 +3,12 @@ package com.gmlab.team_benew.start
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.viewpager2.widget.ViewPager2
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.auth.LoginActivity
@@ -18,11 +16,10 @@ import com.gmlab.team_benew.auth.register.RegisterActivity
 import com.gmlab.team_benew.databinding.ActivityIntroBinding
 import com.gmlab.team_benew.util.getStatusBarHeight
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 
 class IntroActivity:AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
-    private lateinit var adapter: HomeBannerAdapter
+    private lateinit var adapter: IntroBannerAdapter
     private val handler = Handler()
     private lateinit var binding : ActivityIntroBinding
     private lateinit var fadeInAnim : Animation
@@ -46,7 +43,7 @@ class IntroActivity:AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
         viewPager = findViewById(R.id.viewpager_home_banner)
-        adapter = HomeBannerAdapter()
+        adapter = IntroBannerAdapter()
         viewPager.adapter = adapter
 
         // 이미지 리소스 배열

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 
-class HomeBannerAdapter : ListAdapter<Int, HomeBannerAdapter.BannerViewHolder>(DiffCallback) {
+class IntroBannerAdapter : ListAdapter<Int, IntroBannerAdapter.BannerViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerViewHolder {
         val imageView = LayoutInflater.from(parent.context).inflate(R.layout.intro_banner, parent, false) as ImageView
