@@ -67,7 +67,7 @@
             android:id="@+id/tv_team_searching_intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="팀 찾기"
+            android:text="프로젝트 찾기"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"

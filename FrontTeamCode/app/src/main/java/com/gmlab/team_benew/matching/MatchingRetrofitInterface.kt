@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface MatchingRetrofitInterface {
     //매치 생성 post
     @POST("/api/post/match")
-    fun postCreateMatch(@Header("Authorization") bearerToken: String, @Body matchRequestDto: MatchRequestDto): Call<MatchingResponse>
+    fun postCreateMatch(@Header("Authorization") bearerToken: String, @Body matchRequestDto: MatchRequestDto): Call<List<MatchingResponse>>
 
     //매치 좋아요 스와이프 patch
     @PATCH("/api/patch/match/like/{matchId}")

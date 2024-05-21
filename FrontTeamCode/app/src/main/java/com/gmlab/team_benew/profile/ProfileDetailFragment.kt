@@ -113,40 +113,49 @@ class ProfileDetailFragment: Fragment() {
             startActivityForResult(intent, 1)
         }
 
+        var isEditMode = false
         btn_addSkill.setOnClickListener {
-            if(btn_addSkill.text.toString() == "추가")
-            {
-                btn_addSkill.text = "완료"
+
+            if (!isEditMode) {
+
+                // Edit mode 활성화
+                btn_addSkill.setBackgroundResource(R.drawable.save_or_check_btn)
                 skillAdd()
+                isEditMode = true // isEditMode를 true로 설정
             }
             else {
-                btn_addSkill.text = "추가"
-                if (account != null) {
-                    if (token != null) {
-                        if (memberId != null) {
-                            skillFinish(token, account, memberId)
-                        }
-                    }
+                // Edit mode 비활성화
+                btn_addSkill.setBackgroundResource(R.drawable.add_btn)
+                if (account != null && token != null && memberId != null) {
+                    skillFinish(token, account, memberId)
                 }
+                isEditMode = false // isEditMode를 false로 설정
             }
         }
 
+        var isEditMode2 = false
         btn_modify.setOnClickListener {
-            if (btn_modify.text.toString() == "수정") {
+            if (!isEditMode2) {
+
                 enableInputFields()
 
-                btn_modify.text = "저장"
+                btn_modify.setBackgroundResource(R.drawable.save_or_check_btn)
+
+                isEditMode2 = true
+
             } else {
-                if (token != null) {
-                    if (memberId != null) {
+                if (token != null && memberId != null) {
                         postProfileToServer(token, memberId)
                     }
-                }
 
                 disableInputFields()
 
 
-                btn_modify.text = "수정"
+                // 버튼 배경을 "수정" 이미지로 변경
+                btn_modify.setBackgroundResource(R.drawable.add_btn)
+
+                // isEditMode를 false로 설정
+                isEditMode2 = false
             }
         }
 
@@ -168,7 +177,7 @@ class ProfileDetailFragment: Fragment() {
         }
         catch(e : Exception)
         {
-
+            Toast.makeText(requireContext(), "추가된 링크가 없습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -393,7 +402,6 @@ class ProfileDetailFragment: Fragment() {
         spn_experience.isEnabled = false
         et_role.isEnabled = false
         et_link.isEnabled = false
-        btn_addSkill.isEnabled = false
 
         et_nickname.setTextColor(originalNicknameTextColor)
         et_introduce.setTextColor(originalIntroduceTextColor)
@@ -415,7 +423,7 @@ class ProfileDetailFragment: Fragment() {
         spn_experience.isEnabled = true
         et_role.isEnabled = true
         et_link.isEnabled = true
-        btn_addSkill.isEnabled = true
+
 
         cv_bottom.isEnabled = false
     }
@@ -452,6 +460,12 @@ class ProfileDetailFragment: Fragment() {
         {
             "Python" -> {technologyId = 1}
             "JAVA" -> { technologyId = 2}
+//            "C++" -> {technologyId = 3}
+//            "C" -> {technologyId = 4}
+//            "C#" -> {technologyId = 5}
+//            "Kotlin" -> {technologyId = 6}
+//            "Swift" -> {technologyId = 7}
+//            "JavaScript" -> {technologyId = 8}
         }
 
         when(level_value)

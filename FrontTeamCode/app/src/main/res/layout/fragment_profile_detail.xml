@@ -41,7 +41,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="#F4F6FA"
+                app:cardBackgroundColor="@color/mainBg"
                 app:cardCornerRadius="60dp"
                 app:cardElevation="4dp"
                 app:layout_constraintBaseline_toTopOf="parent"
@@ -59,11 +59,11 @@
                     <View
                         android:id="@+id/view_profilecardDetail_stackbar"
                         android:layout_width="match_parent"
-                        android:layout_height="4dp"
+                        android:layout_height="2dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="4dp"
                         android:layout_marginEnd="20dp"
-                        android:background="#000000"
+                        android:background="@color/mainBg4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_profilecardDetail_stack" />
@@ -76,7 +76,6 @@
                         android:layout_marginTop="8dp"
                         android:text="기술스택"
                         android:textSize="20sp"
-                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -97,10 +96,10 @@
 
                     <android.widget.Button
                         android:id="@+id/btn_profilecard_addskill"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:text="추가"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/add_btn"
+                        android:layout_marginEnd="10dp"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_profilecardDetail_stack"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_profilecardDetail_stack" />
@@ -115,7 +114,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginTop="35dp"
-                app:cardBackgroundColor="#E8E8FA"
+                app:cardBackgroundColor="#F4F6FA"
                 app:cardCornerRadius="60dp"
                 app:cardElevation="4dp"
                 app:layout_constraintBottom_toTopOf="@+id/cv_profilecardDetail_middle"
@@ -150,8 +149,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:background="@drawable/draw_profilecard_detail_textbox"
-                        android:hint="닉네임"
                         android:gravity="start|center_vertical"
+                        android:hint="닉네임"
                         android:inputType="text"
                         android:maxLength="8"
                         android:paddingStart="10dp"
@@ -165,7 +164,7 @@
                         android:layout_height="75dp"
                         android:layout_marginStart="24dp"
                         android:adjustViewBounds="true"
-                        android:background="@drawable/draw_profilecard_picture"
+                        android:background="@drawable/profilecard_detail_default"
                         android:scaleType="centerCrop"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -232,8 +231,8 @@
                         android:layout_marginStart="52dp"
                         android:text="역할"
                         android:textSize="18sp"
-                        app:layout_constraintStart_toEndOf="@+id/tv_profileDetail_projectExperienceLabel"
-                        app:layout_constraintTop_toTopOf="@+id/tv_profileDetail_projectExperienceLabel" />
+                        app:layout_constraintStart_toEndOf="@+id/tv_profilecardDetail_majorLabel"
+                        app:layout_constraintTop_toTopOf="@+id/tv_profilecardDetail_majorLabel" />
 
                     <EditText
                         android:id="@+id/et_profilecardDetail_role"
@@ -252,26 +251,37 @@
 
                     <android.widget.Button
                         android:id="@+id/btn_profilecardDetail_modify"
-                        android:layout_width="wrap_content"
-                        android:layout_height="28dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@null"
-                        android:text="수정"
-                        android:textColor="#000000"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/add_btn"
                         app:layout_constraintBottom_toTopOf="@+id/et_profilecardDetail_nickname"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
-
+                    <TextView
+                        android:id="@+id/tv_profilecardDetail_PeerReview_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="동료평가"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="10dp"
+                        app:layout_constraintStart_toEndOf="@id/tv_profileDetail_projectExperienceLabel"
+                        app:layout_constraintTop_toTopOf="@id/tv_profileDetail_projectExperienceLabel"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_profileDetail_projectExperienceLabel"
+                        android:layout_marginStart="25dp"/>
                     <ImageView
                         android:id="@+id/imgv_profiledetail_peer"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        app:layout_constraintBottom_toBottomOf="@+id/tv_profilecardDetail_major"
-                        app:layout_constraintStart_toEndOf="@+id/tv_profilecardDetail_majorLabel"
-                        app:layout_constraintStart_toStartOf="@+id/tv_profilecardDetail_role"
-                        app:srcCompat="@drawable/profilecard_detail_peer40_59" />
+                        app:srcCompat="@drawable/profilecard_detail_peer40_59"
+                        app:layout_constraintTop_toBottomOf="@id/tv_profilecardDetail_PeerReview_label"
+                        app:layout_constraintStart_toStartOf="@id/tv_profilecardDetail_PeerReview_label"
+                        app:layout_constraintEnd_toEndOf="@id/tv_profilecardDetail_PeerReview_label"
+                        android:layout_marginTop="10dp"/>
 
                     <TextView
                         android:id="@+id/tv_profilecardDetail_majorLabel"
@@ -307,13 +317,14 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
-                app:cardBackgroundColor="#F4F6FA"
+                app:cardBackgroundColor="@color/mainBg"
                 app:cardCornerRadius="60dp"
                 app:cardElevation="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cv_profilecardDetail_middle"
-                app:layout_constraintVertical_weight="2">
+                app:layout_constraintVertical_weight="2"
+                >
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -355,14 +366,14 @@
                     <View
                         android:id="@+id/view_profilecardDetail_linkbar"
                         android:layout_width="match_parent"
-                        android:layout_height="4dp"
+                        android:layout_height="2dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="4dp"
                         android:layout_marginEnd="20dp"
-                        android:background="#000000"
+                        android:background="@color/mainBg4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_profilecardDetail_link" />
+                        app:layout_constraintTop_toBottomOf="@+id/tv_profilecardDetail_link"/>
 
                     <TextView
                         android:id="@+id/textView"
@@ -376,6 +387,20 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
+
+            <View
+                android:id="@+id/view_profilecardDetail_bottom_stackbar"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="100dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/mainBg3"
+                app:layout_constraintTop_toBottomOf="@id/cv_profilecardDetail_bottom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

@@ -6,9 +6,12 @@
     import android.view.Menu
     import android.view.MenuItem
     import android.view.View
+    import android.widget.ImageView
     import androidx.appcompat.app.AppCompatActivity
     import androidx.fragment.app.Fragment
+    import androidx.lifecycle.lifecycleScope
     import androidx.navigation.findNavController
+    import androidx.navigation.fragment.NavHostFragment
     import androidx.navigation.fragment.findNavController
     import androidx.navigation.ui.setupWithNavController
     import com.gmlab.team_benew.R
@@ -22,12 +25,18 @@
         private var redDot: View? = null
 
         private lateinit var mainAlarmsGetService: MainAlarmsGetService
+        private lateinit var toolbar: androidx.appcompat.widget.Toolbar
+        private lateinit var logoImageView: ImageView
 
         //lifecycle 콜백함수
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(com.gmlab.team_benew.R.layout.activity_main) //사용자에게 보여줄 레이아웃 선정 파일 ID인수로
-            setSupportActionBar(findViewById(com.gmlab.team_benew.R.id.toolbar_app_default))
+
+            toolbar = findViewById(R.id.toolbar_app_default)
+            logoImageView = toolbar.findViewById(R.id.iv_logo_image_view_home)
+
+            setSupportActionBar(toolbar)
             // 툴바 제목 설정 제거
             supportActionBar?.title = ""
 
@@ -37,12 +46,45 @@
             val bottomNavigationView = findViewById<BottomNavigationView>(com.gmlab.team_benew.R.id.bottom_navigation_main)
             bottomNavigationView.itemIconTintList = null
 
-            val navController = supportFragmentManager.findFragmentById(com.gmlab.team_benew.R.id.Fragment_container)
-                ?.findNavController() // 참조를 반환, find or get 존재하지않을수 있으니 safe call 컨트롤러
-            navController?.let {
-                bottomNavigationView.setupWithNavController(it) //navHostFragment에서 관리하는 controller
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.Fragment_container) as NavHostFragment
+            val navController = navHostFragment.navController
+
+            bottomNavigationView.setupWithNavController(navController)
+
+            navController.addOnDestinationChangedListener{_, destination, _ ->
+                if(destination.id == R.id.navigation_profile_deatil ||
+                    destination.id == R.id.navigation_notification ||
+                    destination.id == R.id.navigation_chatListFragment ||
+                    destination.id == R.id.navigation_chat ||
+                    destination.id == R.id.navigation_matching ||
+                    destination.id == R.id.navigation_testing ||
+                    destination.id == R.id.navigation_project_list ||
+                    destination.id == R.id.navigation_project_deatil
+                    ) {
+                    //해당 프레그먼트로 이동 시에 툴바의 로고 버튼을 뒤로가기 버튼으로 대체
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    supportActionBar?.setDisplayShowHomeEnabled(true)
+                    toolbar.setNavigationIcon(R.drawable.backtab) //뒤로가기 버튼
+                    toolbar.setNavigationOnClickListener{
+                        navController.navigateUp() //뒤로가기 기능
+                    }
+                    logoImageView.visibility = View.GONE //로고숨기기
+                } else {
+                    //기본 상태로 변경
+                    supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    supportActionBar?.setDisplayShowHomeEnabled(false)
+                    logoImageView.visibility = View.VISIBLE //
+                }
 
             }
+
+//            val navController = supportFragmentManager.findFragmentById(com.gmlab.team_benew.R.id.Fragment_container)
+//                ?.findNavController() // 참조를 반환, find or get 존재하지않을수 있으니 safe call 컨트롤러
+//            navController?.let {
+//                bottomNavigationView.setupWithNavController(it) //navHostFragment에서 관리하는 controller
+//
+//            }
 
 
             mainAlarmsGetService = MainAlarmsGetService(this)
@@ -57,7 +99,7 @@
         }
 
         private fun startPolling(){
-            GlobalScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 while (isActive) {
                     delay(5000) // 5초마다 반복
                     mainAlarmsGetService.getUserAlarms(this@MainActivity)

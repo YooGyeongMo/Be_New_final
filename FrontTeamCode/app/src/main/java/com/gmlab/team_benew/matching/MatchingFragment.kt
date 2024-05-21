@@ -58,10 +58,8 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
             }
 
             override fun onCardSwiped(direction: Direction?) {
-
                 val currentMatchId = matchingId[manager.topPosition - 1]
                 val currentProfile = matchingProfiles[manager.topPosition - 1] // 현재 스와이프한 프로필
-
 
                 if (direction == Direction.Right) {
 
@@ -109,11 +107,11 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
                     matchingService.likeMatch(currentMatchId) { response ->
                         Toast.makeText(
                             context,
+//                            " 상대방에게 '좋아요'를 보냈습니다.",
                             "${currentMatchId}매칭에 '좋아요'를 보냈습니다.",
                             Toast.LENGTH_SHORT
                         ).show()
 //                        Toast.makeText(context, "매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
-
                     }
                 }
 
@@ -124,6 +122,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
                             // 통신 성공 시 처리
                             Toast.makeText(
                                 context,
+//                                "상대방에게 '싫어요'를 보냈습니다.",
                                 "${currentMatchId}매칭에 '싫어요'를 보냈습니다.",
                                 Toast.LENGTH_SHORT
                             ).show()
@@ -179,48 +178,98 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
 
     }
 
-    // MatchingFragment 내부
     private fun fetchMatchingProfiles(preload: Boolean = false) {
         if (isFetching) return
-        isFetching = true // 데이터 요청시작
+        isFetching = true //데이터 요청 시작
         if (preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
-        val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
+        val userId = getIdFromSharedPreferences(requireContext()) ?: return //ID가 없으면 함수 종료
 
         lifecycleScope.launch {
-            val newProfiles = mutableListOf<Pair<Long, Profile>>() //담는용 뮤터블리스트
-            for (i in 1..10) {
-                val matchRequestDto = MatchRequestDto(uid1 = userId)
-                matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
-                    val profile = matchingResponse.profile
-                    val matchId = matchingResponse.matchId
-
-                    val profilePair = Pair(matchId, profile)
-                    newProfiles.add(profilePair)
-//                    val profile = matchingResponse.profile
-                    if (newProfiles.size == 10) {
-
-                        // 기존 리스트에서 이미 스와이프된 프로필 제거
+            matchingService.getUserData(MatchRequestDto(uid1 = userId),
+                onResponse = { newProfiles ->
+                    if (newProfiles.isEmpty()) {
+                        showNoMoreProfilesDialog()
+                    } else {
                         if (userCount > 0 && matchingProfiles.size > userCount) {
                             matchingProfiles.subList(0, userCount).clear()
                             matchingId.subList(0, userCount).clear()
                         }
 
-                        matchingProfiles.addAll(newProfiles.map { it.second }) // Profile만을 matchingProfiles에 추가
-                        matchingId.addAll(newProfiles.map { it.first })
+                        matchingProfiles.addAll(newProfiles.map { it.profile })
+                        matchingId.addAll(newProfiles.map { it.matchId })
                         updateUI(matchingProfiles)
-                        userCount = 0 // 새 데이터 로드 후 userCount 초기화
-                        isFetching = false // 데이터 요청완료
-                        if (preload) hideProgressBar() // 데이터 로딩 완료 시 프로그레스바 숨김
-                        Log.d("MATCHING/POST/CARD/DATA", "SUCCESS")
+                        userCount = 0
                     }
-                })
-                delay(200)
-            }
-//            // 최소 1초 동안 프로그레스바 표시 보장
-//            delay(5000)
-
+                    isFetching = false //데이터 요청 완료
+                    if (preload) hideProgressBar()
+                },
+                onFailure = { errorMessage ->
+                    isFetching = false
+                    if (preload) hideProgressBar()
+                    showErrorDialog(errorMessage) // 에러 메시지를 팝업 창으로 표시
+                }
+            )
         }
     }
+    private fun showNoMoreProfilesDialog() {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("프로필 카드 없음")
+            setMessage("이용 가능한 매칭이 없습니다. 다시 매칭을 시도합니다.")
+            setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            create().show()
+        }
+    }
+
+    private fun showErrorDialog(errorMessage: String) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Error")
+            setMessage(errorMessage)
+            setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            create().show()
+        }
+    }
+//    // MatchingFragment 내부
+//    private fun fetchMatchingProfiles(preload: Boolean = false) {
+//        if (isFetching) return
+//        isFetching = true // 데이터 요청시작
+//        if (preload) showProgressBar() // 데이터 로딩중 프로그레스바 표시
+//        val userId = getIdFromSharedPreferences(requireContext()) ?: return // ID가 없으면 함수 종료
+//
+//        lifecycleScope.launch {
+//            val newProfiles = mutableListOf<Pair<Long, Profile>>() //담는용 뮤터블리스트
+//            for (i in 1..10) {
+//                val matchRequestDto = MatchRequestDto(uid1 = userId)
+//                matchingService.getUserData(matchRequestDto, onResponse = { matchingResponse ->
+//                    val profile = matchingResponse.profile
+//                    val matchId = matchingResponse.matchId
+//
+//                    val profilePair = Pair(matchId, profile)
+//                    newProfiles.add(profilePair)
+////                    val profile = matchingResponse.profile
+//                    if (newProfiles.size == 10) {
+//
+//                        // 기존 리스트에서 이미 스와이프된 프로필 제거
+//                        if (userCount > 0 && matchingProfiles.size > userCount) {
+//                            matchingProfiles.subList(0, userCount).clear()
+//                            matchingId.subList(0, userCount).clear()
+//                        }
+//
+//                        matchingProfiles.addAll(newProfiles.map { it.second }) // Profile만을 matchingProfiles에 추가
+//                        matchingId.addAll(newProfiles.map { it.first })
+//                        updateUI(matchingProfiles)
+//                        userCount = 0 // 새 데이터 로드 후 userCount 초기화
+//                        isFetching = false // 데이터 요청완료
+//                        if (preload) hideProgressBar() // 데이터 로딩 완료 시 프로그레스바 숨김
+//                        Log.d("MATCHING/POST/CARD/DATA", "SUCCESS")
+//                    }
+//                })
+//                delay(200)
+//            }
+////            // 최소 1초 동안 프로그레스바 표시 보장
+////            delay(5000)
+//
+//        }
+//    }
 
 
     // 받아온 프로필 정보로 UI를 업데이트하는 함수

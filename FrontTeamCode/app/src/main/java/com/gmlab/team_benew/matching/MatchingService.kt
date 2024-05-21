@@ -18,7 +18,8 @@ class MatchingService private constructor(private val context: Context) {
     private lateinit var matchingAlarmsPostView: MatchingAlarmsPostView
 
     companion object {
-        @Volatile private var instance: MatchingService? = null
+        @Volatile
+        private var instance: MatchingService? = null
 
         fun getInstance(context: Context): MatchingService {
             return instance ?: synchronized(this) {
@@ -35,53 +36,94 @@ class MatchingService private constructor(private val context: Context) {
         this.matchingAlarmsPostView = matchingAlarmsPostView
     }
 
-
-
-    // 1개씩 Post 매칭 만들고 유저 데이터 받아오는 함수
-    fun getUserData(matchRequestDto: MatchRequestDto, onResponse: (MatchingResponse) -> Unit){
+    fun getUserData(matchRequestDto: MatchRequestDto, onResponse: (List<MatchingResponse>) -> Unit, onFailure: (String)-> Unit){
         val token = getTokenFromSharedPreferences(context) ?: return
-        val userid = getIdFromSharedPreferences(context) ?: return //문자열을 정수형으로 반환
+        val userid = getIdFromSharedPreferences(context) ?: return // 문자열을 정수형으로 반환
         val bearerToken = "Bearer $token"
         val matchingPostService = getRetrofit().create(MatchingRetrofitInterface::class.java)
 
-        // 데이터 불변성으로 유지하기위해 사용
+        // 데이터 불변성으로 유지하기 위해 사용
         // MatchRequestDto에 사용자 ID 설정
         val updatedMatchRequestDto = matchRequestDto.copy(uid1 = userid)
 
-        matchingPostService.postCreateMatch(bearerToken, updatedMatchRequestDto).enqueue(object: Callback<MatchingResponse> {
-            override fun onResponse(call: Call<MatchingResponse>, response: Response<MatchingResponse>)
-            {
-                Log.d("NETWORK_MATCHING_USER_SUCCESS","USER_MATCHING_DATA_POST")
-               when(response.code()) {
-                   201 -> {
-                       val matchingResponse = response.body()
-                       matchingResponse?.let {
-                           onResponse(it)
-                           matchingPostView.onMatchingPostSuccess()
-                       } ?: run {
-                           Log.e("MatchingService", "Response body is null")
-                       }
-                   }
-                   204 -> {
-                       Log.e("MATHCING/POST/NOCONTENT","204,서버에서 보낼 유저가 없음")
-                   }
-
-                   401-> {
-                       matchingPostView.onMatchingPostFailure()
-                   }
-                   else -> {
-                       Log.e("MatchingService", "Error with response code: ${response.code()}")
-                   }
-               }
+        matchingPostService.postCreateMatch(bearerToken, updatedMatchRequestDto).enqueue(object : Callback<List<MatchingResponse>> {
+            override fun onResponse(call: Call<List<MatchingResponse>>, response: Response<List<MatchingResponse>>) {
+                Log.d("NETWORK_MATCHING_USER_SUCCESS", "USER_MATCHING_DATA_POST")
+                when (response.code()) {
+                    201 -> {
+                        val matchingResponses = response.body()
+                        if (matchingResponses.isNullOrEmpty()) {
+                            onFailure("더 이상 매칭이 없습니다. ")
+                        } else {
+                            onResponse(matchingResponses)
+                            matchingPostView.onMatchingPostSuccess()
+                        }
+                    }
+                    204 -> {
+                        Log.e("MATCHING/POST/NOCONTENT", "204, 서버에서 보낼 유저가 없음")
+                    }
+                    401 -> {
+                        matchingPostView.onMatchingPostFailure()
+                    }
+                    else -> {
+                        Log.e("MatchingService", "Error with response code: ${response.code()}")
+                    }
+                }
             }
 
-            override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
-                Log.e("NETWORK_MATCHING_USER_FAILURE","USER_MATCHING_DATA_FAILURE")
+            override fun onFailure(call: Call<List<MatchingResponse>>, t: Throwable) {
+                Log.e("NETWORK_MATCHING_USER_FAILURE", "USER_MATCHING_DATA_FAILURE")
                 // 기타 오류 처리
                 matchingPostView.onMatchingRequestFailure("유저 매칭 받아오는 중 네트워크 통신 에러.")
             }
         })
     }
+
+//    // 1개씩 Post 매칭 만들고 유저 데이터 받아오는 함수
+//    fun getUserData(matchRequestDto: MatchRequestDto, onResponse: (MatchingResponse) -> Unit){
+//        val token = getTokenFromSharedPreferences(context) ?: return
+//        val userid = getIdFromSharedPreferences(context) ?: return //문자열을 정수형으로 반환
+//        val bearerToken = "Bearer $token"
+//        val matchingPostService = getRetrofit().create(MatchingRetrofitInterface::class.java)
+//
+//        // 데이터 불변성으로 유지하기위해 사용
+//        // MatchRequestDto에 사용자 ID 설정
+//        val updatedMatchRequestDto = matchRequestDto.copy(uid1 = userid)
+//
+//        matchingPostService.postCreateMatch(bearerToken, updatedMatchRequestDto).enqueue(object: Callback<MatchingResponse> {
+//            override fun onResponse(call: Call<MatchingResponse>, response: Response<MatchingResponse>)
+//            {
+//                Log.d("NETWORK_MATCHING_USER_SUCCESS","USER_MATCHING_DATA_POST")
+//               when(response.code()) {
+//                   201 -> {
+//                       val matchingResponse = response.body()
+//                       matchingResponse?.let {
+//                           onResponse(it)
+//                           matchingPostView.onMatchingPostSuccess()
+//                       } ?: run {
+//                           Log.e("MatchingService", "Response body is null")
+//                       }
+//                   }
+//                   204 -> {
+//                       Log.e("MATHCING/POST/NOCONTENT","204,서버에서 보낼 유저가 없음")
+//                   }
+//
+//                   401-> {
+//                       matchingPostView.onMatchingPostFailure()
+//                   }
+//                   else -> {
+//                       Log.e("MatchingService", "Error with response code: ${response.code()}")
+//                   }
+//               }
+//            }
+//
+//            override fun onFailure(call: Call<MatchingResponse>, t: Throwable) {
+//                Log.e("NETWORK_MATCHING_USER_FAILURE","USER_MATCHING_DATA_FAILURE")
+//                // 기타 오류 처리
+//                matchingPostView.onMatchingRequestFailure("유저 매칭 받아오는 중 네트워크 통신 에러.")
+//            }
+//        })
+//    }
 
     fun likeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit) {
         val token = getTokenFromSharedPreferences(context) ?: return
@@ -118,6 +160,7 @@ class MatchingService private constructor(private val context: Context) {
                     else -> {
                         // 기타 오류 처리
                         matchingPostView.onMatchingRequestFailure("Unknown error occurred.")
+                        Log.e("MatchingService", "Error with response code: ${response.code()}")
                     }
                 }
             }

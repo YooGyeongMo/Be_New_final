@@ -52,7 +52,7 @@ class CardStackAdapter(val context: Context, items: List<Profile>) : RecyclerVie
                     .into(profileImageView)
             } ?: run {
                 // 프로필 사진이 null일 경우 기본 이미지 설정
-                profileImageView.setImageResource(R.drawable.profile_main) // 예시로 기본 이미지를 설정
+                profileImageView.setImageResource(R.drawable.male_avatar) // 예시로 기본 이미지를 설정
             }
 
             nameTextView.text = profile.member.name
