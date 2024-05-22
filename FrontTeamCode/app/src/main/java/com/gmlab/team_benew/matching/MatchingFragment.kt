@@ -33,6 +33,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
     private var userCount = 0;
     private var isFetching = false // 데이터 요청 중인지 표시하는 플래그
 
+    private var currentTopPosition = 0 // 현재 CardStackView의 topPosition
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -166,6 +167,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
 
             }
 
+
         })
 //        // MatchingService 인스턴스 생성
 //        val matchingService = MatchingService(requireContext())
@@ -176,6 +178,23 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
 //        // 매칭 프로필을 서버로부터 불러오는 함수를 호출
 //        fetchMatchingProfiles(matchingService)
 
+        if (savedInstanceState != null) {
+            matchingProfiles.addAll(savedInstanceState.getParcelableArrayList("profiles") ?: listOf())
+            matchingId.addAll(savedInstanceState.getLongArray("matchingIds")?.toList() ?: listOf())
+            currentTopPosition = savedInstanceState.getInt("currentTopPosition")
+            updateUI(matchingProfiles)
+            manager.topPosition = currentTopPosition
+        } else {
+            fetchMatchingProfiles(true)
+        }
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList("profiles", ArrayList(matchingProfiles))
+        outState.putLongArray("matchingIds", matchingId.toLongArray())
+        outState.putInt("currentTopPosition", manager.topPosition)
     }
 
     private fun fetchMatchingProfiles(preload: Boolean = false) {

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.gmlab.team_benew.main.HomeFragment"
+        android:name="com.gmlab.team_benew.main.home.HomeFragment"
         android:label="HomeFragment" >
         <action
             android:id="@+id/action_home_to_profileDetail"

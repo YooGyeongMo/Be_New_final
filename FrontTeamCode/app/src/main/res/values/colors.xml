@@ -31,4 +31,6 @@
     <color name="mainBg3">#ECECEC</color>
     <color name="mainBg4">#24235F</color>
 
+    <color name="mainNewBg">#F0F0F0</color>
+
 </resources>

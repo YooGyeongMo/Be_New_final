@@ -24,7 +24,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import android.view.animation.AlphaAnimation
 import android.view.animation.AnimationSet
+import android.widget.ImageView
 import androidx.core.content.ContextCompat.startActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.gmlab.team_benew.util.getStatusBarHeight
 
 class SplashActivity: AppCompatActivity(),SplashView{
@@ -48,17 +51,23 @@ class SplashActivity: AppCompatActivity(),SplashView{
         binding.pgProgressBar.visibility = View.GONE
 
 
-        // 여러 개의 애니메이션을 담을 AnimationSet 생성
-        val animationSet = AnimationSet(true)
-        fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
-        // AnimationSet에 애니메이션 추가
-        animationSet.addAnimation(fadeInAnim)
+//        // 여러 개의 애니메이션을 담을 AnimationSet 생성
+//        val animationSet = AnimationSet(true)
+//        fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+//        // AnimationSet에 애니메이션 추가
+//        animationSet.addAnimation(fadeInAnim)
+//
+//        // 애니메이션을 시작할 뷰에 AnimationSet 적용
+////        binding.ivSplashBg.startAnimation(animationSet)
+//        binding.ivSplashTitle.startAnimation(animationSet)
+//        binding.ivSplashTitleTxt.startAnimation(animationSet)
 
-        // 애니메이션을 시작할 뷰에 AnimationSet 적용
-//        binding.ivSplashBg.startAnimation(animationSet)
-        binding.ivSplashTitle.startAnimation(animationSet)
-        binding.ivSplashTitleTxt.startAnimation(animationSet)
-
+        val imageView = findViewById<ImageView>(R.id.iv_splash_title)
+        Glide.with(this)
+            .asGif()
+            .load("file:///android_asset/collab_splash_logo.gif")
+            .diskCacheStrategy(DiskCacheStrategy.ALL) // 디스크 캐시 전략 설정
+            .into(imageView)
 
         handler.postDelayed({
             val token = getTokenFromSharedPreferences(this)

@@ -13,6 +13,7 @@
     import androidx.navigation.findNavController
     import androidx.navigation.fragment.NavHostFragment
     import androidx.navigation.fragment.findNavController
+    import androidx.navigation.ui.NavigationUI
     import androidx.navigation.ui.setupWithNavController
     import com.gmlab.team_benew.R
     import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -50,7 +51,12 @@
                 supportFragmentManager.findFragmentById(R.id.Fragment_container) as NavHostFragment
             val navController = navHostFragment.navController
 
-            bottomNavigationView.setupWithNavController(navController)
+//            bottomNavigationView.setupWithNavController(navController)
+
+            bottomNavigationView.setOnItemSelectedListener { item ->
+                NavigationUI.onNavDestinationSelected(item, navController)
+                return@setOnItemSelectedListener true
+            }
 
             navController.addOnDestinationChangedListener{_, destination, _ ->
                 if(destination.id == R.id.navigation_profile_deatil ||

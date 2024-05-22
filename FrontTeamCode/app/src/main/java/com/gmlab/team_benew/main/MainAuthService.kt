@@ -1,12 +1,11 @@
 package com.gmlab.team_benew.main
 
-import android.content.Context
 import android.util.Log
 import com.gmlab.team_benew.auth.AuthRetrofitInterface
 
 import com.gmlab.team_benew.auth.UserGet
 import com.gmlab.team_benew.auth.getRetrofit
-import okhttp3.ResponseBody
+import com.gmlab.team_benew.main.home.HomeFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

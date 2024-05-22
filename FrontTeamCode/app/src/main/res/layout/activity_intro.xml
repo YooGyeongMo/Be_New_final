@@ -7,58 +7,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/mainBg3"
+    android:background="@color/mainBg2"
     >
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewpager_home_banner"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:fitsSystemWindows="true"
-        android:layout_marginTop="45dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_intro"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-        android:id="@+id/dotsIndicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom = "true"
-        android:layout_centerInParent = "true"
-        app:dotsCornerRadius="10dp"
-        app:dotsSize="10sp"
-        app:dotsColor="@color/white"
-        app:selectedDotColor="@color/mainBlue2"
-        app:layout_constraintTop_toBottomOf="@id/viewpager_home_banner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:dotsSpacing="4dp" />
-    <TextView
-        android:id="@+id/tv_intro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="안녕하세요"
-        android:textSize="35dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginStart="50dp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-    <TextView
-        android:id="@+id/tv_intro_sub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="원하는 팀과 원하는 팀원을 찾아 매칭해보세요\n 그들과 함께 멋진 프로젝트를 진행해보세요!"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18dp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewpager_home_banner"
-         />
+   <ImageView
+       android:id="@+id/iv_intro_gif"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintTop_toTopOf="parent"/>
+
+
 <!--    <TextView-->
 <!--        android:id="@+id/tv_intro_login"-->
 <!--        android:layout_width="wrap_content"-->
@@ -92,12 +52,12 @@
         android:id="@+id/btn_intro_login"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="시작하기"
+        android:text="로그인"
         android:textColor="@color/white"
         android:background="@drawable/button_bg"
-        android:layout_marginTop="30dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_intro_sub"
-        app:layout_constraintEnd_toStartOf="@id/btn_intro_register"
+        android:layout_marginBottom="150dp"
+       app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_intro_register"
         app:layout_constraintStart_toStartOf="parent"
         />
 
@@ -108,12 +68,20 @@
         android:text="회원가입"
         android:textColor="@color/white"
         android:background="@drawable/button_bg"
-        android:layout_marginTop="30dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_intro_sub"
+        android:layout_marginBottom="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/btn_intro_login"
         app:layout_constraintEnd_toEndOf="parent"
         />
-
+    <ProgressBar
+        android:id="@+id/pg_intro_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
 

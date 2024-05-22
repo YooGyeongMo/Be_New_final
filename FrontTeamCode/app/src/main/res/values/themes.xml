@@ -4,7 +4,7 @@
         <!-- Customize your light theme here. -->
         <!-- Status bar color. -->
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">@color/mainBg3</item>
+        <item name="android:statusBarColor">@color/mainBg2</item>
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
 
     </style>

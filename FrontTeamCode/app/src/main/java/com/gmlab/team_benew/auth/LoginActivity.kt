@@ -52,8 +52,19 @@ class LoginActivity : AppCompatActivity(), LoginView, ReLoginView {
 //            finish()
         }
 
+        // 뒤로가기 버튼 클릭 리스너 설정
+        binding.loginBacktab.setOnClickListener {
+            onBackPressed() // 뒤로 가기 버튼 클릭 시 액티비티 종료
+        }
 
     }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // 뒤로 가기 버튼 클릭 시 추가로 필요한 동작이 있다면 여기서 처리
+        // 예: Toast 메시지 표시
+        // Toast.makeText(this, "뒤로 가기 버튼 클릭", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun getUser() : User {
         val id : String = binding.tetLoginId.text.toString()

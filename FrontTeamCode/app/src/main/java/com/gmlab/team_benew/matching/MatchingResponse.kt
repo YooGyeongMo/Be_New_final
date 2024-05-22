@@ -1,7 +1,11 @@
 package com.gmlab.team_benew.matching
 
 import com.gmlab.team_benew.auth.Role
+import android.os.Parcel
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class MatchingResponse(
     val isUid2Team: Boolean,
     val matchId: Long,
@@ -11,8 +15,9 @@ data class MatchingResponse(
     val profile: Profile,
     val projectId: Int,
     val uid1: Int
-)
+) : Parcelable
 
+@Parcelize
 data class Profile(
     val matchId: Long, // 서버 응답에 따라 추가
     val id: Int,
@@ -24,8 +29,9 @@ data class Profile(
     val photo: String,
     val projectExperience: Boolean,
     val role: String
-)
+) : Parcelable
 
+@Parcelize
 data class Member(
     val account: String,
     val birthday: String,
@@ -36,10 +42,10 @@ data class Member(
     val name: String,
     val password: String,
     val phoneNumber: String,
-    val roles: List<Role>
-)
+): Parcelable
 
+@Parcelize
 data class Role(
     val name: String
-)
+): Parcelable
 

@@ -1,4 +1,4 @@
-package com.gmlab.team_benew.main
+package com.gmlab.team_benew.main.home
 
 import android.view.LayoutInflater
 import android.view.View
