@@ -1,11 +1,13 @@
     package com.gmlab.team_benew.main
 
+    import android.app.Activity
     import android.content.ContentValues.TAG
     import android.os.Bundle
     import android.util.Log
     import android.view.Menu
     import android.view.MenuItem
     import android.view.View
+    import android.view.WindowManager
     import android.widget.ImageView
     import androidx.appcompat.app.AppCompatActivity
     import androidx.fragment.app.Fragment
@@ -16,6 +18,8 @@
     import androidx.navigation.ui.NavigationUI
     import androidx.navigation.ui.setupWithNavController
     import com.gmlab.team_benew.R
+    import com.gmlab.team_benew.databinding.ActivityMainBinding
+    import com.gmlab.team_benew.util.getStatusBarHeight
     import com.google.android.material.bottomnavigation.BottomNavigationView
     import kotlinx.coroutines.*
     import okhttp3.ResponseBody
@@ -23,6 +27,7 @@
 
     class MainActivity : AppCompatActivity(),MainLiveAlarmsView { //compat 호환성을 해준다는 이야기
 
+        private lateinit var binding: ActivityMainBinding
         private var redDot: View? = null
 
         private lateinit var mainAlarmsGetService: MainAlarmsGetService
@@ -32,7 +37,8 @@
         //lifecycle 콜백함수
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            setContentView(com.gmlab.team_benew.R.layout.activity_main) //사용자에게 보여줄 레이아웃 선정 파일 ID인수로
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root) //사용자에게 보여줄 레이아웃 선정 파일 ID인수로
 
             toolbar = findViewById(R.id.toolbar_app_default)
             logoImageView = toolbar.findViewById(R.id.iv_logo_image_view_home)
@@ -41,6 +47,12 @@
             // 툴바 제목 설정 제거
             supportActionBar?.title = ""
 
+//            binding.mainRootLayout.setPadding(0, getStatusBarHeight(this), 0, 0)
+//
+//            //status bar와 navigation bar 모두 투명하게 만드는 코드
+//            window.setFlags(
+//                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+//                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
             Log.d(TAG, "onCreate")
 
@@ -66,7 +78,8 @@
                     destination.id == R.id.navigation_matching ||
                     destination.id == R.id.navigation_testing ||
                     destination.id == R.id.navigation_project_list ||
-                    destination.id == R.id.navigation_project_deatil
+                    destination.id == R.id.navigation_project_deatil ||
+                    destination.id == R.id.navigation_project_post_deatil
                     ) {
                     //해당 프레그먼트로 이동 시에 툴바의 로고 버튼을 뒤로가기 버튼으로 대체
                     supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -137,7 +150,7 @@
 
         private fun updateRedDot(body: ResponseBody) {
             val count = parseResponse(body)
-            GlobalScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Main) {
                 if (count > 0) {
                     redDot?.visibility = View.VISIBLE
                     Log.d("MAIN/LIVE/ALARMS/SUCCESS","알람 갯수 데이터 1개이상 정상성공")

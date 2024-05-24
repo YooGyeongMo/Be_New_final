@@ -26,18 +26,24 @@ import com.gmlab.team_benew.R
 import com.gmlab.team_benew.main.MainAuthService
 import com.gmlab.team_benew.main.MainView
 import com.gmlab.team_benew.main.UserNameCallback
+import com.gmlab.team_benew.project.ProjectListService
+import com.gmlab.team_benew.project.ProjectListView
+import com.gmlab.team_benew.project.ProjectResponse
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import java.io.ByteArrayOutputStream
 
 
-class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
+class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectListView {
 
     private lateinit var viewPager: ViewPager2
+    private lateinit var viewPager2: ViewPager2
     private lateinit var textIndicator: TextView
     private lateinit var textIndicatorData: TextView
     private lateinit var  homeService: HomeService
     private lateinit var profileImageView: ImageView
     private lateinit var peerImageView: ImageView
     private lateinit var loadingIndicator: ProgressBar
+    private var viewPager2Indicator: DotsIndicator? = null
 
     private val homeViewModel: HomeViewModel by viewModels()
 
@@ -54,6 +60,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
         super.onResume()
         getUserInfo() // 사용자 정보를 새로고침하는 메서드 호출
         getUserProfileInfo()
+        loadProjects()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,10 +73,18 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
         profileImageView = view.findViewById(R.id.iv_profile_info_pic)
         peerImageView = view.findViewById(R.id.home_profile_preview_peer_review_weather)
         loadingIndicator = view.findViewById(R.id.loading_indicator)
+        viewPager2 = view.findViewById(R.id.vp_home_project_list)
+        viewPager2Indicator = view.findViewById(R.id.did_project_list)
+
 
         // ViewModel의 프로필 데이터를 관찰합니다.
         homeViewModel.profileData.observe(viewLifecycleOwner, Observer { profileData ->
             profileData?.let { updateProfileUI(it) }
+        })
+
+        // ViewModel의 프로젝트 데이터를 관찰합니다.
+        homeViewModel.projectList.observe(viewLifecycleOwner, Observer { projects ->
+            updateProjectList(projects)
         })
 
         // ViewModel의 로딩 상태를 관찰합니다.
@@ -78,10 +93,13 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
         })
 
 
+
         // 여기서 사용자 정보를 가져옴
         getUserInfo()
         //여기서 사용자 프로젝트 프로필 미리보기 데이터 가져오기
         getUserProfileInfo()
+        // 프로젝트 목록을 로드합니다.
+        loadProjects()
 
 
         // 이미지 리스트
@@ -95,13 +113,11 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
         // 어댑터 설정
         val adapter = HomeBannerImageAdapter(imageList)
         viewPager.adapter = adapter
-
         // 초기 페이지 설정
         viewPager.setCurrentItem(0, false)
 
         // 텍스트 인디케이터 초기화
         updateTextIndicator(0, imageList.size)
-
         // 페이지 변경 리스너 설정
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -136,6 +152,41 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
 
 
     }
+
+    private fun loadProjects() {
+        val projectListService = ProjectListService(requireContext())
+        projectListService.setProjectListView(this) // HomeFragment를 ProjectListView로 설정
+        projectListService.getProjects() // 프로젝트 목록 가져오기
+    }
+
+    private fun updateProjectList(projects: List<ProjectResponse?>) {
+        val adapter: HomeProjectListAdapter
+
+        if (projects.isNotEmpty()) {
+            adapter = HomeProjectListAdapter(projects, findNavController())
+            viewPager2.adapter = adapter // 어댑터 설정을 먼저 합니다.
+            viewPager2Indicator?.setViewPager2(viewPager2)
+            viewPager2Indicator?.visibility = View.VISIBLE
+        } else {
+            // 프로젝트 리스트가 비어 있을 때 빈 아이템 추가
+            val emptyProjectList = listOf<ProjectResponse?>(null)
+            adapter = HomeProjectListAdapter(emptyProjectList, findNavController())
+            viewPager2.adapter = adapter // 어댑터 설정을 먼저 합니다.
+            viewPager2Indicator?.visibility = View.GONE
+        }
+
+
+        // 초기 페이지 설정
+        viewPager2.setCurrentItem(0, false)
+
+        // 페이지 변경 리스너 설정
+        viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+            }
+        })
+    }
+
 
     private fun updateTextIndicator(position: Int, total: Int) {
         val currentPosition = (position % total) + 1
@@ -321,6 +372,29 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView {
 
     override fun onHomeGetFailure() {
         Log.e("HomeFragment", "Failed to get profile data")
+    }
+
+    // ProjectListView 인터페이스 구현
+    override fun onProjectListSuccess(projects: List<ProjectResponse>) {
+        homeViewModel.setProjectList(projects)
+        Log.d("HomeFragment", "프로젝트 리스트 불러오는데 성공! 200")
+    }
+
+    override fun onProjectListEmpty() {
+        homeViewModel.setProjectList(emptyList())
+        Log.e("HomeFragment", "프로젝트 리스트가 비어있습니다.")
+    }
+
+    override fun onProjectListFailure() {
+        Log.e("HomeFragment", "프로젝트 리스트 불러오는데 실패 401에러")
+    }
+
+    override fun onProjectListForbidden() {
+        Log.e("HomeFragment", "접근 금지 403에러")
+    }
+
+    override fun onProjectListNotFound() {
+        Log.e("HomeFragment", "프로젝트 리스트를 찾을 수 없음 404에러")
     }
 
 

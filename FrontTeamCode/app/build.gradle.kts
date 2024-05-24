@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -31,6 +32,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -82,7 +84,5 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 // 인디케이터 애니메이션
     implementation("com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2")
-
-
 
 }

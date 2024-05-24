@@ -13,7 +13,7 @@
         android:icon="@drawable/selector_matching_icon"
         android:title="매칭"/>
     <item
-        android:id="@+id/navigation_myteampage"
+        android:id="@+id/navigation_project_list"
         android:icon="@drawable/selector_myteam_icon"
         android:title="@string/label_myteam_icon"/>
     <item

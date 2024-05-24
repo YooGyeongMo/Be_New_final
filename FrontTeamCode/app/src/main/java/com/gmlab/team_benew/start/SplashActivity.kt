@@ -32,7 +32,7 @@ import com.gmlab.team_benew.util.getStatusBarHeight
 
 class SplashActivity: AppCompatActivity(),SplashView{
     private val handler = Handler()
-    private lateinit var fadeInAnim : Animation
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

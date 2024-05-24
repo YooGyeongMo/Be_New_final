@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
     app:startDestination="@id/navigation_home">
 
@@ -12,14 +13,20 @@
             android:id="@+id/action_home_to_profileDetail"
             app:destination="@id/navigation_profile_deatil" />
         <action
-            android:id="@+id/action_home_to_projectList"
-            app:destination="@id/navigation_project_list" />
-        <action
             android:id="@+id/action_home_to_teamList"
             app:destination="@id/navigation_team_list" />
         <action
             android:id="@+id/action_home_to_intro_testing"
             app:destination="@id/navigation_intro_testing" />
+        <action
+            android:id="@+id/action_home_to_projectList"
+            app:destination="@id/navigation_project_list" />
+        <action
+            android:id="@+id/action_home_to_projectDetail"
+            app:destination="@id/navigation_project_deatil" />
+        <action
+            android:id="@+id/action_home_to_navigation_project_post_deatil"
+            app:destination="@id/navigation_project_post_deatil" />
     </fragment>
     <fragment
         android:id="@+id/navigation_setting"
@@ -38,14 +45,6 @@
         android:name="com.gmlab.team_benew.profile.ProfileDetailFragment"
         android:label="ProfileDetailFragment" />
     <fragment
-        android:id="@+id/navigation_project_list"
-        android:name="com.gmlab.team_benew.teamproject.ProjectListFragment"
-        android:label="ProjectListFragment" >
-        <action
-            android:id="@+id/action_projectList_to_projectDetail"
-            app:destination="@id/navigation_project_deatil" />
-    </fragment>
-    <fragment
         android:id="@+id/navigation_team_list"
         android:name="com.gmlab.team_benew.teamproject.TeamListFragment"
         android:label="TeamListFragment" >
@@ -53,10 +52,6 @@
             android:id="@+id/action_teamList_to_teamDetail"
             app:destination="@id/navigation_team_detail" />
     </fragment>
-    <fragment
-        android:id="@+id/navigation_project_deatil"
-        android:name="com.gmlab.team_benew.teamproject.ProjectDetailFragment"
-        android:label="ProjectDetailFragment" />
     <fragment
         android:id="@+id/navigation_team_detail"
         android:name="com.gmlab.team_benew.teamproject.TeamDetailFragment"
@@ -110,6 +105,22 @@
             android:name="selectedLanguage"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_project_list"
+        android:name="com.gmlab.team_benew.project.ProjectListFragment"
+        android:label="ProjectListFragment" >
+        <action
+            android:id="@+id/action_navigation_project_list_to_projectPostDeatilFragment"
+            app:destination="@id/navigation_project_post_deatil" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_project_post_deatil"
+        android:name="com.gmlab.team_benew.project.projectpostdetail.ProjectPostDeatilFragment"
+        android:label="ProjectPostDeatilFragment" />
+    <fragment
+        android:id="@+id/navigation_project_deatil"
+        android:name="com.gmlab.team_benew.main.home.ProjectDetailFragment"
+        android:label="ProjectDetailFragment" />
 
 </navigation>
 

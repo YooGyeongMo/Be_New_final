@@ -1,7 +1,6 @@
 package com.gmlab.team_benew.main.home
 
 import android.content.Context
-import com.gmlab.team_benew.auth.AuthRetrofitInterface
 import com.gmlab.team_benew.auth.getRetrofit
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,7 +46,6 @@ class HomeService(private val context: Context) {
             homeView.onHomeGetFailure()
         }
     }
-
 
     private fun getTokenFromSharedPreferences(): String? {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
