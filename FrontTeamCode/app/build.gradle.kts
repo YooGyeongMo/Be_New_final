@@ -90,4 +90,7 @@ dependencies {
 // 인디케이터 애니메이션
     implementation("com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2")
 
+    //radio 버튼
+    implementation ("com.google.android.material:material:<1.9.0>")
+
 }

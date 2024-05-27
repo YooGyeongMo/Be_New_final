@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".test.CodingTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".main.home.firstSetting.FirstSettingActivity"
             android:exported="false" />
         <activity
