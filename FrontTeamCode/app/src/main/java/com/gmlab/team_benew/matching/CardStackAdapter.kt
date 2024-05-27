@@ -1,6 +1,8 @@
 package com.gmlab.team_benew.matching
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.gmlab.team_benew.R
 
 class CardStackAdapter(val context: Context, items: List<Profile>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>(){
@@ -17,6 +20,16 @@ class CardStackAdapter(val context: Context, items: List<Profile>) : RecyclerVie
             field = value
             notifyDataSetChanged()
         }
+
+    private fun decodeBase64(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardStackAdapter.ViewHolder {
 
@@ -44,15 +57,21 @@ class CardStackAdapter(val context: Context, items: List<Profile>) : RecyclerVie
         private val profileImageView: ImageView = itemView.findViewById(R.id.civ_matching_profile_user_image)
 
         fun binding(profile: Profile){
-            // 프로필 이미지 로딩 (Glide 사용)
-            profile.photo?.let {
-                val imageByteArray = Base64.decode(it, Base64.DEFAULT)
-                Glide.with(context)
-                    .load(imageByteArray)
+          val matchingPhotoBase64 = profile.photo
+
+            if(matchingPhotoBase64.isNullOrEmpty()){
+                Glide.with(itemView)
+                    .load(R.drawable.male_avatar)
                     .into(profileImageView)
-            } ?: run {
-                // 프로필 사진이 null일 경우 기본 이미지 설정
-                profileImageView.setImageResource(R.drawable.male_avatar) // 예시로 기본 이미지를 설정
+            }
+            else {
+                val bitmapDecode = decodeBase64(matchingPhotoBase64)
+                bitmapDecode?.let{
+                    Glide.with(itemView)
+                        .load(it)
+                        .apply(RequestOptions().fitCenter())
+                        .into(profileImageView)
+                }
             }
 
             nameTextView.text = profile.member.name

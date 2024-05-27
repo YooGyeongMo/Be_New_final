@@ -16,6 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:theme="@style/Progressbar_color_under_api21"
         />
     <com.yuyakaido.android.cardstackview.CardStackView
         android:id="@+id/cardstackView"

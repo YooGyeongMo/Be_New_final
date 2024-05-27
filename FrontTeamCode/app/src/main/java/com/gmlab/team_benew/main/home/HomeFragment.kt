@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Base64
@@ -15,12 +19,15 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.gmlab.team_benew.R
@@ -41,6 +48,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 
 class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectListView {
@@ -237,25 +246,17 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             // photo가 null이거나 빈 문자열인 경우
             Glide.with(this)
                 .load(R.drawable.male_avatar)
-                .placeholder(R.drawable.male_avatar) // 로딩 중일 때 표시할 기본 이미지
-                .error(R.drawable.male_avatar) // 로드 실패 시 표시할 기본 이미지
+                .apply(RequestOptions.circleCropTransform())
                 .into(profileImageView)
         } else {
-            // photo가 유효한 URL인 경우
-            Glide.with(this)
-                .asBitmap()
-                .load(photoUrl)
-                .placeholder(R.drawable.male_avatar) // 로딩 중일 때 표시할 기본 이미지
-                .error(R.drawable.male_avatar) // 로드 실패 시 표시할 기본 이미지
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        handleBitmap(resource)
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                        // Handle if needed
-                    }
-                })
+            // photo가 Base64 문자열인 경우
+            val bitmap = decodeBase64(photoUrl)
+            bitmap?.let {
+               Glide.with(this)
+                   .load(it)
+                   .apply(RequestOptions().circleCrop())
+                   .into(profileImageView)
+            }
         }
 
         val drawableResource = when (profileData.peer) {
@@ -269,33 +270,43 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         peerImageView.setImageResource(drawableResource)
     }
 
-    private fun handleBitmap(bitmap: Bitmap) {
-        // 이미지 크기 조절
-        val resizedBitmap = resizeBitmap(bitmap, 100, 100)
-        // Bitmap을 Base64로 인코딩
-        val base64Image = compressAndEncodeBitmap(resizedBitmap)
-        // 인코딩된 이미지를 다시 이미지 버튼에 설정
-        setBitmapFromBase64(base64Image, profileImageView)
+    private fun decodeBase64(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            null
+        }
+    }
+    private fun dpToPx(context: Context, dp: Int): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 
-    fun compressAndEncodeBitmap(bitmap: Bitmap, quality: Int = 100): String {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        // 이미지 크기를 줄이고 JPEG 형식으로 압축
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
-        val byteArray = byteArrayOutputStream.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
-    }
-
-    fun resizeBitmap(bitmap: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
-        return Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
-    }
-
-    private fun setBitmapFromBase64(base64String: String, imageView: ImageView) {
-        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
-        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-        // 이미지 버튼에 디코딩된 이미지 설정
-        imageView.setImageBitmap(bitmap)
-    }
+//    private fun getRoundedBitmapWithBackground(bitmap: Bitmap, size: Int, backgroundColor: Int): Bitmap {
+//        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+//        val canvas = Canvas(output)
+//        val paint = Paint().apply {
+//            isAntiAlias = true
+//            color = backgroundColor
+//        }
+//
+//        // 배경색을 그립니다.
+//        canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
+//
+//        // 이미지의 크기를 조정하여 가운데에 맞춥니다.
+//        val shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+//        paint.shader = shader
+//
+//        // 반지름은 50dp를 픽셀로 변환한 값이어야 합니다.
+//        val radius = size / 2f
+//        val center = size / 2f
+//
+//        // 이미지를 가운데에 맞춰서 원형으로 자릅니다.
+//        canvas.drawCircle(center, center, radius / 2, paint)
+//
+//        return output
+//    }
 
     private fun getUserInfo() {
         val cachedUserName = getCachedUserName()
