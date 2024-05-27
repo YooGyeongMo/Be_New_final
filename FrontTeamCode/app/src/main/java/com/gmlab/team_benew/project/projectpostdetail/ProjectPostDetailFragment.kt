@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.gmlab.team_benew.databinding.FragmentMyProjectDetailBinding
 import com.gmlab.team_benew.databinding.FragmentMyprojectPostBinding
 
-class ProjectPostDeatilFragment : Fragment() {
+class ProjectPostDetailFragment : Fragment() {
 
     private var _binding: FragmentMyprojectPostBinding? = null
     private val binding get() = _binding!!

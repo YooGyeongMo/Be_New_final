@@ -18,6 +18,35 @@
         android:textSize="30sp"
         android:textStyle="bold"
         android:text="프로젝트 목록" />
+    <TextView
+        android:id="@+id/tv_welcome_no_my_project_intro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="등록된 프로젝트가 없습니다."
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/tv_welcome_no_my_project_intro_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome_no_my_project_intro"
+        android:layout_marginTop="10dp"
+        android:text="프로젝트를 등록하여\n 팀을 이끌어 보세요!"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:visibility="gone"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/my_recycler_view_project_list"
         android:layout_width="match_parent"

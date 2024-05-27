@@ -35,6 +35,7 @@ class ProjectListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         if (holder is ProjectViewHolder && position < projectList.size) {
             val projectItem = projectList[position]
             holder.bind(projectItem)
@@ -44,6 +45,7 @@ class ProjectListAdapter(
     override fun getItemCount(): Int = if (projectList.isEmpty()) 1 else projectList.size + 1
 
     class ProjectViewHolder(private val binding: ItemProjectListInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(projectItem: ProjectResponse) {
             binding.tvProjectListProjectTitleInfo.text = projectItem.projectName
             binding.tvProjectListProjectPersonInfo.text = "${projectItem.numberOfMembers}명"

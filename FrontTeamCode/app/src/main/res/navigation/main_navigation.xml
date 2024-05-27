@@ -115,11 +115,11 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_project_post_deatil"
-        android:name="com.gmlab.team_benew.project.projectpostdetail.ProjectPostDeatilFragment"
+        android:name="com.gmlab.team_benew.project.projectpostdetail.ProjectPostDetailFragment"
         android:label="ProjectPostDeatilFragment" />
     <fragment
         android:id="@+id/navigation_project_deatil"
-        android:name="com.gmlab.team_benew.main.home.ProjectDetailFragment"
+        android:name="com.gmlab.team_benew.project.ProjectDetailFragment"
         android:label="ProjectDetailFragment" />
 
 </navigation>
