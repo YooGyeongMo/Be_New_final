@@ -3,18 +3,18 @@ package com.gmlab.team_benew.auth
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.gmlab.team_benew.auth.register.screens.Register3Fragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import okhttp3.ResponseBody
-import kotlin.math.sign
 
 class AuthService {
     private lateinit var signUpView: SignUpView
     private lateinit var loginView: LoginView
     private lateinit var reloginView: ReLoginView
 
-    fun setSignUpView(signUpView: SignUpView) {
+    fun setSignUpView(signUpView: Register3Fragment) {
         this.signUpView = signUpView
     }
 
@@ -130,5 +130,4 @@ class AuthService {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref.getString("userToken", null)
     }
-
 }

@@ -1,6 +1,7 @@
 package com.gmlab.team_benew.main.home
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -23,13 +24,22 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.auth.AuthRetrofitInterface
+import com.gmlab.team_benew.auth.getRetrofit
 import com.gmlab.team_benew.main.MainAuthService
 import com.gmlab.team_benew.main.MainView
 import com.gmlab.team_benew.main.UserNameCallback
+import com.gmlab.team_benew.main.home.firstSetting.FirstSettingActivity
+import com.gmlab.team_benew.main.home.firstSetting.getNicknameData
+import com.gmlab.team_benew.main.home.firstSetting.getNicknameRequest
+import com.gmlab.team_benew.profile.getProfileDetailData
 import com.gmlab.team_benew.project.ProjectListService
 import com.gmlab.team_benew.project.ProjectListView
 import com.gmlab.team_benew.project.ProjectResponse
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 
 
@@ -53,8 +63,6 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
-
-
     }
     override fun onResume() {
         super.onResume()
@@ -66,7 +74,6 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         viewPager = view.findViewById(R.id.vp_home_banner)
         textIndicator = view.findViewById(R.id.tv_home_banner_text_indicator)
         textIndicatorData = view.findViewById(R.id.tv_home_banner_text_indicator_data)
@@ -76,6 +83,9 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         viewPager2 = view.findViewById(R.id.vp_home_project_list)
         viewPager2Indicator = view.findViewById(R.id.did_project_list)
 
+        //김대환 : db에 닉네임이 없으면 초기 프로필 작성 액티비티를 띄운다
+        //초기 사진 닉네임 세팅 없이 테스트 하고 싶으면 주석처리 할 것
+        checkNicknameIsEmpty()
 
         // ViewModel의 프로필 데이터를 관찰합니다.
         homeViewModel.profileData.observe(viewLifecycleOwner, Observer { profileData ->
@@ -397,5 +407,46 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         Log.e("HomeFragment", "프로젝트 리스트를 찾을 수 없음 404에러")
     }
 
+    //김대환 : db에서 nickname이 null이면 firstSetting 액티비티를 띄움
+    fun checkNicknameIsEmpty(){
 
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+
+        val token = sharedPref?.getString("userToken", "")
+        val memberId = sharedPref?.getInt("loginId", 0)
+
+        if (!token.isNullOrEmpty() && memberId != null && memberId != 0) {
+            val apiService = getRetrofit().create(getNicknameRequest::class.java)
+            val call: Call<getNicknameData> = apiService.getNickname("Bearer $token", memberId)
+
+            call.enqueue(object : Callback<getNicknameData> {
+                override fun onResponse(call: Call<getNicknameData>, response: Response<getNicknameData>) {
+                    if (response.isSuccessful) {
+                        val nicknameData = response.body()
+
+                        if (nicknameData != null && nicknameData.nickname == null) {
+                            // 닉네임이 비어있거나 널인 경우 처리
+                            Log.d("NicknameCheck", "닉네임이 비어있음")
+
+                            val intent = Intent(requireContext(), FirstSettingActivity::class.java)
+                            startActivity(intent)
+                        } else if (nicknameData != null) {
+                            // 닉네임이 비어있지 않은 경우 처리
+                            Log.d("NicknameCheck", "닉네임: ${nicknameData.nickname}")
+                        } else {
+                            // nicknameData가 널인 경우 처리
+                            Log.e("NicknameCheck", "nicknameData is null")
+                        }
+                    } else {
+                        Log.e("NicknameCheck", "Response unsuccessful")
+                    }
+                }
+                override fun onFailure(call: Call<getNicknameData>, t: Throwable) {
+
+                }
+            })
+        } else {
+            // token이나 memberId가 유효하지 않은 경우
+        }
+    }
 }

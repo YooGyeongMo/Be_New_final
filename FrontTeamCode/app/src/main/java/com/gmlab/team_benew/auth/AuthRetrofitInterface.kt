@@ -26,6 +26,12 @@ interface AuthRetrofitInterface {
     @GET("/user/get")
     fun userGet(@Header("Authorization") bearerToken: String, @Query("account") account: String): Call<UserGet>
 
-    //
+    @GET("/check/account")
+    fun checkAccount(@Query("account") account: String): Call<AccountCheckGet>
 
+    @GET("/check/email")
+    fun checkEmail(@Query("email") email: String): Call<EmailCheckGet>
+
+    @GET("/check/phone")
+    fun checkPhone(@Query("phone") phone: String): Call<PhoneCheckGet>
 }

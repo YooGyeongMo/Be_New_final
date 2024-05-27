@@ -20,3 +20,14 @@ data class RegisterUser(
 
 )
 
+data class AccountCheck(
+    @SerializedName(value = "account") var id : String
+)
+
+data class EmailCheck(
+    @SerializedName(value = "email") var email: String
+)
+
+data class PhoneCheck(
+    @SerializedName(value = "phoneNumber") var phoneNumber: String
+)

@@ -54,3 +54,18 @@ data class UserGet(
 data class Role(
     @SerializedName("name") var name: String
 )
+
+data class  AccountCheckGet(
+    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("message") var message: String
+)
+
+data class  EmailCheckGet(
+    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("message") var message: String
+)
+
+data class  PhoneCheckGet(
+    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("message") var message: String
+)
