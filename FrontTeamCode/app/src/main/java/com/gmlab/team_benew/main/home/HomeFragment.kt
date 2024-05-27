@@ -44,6 +44,7 @@ import com.gmlab.team_benew.profile.getProfileDetailData
 import com.gmlab.team_benew.project.ProjectListService
 import com.gmlab.team_benew.project.ProjectListView
 import com.gmlab.team_benew.project.ProjectResponse
+import com.gmlab.team_benew.test.CodingTestActivity
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import retrofit2.Call
 import retrofit2.Callback
@@ -107,6 +108,9 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         mainProjectLoadingIndicator = view.findViewById(R.id.main_project_loading_indicator)
         noMainProjectData = view.findViewById(R.id.no_main_project)
 
+        // 버튼 클릭 리스너 설정
+        val buttonSkillTest = view.findViewById<Button>(R.id.btn_skill_test)
+        buttonSkillTest.setOnClickListener { onButtonClicked(it) }
 
         //김대환 : db에 닉네임이 없으면 초기 프로필 작성 액티비티를 띄운다
         //초기 사진 닉네임 세팅 없이 테스트 하고 싶으면 주석처리 할 것
@@ -286,6 +290,14 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
 //            R.id.cv_project_info_card -> findNavController().navigate(R.id.action_home_to_projectList) // 프로젝트 리스트로
 //            R.id.cv_my_team_list -> findNavController().navigate(R.id.action_home_to_teamList) // 팀 리스트로
 //            R.id.btn_do_test -> findNavController().navigate(R.id.action_home_to_intro_testing) // testing 화면으로
+        }
+    }
+    private fun onButtonClicked(view: View) {
+        when (view.id) {
+            R.id.btn_skill_test -> {
+                val intent = Intent(requireContext(), CodingTestActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
