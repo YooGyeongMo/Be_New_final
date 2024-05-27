@@ -407,7 +407,6 @@
             app:layout_constraintTop_toBottomOf="@id/tv_home_my_main_project"
             app:layout_constraintEnd_toEndOf="parent"
             app:strokeWidth="0dp">
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_main_project_border"
                 android:layout_width="match_parent"
@@ -432,7 +431,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="D-DAY"
+                    android:text="진행률"
                     android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_home_my_main_project_name_info"
@@ -442,7 +441,7 @@
                     android:id="@+id/tv_home_my_main_project_d_day_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-100"
+                    android:text="70%"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_home_my_main_project_d_day"
                     android:layout_marginEnd="10dp"
@@ -464,6 +463,32 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="8dp"
                     android:progressDrawable="@drawable/progress_bar_states"/>
+                <ProgressBar
+                    android:id="@+id/main_project_loading_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:theme="@style/Progressbar_color_under_api21"
+                    />
+
+                <TextView
+                    android:id="@+id/no_main_project"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="새로운 프로젝트를\n만드세요"
+                    android:textAlignment="center"
+                    android:textColor="@color/mainBlue2"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 

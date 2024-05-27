@@ -64,8 +64,15 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     private lateinit var peerImageView: ImageView
     private lateinit var loadingIndicator: ProgressBar
     private var viewPager2Indicator: DotsIndicator? = null
+    private lateinit var mainProjectNameTextView: TextView
+    private lateinit var mainProjectDdayTextView: TextView
+    private lateinit var mainProjectProgressBar: ProgressBar
+    private lateinit var mainProjectLoadingIndicator: ProgressBar
+    private lateinit var noMainProjectData: TextView
 
     private val homeViewModel: HomeViewModel by viewModels()
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +86,8 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         getUserInfo() // 사용자 정보를 새로고침하는 메서드 호출
         getUserProfileInfo()
         loadProjects()
+        // 데이터 로드 호출
+        getMainProjectData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -92,6 +101,12 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         loadingIndicator = view.findViewById(R.id.loading_indicator)
         viewPager2 = view.findViewById(R.id.vp_home_project_list)
         viewPager2Indicator = view.findViewById(R.id.did_project_list)
+        mainProjectNameTextView = view.findViewById(R.id.tv_home_my_main_project_name_info)
+        mainProjectDdayTextView = view.findViewById(R.id.tv_home_my_main_project_d_day_data)
+        mainProjectProgressBar = view.findViewById(R.id.pb_home_main_project_percent_state)
+        mainProjectLoadingIndicator = view.findViewById(R.id.main_project_loading_indicator)
+        noMainProjectData = view.findViewById(R.id.no_main_project)
+
 
         //김대환 : db에 닉네임이 없으면 초기 프로필 작성 액티비티를 띄운다
         //초기 사진 닉네임 세팅 없이 테스트 하고 싶으면 주석처리 할 것
@@ -112,6 +127,10 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             loadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         })
 
+        homeViewModel.mainProjectData.observe(viewLifecycleOwner, Observer { projectData ->
+            projectData?.let { updateMainProjectUI(it) }
+        })
+
 
 
         // 여기서 사용자 정보를 가져옴
@@ -120,6 +139,8 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         getUserProfileInfo()
         // 프로젝트 목록을 로드합니다.
         loadProjects()
+        // 데이터 로드 호출
+        getMainProjectData()
 
 
         // 이미지 리스트
@@ -221,6 +242,42 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             textIndicatorData.setTextColor(resources.getColor(R.color.white, null))
             textIndicator.setTextColor(resources.getColor(R.color.white, null))
         }
+    }
+
+    private fun updateMainProjectUI(projectData: getMainProjectData) {
+        if(projectData != null){
+            noMainProjectData.visibility = View.GONE
+            mainProjectProgressBar.visibility = View.VISIBLE
+            mainProjectDdayTextView.visibility = View.VISIBLE
+            mainProjectNameTextView.visibility = View.VISIBLE
+
+            mainProjectNameTextView.text = projectData.projectName
+            mainProjectDdayTextView.text = "${projectData.projectRateOfProgress}%"
+            mainProjectProgressBar.progress = projectData.projectRateOfProgress
+        }
+        else {
+            noMainProjectData.visibility = View.VISIBLE
+            mainProjectProgressBar.visibility = View.GONE
+            mainProjectDdayTextView.visibility = View.GONE
+            mainProjectNameTextView.visibility = View.GONE
+        }
+    }
+
+    private fun getMainProjectData() {
+        mainProjectLoadingIndicator.visibility = View.VISIBLE // 로딩 인디케이터 표시
+        val homeService = HomeService(requireContext())
+        homeService.setHomeView(this)
+        homeService.getMainProjectData()
+    }
+
+    override fun onMainProjectGetSuccess(projectData: getMainProjectData) {
+        mainProjectLoadingIndicator.visibility = View.GONE // 로딩 인디케이터 숨기기
+        Log.d("HomeFragment", "메인 프로젝트 데이터 성공: $projectData")
+        homeViewModel.setMainProjectData(projectData)
+    }
+    override fun onMainProjectGetFailure(statusCode: Int) {
+        mainProjectLoadingIndicator.visibility = View.GONE // 로딩 인디케이터 숨기기
+        Log.e("HomeFragment", "메인 프로젝트 데이터 실패:  $statusCode")
     }
 
     private fun onCardClicked(view: View) {
