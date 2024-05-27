@@ -18,6 +18,9 @@ class HomeViewModel : ViewModel() {
     private val _projectList = MutableLiveData<List<ProjectResponse>>()
     val projectList: LiveData<List<ProjectResponse>> get() = _projectList
 
+    private val _mainProjectData = MutableLiveData<getMainProjectData>()
+    val mainProjectData: LiveData<getMainProjectData> get() = _mainProjectData
+
     fun setProfileData(data: getProfilePreiviewData) {
         _profileData.value = data
         _isLoading.value = false
@@ -29,6 +32,11 @@ class HomeViewModel : ViewModel() {
 
     fun setProjectList(projects: List<ProjectResponse>) {
         _projectList.value = projects
+        _isLoading.value = false
+    }
+
+    fun setMainProjectData(projectData: getMainProjectData) {
+        _mainProjectData.value = projectData
         _isLoading.value = false
     }
 

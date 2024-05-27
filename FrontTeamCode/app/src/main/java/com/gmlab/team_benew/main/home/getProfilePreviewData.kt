@@ -14,3 +14,8 @@ data class getProfilePreiviewData(
     @SerializedName("photo") val photo: String,
     @SerializedName("peer") val peer: Int
     )
+
+data class getMainProjectData(
+    @SerializedName("projectName") val projectName: String,
+    @SerializedName("projectRateOfProgress") val projectRateOfProgress: Int,
+)
