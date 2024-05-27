@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import com.gmlab.team_benew.R
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -213,19 +214,19 @@ class ProfileDetailFragment: Fragment() {
 
         val request = postProfileDetailData(instruction, nickname, projectExperience, role, personalLink, photo)
 
-        val call: Call<Boolean> = apiService.postProfile("Bearer $token", memberId, request)
+        val call: Call<ResponseBody> = apiService.postProfile("Bearer $token", memberId, request)
 
-        call.enqueue(object : Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                if (response.isSuccessful) {
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.code() == 200) {
                     Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show();
                 } else{
                     Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show();
                 }
             }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                Log.e("API_CALL_FAILURE", "API Call Failed", t)
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("API_CALL_FAILURE", "API Call Failed: ${t.localizedMessage}", t)
             }
 
         })
@@ -549,14 +550,15 @@ class ProfileDetailFragment: Fragment() {
             })
         }
     }
-    fun compressAndEncodeBitmap(bitmap: Bitmap, quality: Int = 100): String {
+    fun compressAndEncodeBitmap(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         // 이미지 크기를 줄이고 JPEG 형식으로 압축
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
+    //비율 정할 때 쓰는 것
     fun resizeBitmap(bitmap: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
         return Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
     }
@@ -566,8 +568,8 @@ class ProfileDetailFragment: Fragment() {
 
         if (drawable is BitmapDrawable) {
             val originalBitmap = drawable.bitmap
-            val resizedBitmap = resizeBitmap(originalBitmap, 100, 100)
-            return compressAndEncodeBitmap(resizedBitmap, quality)
+            //val resizedBitmap = resizeBitmap(originalBitmap, 100, 100)
+            return compressAndEncodeBitmap(originalBitmap)
         } else {
             return ""
         }

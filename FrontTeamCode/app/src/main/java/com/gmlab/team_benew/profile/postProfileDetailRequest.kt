@@ -1,5 +1,6 @@
 package com.gmlab.team_benew.profile
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -11,5 +12,5 @@ interface postProfileDetailRequest {
     fun postProfile(
         @Header("Authorization") token: String,
         @Path("memberId") memberId: Int,
-        @Body request: postProfileDetailData): Call<Boolean>
+        @Body request: postProfileDetailData): Call<ResponseBody>
 }

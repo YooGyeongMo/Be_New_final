@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.auth.getRetrofit
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,9 +70,9 @@ class FirstSetting1Fragment : Fragment() {
         }
 
         //밑 3줄 테스트용 코드 삭제할 것
-        val viewPager = requireActivity().findViewById<ViewPager2>(R.id.vp_firstSettingViewPager_viewPager)
-        val currentIndex = viewPager.currentItem
-        viewPager.setCurrentItem(currentIndex + 1, true)
+        //val viewPager = requireActivity().findViewById<ViewPager2>(R.id.vp_firstSettingViewPager_viewPager)
+        //val currentIndex = viewPager.currentItem
+        //viewPager.setCurrentItem(currentIndex + 1, true)
 
         var nickname = et_nickname.text.toString()
         var photo = imageButtonToBase64(imgb_picture)
@@ -81,14 +82,16 @@ class FirstSetting1Fragment : Fragment() {
         val token = sharedPref?.getString("userToken", "")
         val memberId = sharedPref?.getInt("loginId", 0)
 
+
+
         if (!token.isNullOrEmpty() && memberId != null && memberId != 0) {
             val apiService = getRetrofit().create(postFirstSettingRequest::class.java)
             val request = postFirstSettingData(nickname, photo)
-            val call: Call<Boolean> = apiService.postFirstSetting("Bearer $token", memberId, request)
+            val call: Call<ResponseBody> = apiService.postFirstSetting("Bearer $token", memberId, request)
 
-            call.enqueue(object : Callback<Boolean> {
-                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                    if (response.isSuccessful) {
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.code() == 200) {
                         Toast.makeText(requireContext(), "저장했습니다", Toast.LENGTH_LONG).show()
 
                         val viewPager = requireActivity().findViewById<ViewPager2>(R.id.vp_firstSettingViewPager_viewPager)
@@ -101,7 +104,7 @@ class FirstSetting1Fragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     Log.e("API_CALL_FAILURE", "API Call Failed", t)
                 }
 
@@ -119,25 +122,20 @@ class FirstSetting1Fragment : Fragment() {
         }
     }
 
-    fun compressAndEncodeBitmap(bitmap: Bitmap, quality: Int = 100): String {
+    fun compressAndEncodeBitmap(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
-        // 이미지 크기를 줄이고 JPEG 형식으로 압축
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    fun resizeBitmap(bitmap: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
-        return Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
-    }
-
-    private fun imageButtonToBase64(imageButton: ImageButton, quality: Int = 100): String {
+    private fun imageButtonToBase64(imageButton: ImageButton): String {
         val drawable = imageButton.drawable
 
         if (drawable is BitmapDrawable) {
             val originalBitmap = drawable.bitmap
-            val resizedBitmap = resizeBitmap(originalBitmap, 100, 100)
-            return compressAndEncodeBitmap(resizedBitmap, quality)
+            return compressAndEncodeBitmap(originalBitmap)
         } else {
             return ""
         }
