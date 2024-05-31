@@ -76,7 +76,8 @@ class HomeService(private val context: Context) {
                 }
 
                 override fun onFailure(call: Call<getMainProjectData>, t: Throwable) {
-                    Log.e("NETWORK/FAILURE","Home main project 네트워크 연결실패")
+                    Log.e("NETWORK/FAILURE", "Home main project 네트워크 연결실패: ${t.message}")
+                    homeView.onMainProjectGetFailure(-1) // 추가된 실패 처리
                 }
             })
         } else {

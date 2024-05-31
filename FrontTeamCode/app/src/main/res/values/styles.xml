@@ -9,4 +9,9 @@
         <item name="colorAccent">@color/mainBlue2</item>
     </style>
 
+    <style name="CustomSpinnerStyle">
+        <item name="android:background">@drawable/modal_spinner_background</item>
+    </style>
+
+
 </resources>

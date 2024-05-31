@@ -4,11 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.BitmapShader
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Shader
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -29,10 +24,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.gmlab.team_benew.R
-import com.gmlab.team_benew.auth.AuthRetrofitInterface
 import com.gmlab.team_benew.auth.getRetrofit
 import com.gmlab.team_benew.main.MainAuthService
 import com.gmlab.team_benew.main.MainView
@@ -52,7 +44,6 @@ import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-
 
 class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectListView {
 
@@ -242,22 +233,25 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             textIndicatorData.setTextColor(resources.getColor(R.color.black, null))
             textIndicator.setTextColor(resources.getColor(R.color.black, null))
         }
-        else{
+        else {
             textIndicatorData.setTextColor(resources.getColor(R.color.white, null))
             textIndicator.setTextColor(resources.getColor(R.color.white, null))
         }
     }
 
     private fun updateMainProjectUI(projectData: getMainProjectData) {
-        if(projectData != null){
+        if(projectData != null) {
             noMainProjectData.visibility = View.GONE
             mainProjectProgressBar.visibility = View.VISIBLE
             mainProjectDdayTextView.visibility = View.VISIBLE
             mainProjectNameTextView.visibility = View.VISIBLE
 
             mainProjectNameTextView.text = projectData.projectName
-            mainProjectDdayTextView.text = "${projectData.projectRateOfProgress}%"
-            mainProjectProgressBar.progress = projectData.projectRateOfProgress
+
+            // double 값을 올림하여 int로 변환
+            val progressRate = Math.ceil(projectData.projectRateOfProgress).toInt()
+            mainProjectDdayTextView.text = "$progressRate%"
+            mainProjectProgressBar.progress = progressRate
         }
         else {
             noMainProjectData.visibility = View.VISIBLE
@@ -397,6 +391,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             updateUserNameUI(cachedUserName)
         }
     }
+
     override fun onUserNameReceived(userName: String) {
         val cachedUserName = getCachedUserName()
         if (cachedUserName != userName) {

@@ -71,6 +71,22 @@
             android:background="@drawable/btn_basic"/>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_if_no_project_show_this_button"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:text="새로운 프로젝트 만들기"
+            android:textColor="@color/mainBlue2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="15dp"
+            android:visibility="gone"
+            android:background="@drawable/btn_basic"/>
+
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_team_searching_intro"
             android:layout_width="0dp"
             android:layout_height="40dp"

@@ -114,7 +114,6 @@
         app:layout_constraintEnd_toEndOf="@id/ti_login_pw"
         app:layout_constraintStart_toStartOf="@id/ti_login_pw"
         app:layout_constraintTop_toBottomOf="@id/ti_login_pw"
-
         />
 
     <TextView

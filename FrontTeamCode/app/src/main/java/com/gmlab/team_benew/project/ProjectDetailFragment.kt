@@ -30,6 +30,7 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
     private lateinit var projectIntroTextView: TextView
     private lateinit var projectProgressBar: ProgressBar
     private lateinit var loadingIndicator: ProgressBar
+    private lateinit var projectDetailContent: View
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +39,7 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_my_project_detail, container, false)
 
+        projectDetailContent = view.findViewById(R.id.project_detail_content)
         projectNameTextView = view.findViewById(R.id.tv_project_title_name_of_detail)
         projectStartDateTextView = view.findViewById(R.id.tv_project_detail_start_date_data)
         projectEndDateTextView = view.findViewById(R.id.tv_project_detail_end_date_data)
@@ -54,7 +56,13 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
         })
 
         projectDetailViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            loadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+            if (isLoading) {
+                loadingIndicator.visibility = View.VISIBLE
+                projectDetailContent.visibility = View.GONE
+            } else {
+                loadingIndicator.visibility = View.GONE
+                projectDetailContent.visibility = View.VISIBLE
+            }
         })
 
         return view
@@ -95,6 +103,7 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
         projectEndDateTextView.text = projectDetail.projectDeadlineDate
         projectOneLineIntroTextView.text = projectDetail.projectOneLineIntroduction
         projectIntroTextView.text = projectDetail.projectIntroduction
+
     }
 
 }

@@ -95,6 +95,17 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="5dp"
                 />
+            <ImageView
+                android:id="@+id/popup_project_list_edit_or_disband"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/btn_more_option"
+                android:contentDescription="More option"
+                app:layout_constraintStart_toEndOf="@id/tv_project_list_project_title_info"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
