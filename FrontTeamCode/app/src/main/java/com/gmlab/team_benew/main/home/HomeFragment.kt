@@ -4,11 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.BitmapShader
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Shader
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -29,10 +24,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.gmlab.team_benew.R
-import com.gmlab.team_benew.auth.AuthRetrofitInterface
 import com.gmlab.team_benew.auth.getRetrofit
 import com.gmlab.team_benew.main.MainAuthService
 import com.gmlab.team_benew.main.MainView
@@ -44,6 +36,7 @@ import com.gmlab.team_benew.profile.getProfileDetailData
 import com.gmlab.team_benew.project.ProjectListService
 import com.gmlab.team_benew.project.ProjectListView
 import com.gmlab.team_benew.project.ProjectResponse
+import com.gmlab.team_benew.test.CodingTestActivity
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import retrofit2.Call
 import retrofit2.Callback
@@ -51,7 +44,6 @@ import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-
 
 class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectListView {
 
@@ -107,6 +99,9 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         mainProjectLoadingIndicator = view.findViewById(R.id.main_project_loading_indicator)
         noMainProjectData = view.findViewById(R.id.no_main_project)
 
+        // 버튼 클릭 리스너 설정
+        val buttonSkillTest = view.findViewById<Button>(R.id.btn_skill_test)
+        buttonSkillTest.setOnClickListener { onButtonClicked(it) }
 
         //김대환 : db에 닉네임이 없으면 초기 프로필 작성 액티비티를 띄운다
         //초기 사진 닉네임 세팅 없이 테스트 하고 싶으면 주석처리 할 것
@@ -238,22 +233,25 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             textIndicatorData.setTextColor(resources.getColor(R.color.black, null))
             textIndicator.setTextColor(resources.getColor(R.color.black, null))
         }
-        else{
+        else {
             textIndicatorData.setTextColor(resources.getColor(R.color.white, null))
             textIndicator.setTextColor(resources.getColor(R.color.white, null))
         }
     }
 
     private fun updateMainProjectUI(projectData: getMainProjectData) {
-        if(projectData != null){
+        if(projectData != null) {
             noMainProjectData.visibility = View.GONE
             mainProjectProgressBar.visibility = View.VISIBLE
             mainProjectDdayTextView.visibility = View.VISIBLE
             mainProjectNameTextView.visibility = View.VISIBLE
 
             mainProjectNameTextView.text = projectData.projectName
-            mainProjectDdayTextView.text = "${projectData.projectRateOfProgress}%"
-            mainProjectProgressBar.progress = projectData.projectRateOfProgress
+
+            // double 값을 올림하여 int로 변환
+            val progressRate = Math.ceil(projectData.projectRateOfProgress).toInt()
+            mainProjectDdayTextView.text = "$progressRate%"
+            mainProjectProgressBar.progress = progressRate
         }
         else {
             noMainProjectData.visibility = View.VISIBLE
@@ -286,6 +284,14 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
 //            R.id.cv_project_info_card -> findNavController().navigate(R.id.action_home_to_projectList) // 프로젝트 리스트로
 //            R.id.cv_my_team_list -> findNavController().navigate(R.id.action_home_to_teamList) // 팀 리스트로
 //            R.id.btn_do_test -> findNavController().navigate(R.id.action_home_to_intro_testing) // testing 화면으로
+        }
+    }
+    private fun onButtonClicked(view: View) {
+        when (view.id) {
+            R.id.btn_skill_test -> {
+                val intent = Intent(requireContext(), CodingTestActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
@@ -385,6 +391,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             updateUserNameUI(cachedUserName)
         }
     }
+
     override fun onUserNameReceived(userName: String) {
         val cachedUserName = getCachedUserName()
         if (cachedUserName != userName) {

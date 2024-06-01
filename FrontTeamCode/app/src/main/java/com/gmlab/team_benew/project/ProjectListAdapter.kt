@@ -1,8 +1,14 @@
 package com.gmlab.team_benew.project
 
+import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide.init
@@ -27,7 +33,7 @@ class ProjectListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_PROJECT) {
             val binding = ItemProjectListInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ProjectViewHolder(binding)
+            ProjectViewHolder(binding, navController)
         } else {
             val binding = ItemProjectNoListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             NoProjectViewHolder(binding, navController)
@@ -35,6 +41,7 @@ class ProjectListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         if (holder is ProjectViewHolder && position < projectList.size) {
             val projectItem = projectList[position]
             holder.bind(projectItem)
@@ -43,11 +50,44 @@ class ProjectListAdapter(
 
     override fun getItemCount(): Int = if (projectList.isEmpty()) 1 else projectList.size + 1
 
-    class ProjectViewHolder(private val binding: ItemProjectListInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ProjectViewHolder(
+        private val binding: ItemProjectListInfoBinding,
+        private val navController: NavController
+        ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(projectItem: ProjectResponse) {
             binding.tvProjectListProjectTitleInfo.text = projectItem.projectName
             binding.tvProjectListProjectPersonInfo.text = "${projectItem.numberOfMembers}명"
             binding.tvProjectListProjectStartDateInfo.text = projectItem.projectStartDate
+
+            binding.popupProjectListEditOrDisband.setOnClickListener { view ->
+                showPopupMenu(view.context, view, projectItem)
+        }
+    }
+        private fun showPopupMenu(context: Context, anchorView: View, projectItem: ProjectResponse) {
+            val inflater = LayoutInflater.from(context)
+            val popupView = inflater.inflate(R.layout.popup_menu_layout, null)
+
+            val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
+            popupWindow.elevation = 10f
+
+            val actionEdit = popupView.findViewById<TextView>(R.id.action_edit)
+            val actionDelete = popupView.findViewById<TextView>(R.id.action_delete)
+
+            actionEdit.setOnClickListener {
+                popupWindow.dismiss()
+                navController.navigate(R.id.action_project_list_to_project_edit_detail, Bundle().apply {
+                    putParcelable("projectItem", projectItem)
+                })
+            }
+
+            actionDelete.setOnClickListener {
+                popupWindow.dismiss()
+                // Perform delete operation here
+            }
+
+            // Show the popup window
+            popupWindow.showAsDropDown(anchorView, 0, 0)
         }
     }
 

@@ -74,7 +74,8 @@ dependencies {
     //okHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
-
+    implementation ("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation("com.squareup.okhttp3:okhttp-sse:4.9.0")
     //Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
@@ -92,5 +93,7 @@ dependencies {
 
     //radio 버튼
     implementation ("com.google.android.material:material:<1.9.0>")
+    implementation ("com.airbnb.android:lottie:4.2.0")
+
 
 }

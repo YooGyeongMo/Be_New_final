@@ -125,13 +125,14 @@ class MatchingService private constructor(private val context: Context) {
 //        })
 //    }
 
-    fun likeMatch(matchId: Long, onResponse: (MatchingResponse) -> Unit) {
+    fun likeMatch(matchId: Long, projectId: Int, onResponse: (MatchingResponse) -> Unit) {
         val token = getTokenFromSharedPreferences(context) ?: return
         val bearerToken = "Bearer $token"
 
         val matchingLikePatchService = getRetrofit().create(MatchingRetrofitInterface::class.java)
+        val request = LikeMatchRequest(projectId) // 프로젝트 ID를 포함한 요청 객체
 
-        matchingLikePatchService.patchLikeMatch(bearerToken, matchId).enqueue(object : Callback<MatchingResponse>
+        matchingLikePatchService.patchLikeMatch(bearerToken, matchId, request).enqueue(object : Callback<MatchingResponse>
         {
             override fun onResponse(call: Call<MatchingResponse>, response: Response<MatchingResponse>)
             {

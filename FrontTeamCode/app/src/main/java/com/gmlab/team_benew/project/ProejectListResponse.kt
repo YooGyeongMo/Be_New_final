@@ -1,7 +1,10 @@
 package com.gmlab.team_benew.project
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class ProjectResponse(
     @SerializedName("creationDate") val creationDate: String,
     @SerializedName("numberOfMembers") val numberOfMembers: Int,
@@ -13,8 +16,9 @@ data class ProjectResponse(
     @SerializedName("projectOneLineIntroduction") val projectOneLineIntroduction: String,
     @SerializedName("projectStartDate") val projectStartDate: String,
     @SerializedName("projectStarted") val projectStarted: Boolean
-)
+) : Parcelable
 
+@Parcelize
 data class Profile(
     @SerializedName("id") val id: Int,
     @SerializedName("instruction") val instruction: String,
@@ -25,8 +29,9 @@ data class Profile(
     @SerializedName("photo") val photo: String,
     @SerializedName("projectExperience") val projectExperience: Boolean,
     @SerializedName("role") val role: String
-)
+) : Parcelable
 
+@Parcelize
 data class Member(
     @SerializedName("account") val account: String,
     @SerializedName("birthday") val birthday: String,
@@ -39,8 +44,9 @@ data class Member(
     @SerializedName("phoneNumber") val phoneNumber: String,
     @SerializedName("roles") val roles: List<Role>,
     @SerializedName("token") val token: String
-)
+) : Parcelable
 
+@Parcelize
 data class Role(
     @SerializedName("name") val name: String
-)
+) : Parcelable

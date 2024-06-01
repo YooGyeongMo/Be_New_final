@@ -9,6 +9,7 @@
         <item name="colorAccent">@color/mainBlue2</item>
     </style>
 
+<<<<<<< HEAD
     <!-- 로그아웃 팝업창 -->
     <style name="LogoutPopupDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowMinWidthMajor">80%</item>
@@ -18,4 +19,11 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+=======
+    <style name="CustomSpinnerStyle">
+        <item name="android:background">@drawable/modal_spinner_background</item>
+    </style>
+
+
+>>>>>>> abd623129e427f87b3e1f4ae17e43699a895f511
 </resources>

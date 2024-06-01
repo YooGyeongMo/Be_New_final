@@ -112,15 +112,30 @@
         <action
             android:id="@+id/action_navigation_project_list_to_projectPostDeatilFragment"
             app:destination="@id/navigation_project_post_deatil" />
+        <action
+            android:id="@+id/action_project_list_to_project_edit_detail"
+            app:destination="@id/navigation_project_edit_detail" />
     </fragment>
     <fragment
         android:id="@+id/navigation_project_post_deatil"
-        android:name="com.gmlab.team_benew.project.projectpostdetail.ProjectPostDeatilFragment"
+        android:name="com.gmlab.team_benew.project.projectpostdetail.ProjectPostDetailFragment"
         android:label="ProjectPostDeatilFragment" />
     <fragment
         android:id="@+id/navigation_project_deatil"
-        android:name="com.gmlab.team_benew.main.home.ProjectDetailFragment"
+        android:name="com.gmlab.team_benew.project.ProjectDetailFragment"
         android:label="ProjectDetailFragment" />
+    <fragment
+        android:id="@+id/navigation_project_edit_detail"
+        android:name="com.gmlab.team_benew.project.projecteditdetail.ProjectEditDetail"
+        android:label="ProjectEditDetail" />
+    <fragment
+        android:id="@+id/navigation_chat_intro"
+        android:name="com.gmlab.team_benew.chat.chatintro.ChatIntroFragment"
+        android:label="ChatIntroFragment" >
+        <action
+            android:id="@+id/action_navaction_chat_intro_to_chatListFragment"
+            app:destination="@id/navigation_chatListFragment" />
+    </fragment>
 
 </navigation>
 

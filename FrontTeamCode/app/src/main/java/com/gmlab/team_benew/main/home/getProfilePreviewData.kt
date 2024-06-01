@@ -17,5 +17,5 @@ data class getProfilePreiviewData(
 
 data class getMainProjectData(
     @SerializedName("projectName") val projectName: String,
-    @SerializedName("projectRateOfProgress") val projectRateOfProgress: Int,
+    @SerializedName("projectRateOfProgress") val projectRateOfProgress: Double,
 )

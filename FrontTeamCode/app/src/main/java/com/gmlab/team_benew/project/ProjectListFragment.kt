@@ -5,12 +5,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.gmlab.team_benew.R
 import com.gmlab.team_benew.databinding.FragmentIntroMyprojectBinding
 
 class ProjectListFragment : Fragment(), ProjectListView {
@@ -20,6 +23,9 @@ class ProjectListFragment : Fragment(), ProjectListView {
     private lateinit var projectListAdapter: ProjectListAdapter
     private val projectListViewModel: ProjectListViewModel by viewModels()
     private lateinit var projectListService: ProjectListService
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var noProjectTextView: TextView
+    private lateinit var noProjectTextView2: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +53,16 @@ class ProjectListFragment : Fragment(), ProjectListView {
         projectListViewModel.projects.observe(viewLifecycleOwner, Observer { projects ->
             projectListAdapter = ProjectListAdapter(projects,  findNavController())
             binding.myRecyclerViewProjectList.adapter = projectListAdapter
+
+            if(projects.isNullOrEmpty()){
+                binding.myRecyclerViewProjectList.visibility = View.GONE
+                binding.tvWelcomeNoMyProjectIntro.visibility = View.VISIBLE
+                binding.tvWelcomeNoMyProjectIntro2.visibility = View.VISIBLE
+            } else {
+                binding.myRecyclerViewProjectList.visibility = View.VISIBLE
+                binding.tvWelcomeNoMyProjectIntro.visibility = View.GONE
+                binding.tvWelcomeNoMyProjectIntro2.visibility = View.GONE
+            }
         })
 
         projectListViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
