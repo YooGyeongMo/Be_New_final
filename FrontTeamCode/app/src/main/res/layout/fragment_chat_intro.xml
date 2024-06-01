@@ -90,9 +90,18 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_welcome_chat_pic" />
+    <ImageView
+        android:id="@+id/btn_add_friends_or_add_chat"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/person_add"
+        app:layout_constraintBottom_toTopOf="@id/rc_freinds_list_or_chat_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="40dp"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rc_freinds_list"
+        android:id="@+id/rc_freinds_list_or_chat_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="260dp"
     android:layout_height="wrap_content"
-    android:background="#FFFFFF"
+    android:background="@drawable/white_btn_"
     android:layout_gravity="center"
     tools:context=".main.LogoutPopupActivity">
 
@@ -13,7 +13,7 @@
         android:id="@+id/btn_logoutPopup_true"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/mainBlue2"
+        android:background="@drawable/button_bg"
         android:text="네"
         android:textColor="#FFFFFF"
         android:textSize="16dp"
@@ -26,7 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="아니요"
-        android:background="#FFFFFF"
+        android:background="@drawable/white_btn_stroke"
         android:textSize="16dp"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
