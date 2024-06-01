@@ -131,8 +131,8 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
         mainAlarmsGetService.setMainLiveAlarmsView(this)
 
 
-        // 5초 후에 폴링 시작
-        startPolling()
+//        // 5초 후에 폴링 시작
+//        startPolling()
 
     }
 
@@ -200,6 +200,7 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
     }
 
     override fun onNewEvent(data: String) {
+        Log.d("SSE", "New event received: $data")
         // 알림 데이터 처리
         runOnUiThread {
             showNotification(this, data)
@@ -290,7 +291,13 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
 
     private fun updateUI(data: String) {
         // Update UI based on the data received
-        redDot?.visibility = View.VISIBLE
+        Log.d("SSE", "Updating UI with data: $data")
+        redDot?.let {
+            it.visibility = View.VISIBLE
+            Log.d("SSE", "Red dot set to VISIBLE")
+        } ?: run {
+            Log.e("SSE", "redDot is null")
+        }
     }
 
 
