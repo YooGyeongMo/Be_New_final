@@ -22,6 +22,7 @@ class SSEService(private val listener: SSEListener, private val token: String) {
         eventSource = EventSources.createFactory(client).newEventSource(request, object : EventSourceListener() {
             override fun onOpen(eventSource: EventSource, response: Response) {
                 Log.d("SSE", "Connection opened")
+                listener.onConnectionOpened()
             }
 
             override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
@@ -31,6 +32,7 @@ class SSEService(private val listener: SSEListener, private val token: String) {
 
             override fun onClosed(eventSource: EventSource) {
                 Log.d("SSE", "Connection closed")
+                listener.onConnectionClosed()
             }
 
             override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
@@ -47,5 +49,7 @@ class SSEService(private val listener: SSEListener, private val token: String) {
     interface SSEListener {
         fun onNewEvent(data: String)
         fun onConnectionError(t: Throwable?)
+        fun onConnectionOpened()
+        fun onConnectionClosed()
     }
 }

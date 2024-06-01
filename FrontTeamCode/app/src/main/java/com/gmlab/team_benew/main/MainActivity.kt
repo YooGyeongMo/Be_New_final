@@ -1,8 +1,14 @@
 package com.gmlab.team_benew.main
 
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -10,7 +16,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -28,13 +36,14 @@ import okhttp3.ResponseBody
 import okhttp3.sse.EventSource
 
 
-class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호환성을 해준다는 이야기
+class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListener { //compat 호환성을 해준다는 이야기
 
     private lateinit var binding: ActivityMainBinding
     private var redDot: View? = null
     private lateinit var sseService: SSEService
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var logoImageView: ImageView
+    private lateinit var mainAlarmsGetService: MainAlarmsGetService
 
     //lifecycle 콜백함수
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,6 +127,13 @@ class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호�
             Log.e("SSE", "토큰이 없음!!")
         }
 
+        mainAlarmsGetService = MainAlarmsGetService(this)
+        mainAlarmsGetService.setMainLiveAlarmsView(this)
+
+
+        // 5초 후에 폴링 시작
+        startPolling()
+
     }
 
     private fun startSSE() {
@@ -126,6 +142,50 @@ class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호�
             sseService.startSSE(userId)
         } else {
             Log.e("SSE", "UserID가 없음!!")
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar, menu)
+
+        val notificationItem = menu.findItem(R.id.item1)
+        val chatItem = menu.findItem(R.id.item2)
+
+        val notificationActionView = notificationItem.actionView
+        redDot = notificationActionView?.findViewById(R.id.red_dot_notification)
+        val chatActionView = chatItem.actionView
+
+        notificationActionView?.setOnClickListener { navigateToFragment(R.id.navigation_notification) }
+        chatActionView?.setOnClickListener { navigateToFragment(R.id.navigation_chat_intro) }
+
+        // 최초 알림 확인
+        checkAlarmsOnce()
+
+        return true
+    }
+
+    private fun checkAlarmsOnce() {
+        mainAlarmsGetService.getUserAlarms(this)
+    }
+
+    private fun startPolling(){
+        lifecycleScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                delay(5000) // 5초마다 반복
+                mainAlarmsGetService.getUserAlarms(this@MainActivity)
+            }
+        }
+    }
+
+    private fun updateRedDot(count: Int) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (count > 0) {
+                redDot?.visibility = View.VISIBLE
+                Log.d("MAIN/LIVE/ALARMS/SUCCESS", "알람 갯수 데이터 1개 이상 정상 성공")
+            } else {
+                redDot?.visibility = View.GONE
+                Log.d("MAIN/LIVE/ALARMS/SUCCESS", "알람 갯수 데이터 0개 정상 성공")
+            }
         }
     }
 
@@ -142,7 +202,8 @@ class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호�
     override fun onNewEvent(data: String) {
         // 알림 데이터 처리
         runOnUiThread {
-            redDot?.visibility = View.VISIBLE
+            showNotification(this, data)
+            updateUI(data)
         }
     }
 
@@ -165,31 +226,92 @@ class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호�
         }
     }
 
+    override fun onConnectionOpened() {
+        runOnUiThread {
+            Toast.makeText(this, "서버와 연결됨 Connection Opened", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onConnectionClosed() {
+        runOnUiThread {
+            Toast.makeText(this, "서버로부터 연결 끊어짐 Connection Closed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         sseService.stopSSE()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-
-        val notificationItem = menu.findItem(R.id.item1)
-        val chatItem = menu.findItem(R.id.item2)
-
-        val notificationActionView = notificationItem.actionView
-        redDot = notificationActionView?.findViewById(R.id.red_dot_notification)
-        val chatActionView = chatItem.actionView
-
-        notificationActionView?.setOnClickListener { navigateToFragment(R.id.navigation_notification) }
-        chatActionView?.setOnClickListener { navigateToFragment(R.id.navigation_chat_intro) }
-
-        return true
-    }
 
 
     private fun navigateToFragment(fragmentId: Int) {
         findNavController(R.id.Fragment_container).navigate(fragmentId)
     }
+
+    private fun showNotification(context: Context, message: String) {
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val NOTIFICATION_CHANNEL_ID = "my_channel_id_01"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Event Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Channel for Event Notification"
+                enableLights(true)
+                lightColor = Color.RED
+                vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+                enableVibration(true)
+            }
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        val notificationIntent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle("New Event")
+            .setContentText(message)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        notificationManager.notify(1, notificationBuilder.build())
+    }
+
+    private fun updateUI(data: String) {
+        // Update UI based on the data received
+        redDot?.visibility = View.VISIBLE
+    }
+
+
+    private fun parseResponse(body: ResponseBody): Int {
+        // 서버 응답에서 알람 개수를 파싱하는 로직 구현
+        return body.string().toIntOrNull() ?: 0
+    }
+
+    // MainAlarmsGetService에서 알람 확인이 성공적일 때 호출되는 함수
+    override fun onMainLiveAlarmsGetSuccess(responseBody: ResponseBody) {
+        val count = parseResponse(responseBody)
+        Log.d("MainActivity", "Alarm count: $count")
+        updateRedDot(count)
+    }
+
+
+    override fun onMainLiveAlarmsGetFailure() {
+        Log.e("MAIN/LIVE/ALARMS/FAILURE","알람 갯수 데이터 실패")
+    }
+}
+
 
 //        private fun showAlertDialog()
 //        {
@@ -204,6 +326,3 @@ class MainActivity : AppCompatActivity(), SSEService.SSEListener { //compat 호�
 //                }
 //                .show()
 //        }
-
-
-}
