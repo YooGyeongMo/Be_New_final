@@ -16,6 +16,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".main.LogoutPopupActivity"
+            android:theme="@style/LogoutPopupDialog"
+            android:exported="false" />
+        <activity
             android:name=".test.CodingTestActivity"
             android:exported="false" />
         <activity
@@ -47,7 +51,10 @@
             android:name=".auth.SignUpActivity"
             android:exported="false"
             android:theme="@style/Theme.SeeMeet.TransparentStatusBar" />
+
         <activity android:name=".main.MainActivity" />
+
+
     </application>
 
 </manifest>
