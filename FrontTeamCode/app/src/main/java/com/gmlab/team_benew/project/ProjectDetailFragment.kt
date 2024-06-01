@@ -10,11 +10,15 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.project.projectgetdetail.GetProjectDeatilResponse
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailService
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailView
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailViewModel
+import com.gmlab.team_benew.project.projectgetmember.ProjectGetMemberViewModel
+import com.gmlab.team_benew.project.projectgetmember.ProjectMemberListAdapter
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -22,6 +26,8 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
 
     private lateinit var projectDetailService: ProjectDetailService
     private val projectDetailViewModel: ProjectDetailViewModel by viewModels()
+    private val projectGetMemberViewModel: ProjectGetMemberViewModel by viewModels()
+
 
     private lateinit var projectNameTextView: TextView
     private lateinit var projectStartDateTextView: TextView
@@ -31,6 +37,9 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
     private lateinit var projectProgressBar: ProgressBar
     private lateinit var loadingIndicator: ProgressBar
     private lateinit var projectDetailContent: View
+    private lateinit var memberViewPager: ViewPager2
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +56,7 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
         projectIntroTextView = view.findViewById(R.id.tv_project_detail_explain_introduction_info_data)
         projectProgressBar = view.findViewById(R.id.pb_project_detail_state_data)
         loadingIndicator = view.findViewById(R.id.project_detail_loading_indicator)
+        memberViewPager = view.findViewById(R.id.viewPager_team_members)
 
         projectDetailService = ProjectDetailService(requireContext())
         projectDetailService.setProjectDetailView(this)
@@ -65,8 +75,32 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
             }
         })
 
+        projectGetMemberViewModel.projectMembers.observe(viewLifecycleOwner, Observer { members ->
+            memberViewPager.adapter = ProjectMemberListAdapter(members)
+
+        })
+
+        projectGetMemberViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            if (isLoading) {
+                loadingIndicator.visibility = View.VISIBLE
+                projectDetailContent.visibility = View.GONE
+            } else {
+                loadingIndicator.visibility = View.GONE
+                projectDetailContent.visibility = View.VISIBLE
+            }
+        })
+
+        projectGetMemberViewModel.errorMessage.observe(viewLifecycleOwner, Observer { errorMessage ->
+            if (errorMessage != null) {
+                // 에러 처리 로직을 추가할 수 있습니다.
+                Log.e("ProjectDetailFragment", errorMessage)
+            }
+        })
+
         return view
     }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,6 +112,7 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
             // 로그에 출력
             projectDetailViewModel.setLoading(true)
             projectDetailService.getProjectDetail(projectId)
+            projectGetMemberViewModel.getProjectMembers(requireContext(), projectId)  // Context를 전달하여 getProjectMembers 호출
             Log.d("ProjectDetailFragment", "프로젝트 id: $projectId")
         }
         else{

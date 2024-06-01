@@ -18,7 +18,7 @@ class SSEService(private val listener: SSEListener, private val token: String) {
             .url("http://3.34.144.78:8080/alarms/stream/$userId")
             .header("Authorization", "Bearer $token")
             .build()
-
+        Log.d("SSESERVICE","SSE통신완료")
         eventSource = EventSources.createFactory(client).newEventSource(request, object : EventSourceListener() {
             override fun onOpen(eventSource: EventSource, response: Response) {
                 Log.d("SSE", "Connection opened")

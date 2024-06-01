@@ -110,5 +110,17 @@
         app:layout_constraintTop_toBottomOf="@id/tv_chat_intro_type_check">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <ProgressBar
+        android:id="@+id/chat_intro_fragment_loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:theme="@style/Progressbar_color_under_api21"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

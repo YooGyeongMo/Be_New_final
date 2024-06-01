@@ -118,7 +118,7 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
         val myName = getNameFromSharedPreferences(requireContext()) ?: return
         val project = sharedViewModel.selectedProject.value ?: return // 프로젝트 정보를 가져옴
 
-        val message = "$myName 님이, 프로젝트${project.projectId}요청을  보냈습니다."
+        val message = "$myName 님이, 프로젝트 ${project.projectName}, 번호 ${project.projectId}에 대한 요청을  보냈습니다."
         val matchingAlarmRequest = MatchingAlarmRequest(message, receiverId, myUserId)
 
         matchingService.sendMatchingAlrams(matchingAlarmRequest,

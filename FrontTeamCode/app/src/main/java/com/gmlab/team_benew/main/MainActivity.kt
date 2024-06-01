@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
 
 
 //        // 5초 후에 폴링 시작
-//        startPolling()
+        startPolling()
 
     }
 

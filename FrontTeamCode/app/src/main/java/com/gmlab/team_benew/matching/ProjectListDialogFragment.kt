@@ -1,5 +1,6 @@
 package com.gmlab.team_benew.matching
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.Spinner
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -39,7 +41,7 @@ class ProjectListDialogFragment : DialogFragment() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
             {
-                selectedProject = projects[position]
+                selectedProject = adapter.getItem(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -48,17 +50,28 @@ class ProjectListDialogFragment : DialogFragment() {
         }
 
         view.findViewById<Button>(R.id.btn_enter_modal_project).setOnClickListener {
-            selectedProject?.let {
-                sharedViewModel.setSelectedProject(it)
+
+            if (selectedProject == null) {
+                showAlertDialog() // 경고 다이얼로그 표시
+            } else {
+                sharedViewModel.setSelectedProject(selectedProject!!)
                 dismiss()
                 findNavController().navigate(R.id.action_intro_matching_to_navigation_matching)
-            } ?: run {
-                // 기본 항목 "프로젝트 선택"이 선택된 경우 처리
             }
         }
 
+
         view.findViewById<Button>(R.id.btn_cancel_modal_project).setOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun showAlertDialog() {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("프로젝트 선택")
+            setMessage("프로젝트를 선택해주세요.")
+            setPositiveButton("확인") { dialog, which -> dialog.dismiss() }
+            show()
         }
     }
 }

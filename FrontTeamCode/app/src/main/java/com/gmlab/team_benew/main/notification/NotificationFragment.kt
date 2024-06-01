@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.main.notification.ProjectMemeberPatch.ProjectMemberPatchService
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostService
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostView
 import com.gmlab.team_benew.main.notification.matchingalarm.MatchingAlarmsPatchView
@@ -33,6 +34,7 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
     private lateinit var notificationReadService: NotificationReadService
     private lateinit var matchingPatchService: MatchingPatchService
     private lateinit var chattingPostService: ChattingPostService
+    private lateinit var projectMemberPatchService: ProjectMemberPatchService
 
     // resquestLock 버튼 중복터치 막기
     private var requestLock = false
@@ -67,6 +69,8 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
         chattingPostService = ChattingPostService()
         chattingPostService.setChattingPostView(this)
 
+
+        projectMemberPatchService = ProjectMemberPatchService()
     }
 
     override fun onNotificationListSuccess(notifications: List<NotificationMatchingResponse>) {
@@ -86,257 +90,123 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
 
     private fun handleAccept(notification: NotificationMatchingResponse) {
-        //비동기 처리 및 버튼 중복 처리
-        if (requestLock) return // 이미 요청 중이면 함수반환
-        requestLock = true // 요청 시작
+        if (requestLock) return
+        requestLock = true
 
         CoroutineScope(Dispatchers.IO).launch {
             val senderId = notification.senderUserId
             val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
+            val projectId = extractProjectId(notification.message)
+
             try {
-                val readResponse =
-                    notificationReadService.alarmsRead(requireContext(), notification.id)
-                Log.d("NETWORK_SUCCESS_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크성공")
-                when (readResponse.code()) {
-                    200 -> {
-                        onNotificationReadSuccess() // 읽기성공
-                        val matchResponse =
-                            matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
-                        handleMatchSuccessResponse(matchResponse, notification)
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
+                if (readResponse.isSuccessful) {
+                    Log.d("NotificationFragment", "알람 읽기 성공: ${readResponse.code()}")
+                    val matchResponse = matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
+                    if (matchResponse.isSuccessful) {
+                        Log.d("NotificationFragment", "매칭 수락 성공: ${matchResponse.code()}")
+                        val patchResponse = projectMemberPatchService.addProjectMember(requireContext(), projectId, receiverId)
+                        if (patchResponse.isSuccessful) {
+                            Log.d("NotificationFragment", "프로젝트 팀원 추가 성공: ${patchResponse.code()}")
+                            val chatResponse = chattingPostService.chattingPost(requireContext(), senderId, receiverId)
+                            if (chatResponse.isSuccessful) {
+                                Log.d("NotificationFragment", "채팅방 생성 성공: ${chatResponse.code()}")
+                                withContext(Dispatchers.Main) {
+                                    showSuccessDialog("해당 프로젝트에 팀원으로 추가되었습니다.\n해당 프로젝트 채팅방이 생성되었습니다.")
+                                    (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+                                }
+                            } else {
+                                Log.e("NotificationFragment", "채팅방 생성 실패: ${chatResponse.code()} - ${chatResponse.errorBody()?.string()}")
+                                handleFailure("채팅방 생성에 실패했습니다. 오류 코드: ${chatResponse.code()}")
+                            }
+                        } else {
+                            Log.e("NotificationFragment", "프로젝트 팀원 추가 실패: ${patchResponse.code()} - ${patchResponse.errorBody()?.string()}")
+                            handleFailure("프로젝트 팀원 추가에 실패했습니다. 오류 코드: ${patchResponse.code()}")
+                        }
+                    } else {
+                        Log.e("NotificationFragment", "매칭 수락 실패: ${matchResponse.code()} - ${matchResponse.errorBody()?.string()}")
+                        handleFailure("매칭 수락에 실패했습니다. 오류 코드: ${matchResponse.code()}")
                     }
-
-                    401 -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR ")
-                        onNotificationReadFailure()
-                    }
-
-                    500 -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR  ")
-                        onNotificationReadFailure()
-                    }
-
-                    else -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR ")
-                        onNotificationReadFailure()
-                    }
+                } else {
+                    Log.e("NotificationFragment", "알람 읽기 실패: ${readResponse.code()} - ${readResponse.errorBody()?.string()}")
+                    handleFailure("알람 읽기에 실패했습니다. 오류 코드: ${readResponse.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("NETWORK_FAILURE_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크실패")
-//                Log.e("NETWORK_FAILURE_ALARMS_READ", "Error during network call", e)
-                withContext(Dispatchers.Main) {
-                    onNotificationReadFailure()
-                }
+                Log.e("NotificationFragment", "네트워크 요청에 실패했습니다.", e)
+                handleFailure("네트워크 요청에 실패했습니다. ${e.message}")
             } finally {
-                //어쨋든 이 함수하다가 실패하거나 성공안해도 버튼 중복은 false가 되어야하기에
                 requestLock = false
             }
         }
     }
-//        // 매칭 수락 관련 로직 처리
-
-//        val senderId = notification.senderUserId
-//        val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
-//
-//        notificationReadService.alarmsRead(requireContext(), notification.id)
-//        matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
-//
-//        // 알람 API 수락 관련 로직 처리
-//        notificationReadService.alarmsRead(requireContext(), notification.id)
-//        (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-
-
-    private fun handleMatchSuccessResponse(
-        matchResponse: Response<MatchingAlarmResponse>,
-        notification: NotificationMatchingResponse
-    ) {
-        CoroutineScope(Dispatchers.Main).launch {
-
-            when (matchResponse.code()) {
-                200 -> {
-                    val senderId = notification.senderUserId
-                    createChatRoom(senderId, notification)
-                    onMatchingAlarmsAccessSuccess() // 예시: 성공 처리
-                }
-
-                401 -> {
-                    Log.e("NotificationPATCH/수락/ERROR", "401 ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsAccessFailure()
-
-                }
-
-                500 -> {
-                    Log.e("NotificationPATCH/수락/ERROR", "500 ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsAccessFailure()
-                }
-
-                else -> {
-                    Log.e("NotificationPATCH/수락/ERROR", " ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsAccessFailure()
-                }
-            }
-
-            requestLock = false //요청 잠금해제
-
-        }
-
-    }
-
-    private fun createChatRoom(senderId: Long, notification: NotificationMatchingResponse) {
-        // 여기 로직 한번확인해야함
-        val myUserId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response =
-                    chattingPostService.chattingPost(requireContext(), myUserId, senderId)
-                withContext(Dispatchers.Main) {
-                    when (response.code()) {
-                        200 -> {
-                            onChattingPostSuccess()
-                            (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-//                            // 채팅방 리스트 프래그먼트로 이동
-                            findNavController().navigate(R.id.navigation_chatListFragment)
-
-
-                        }
-
-                        401 -> {
-                            Log.e("CREATECHATROOM/POST/ERROR", "401 ERROR ${response.code()}")
-                            onChattingPostFailure()
-                        }
-
-                        500 -> {
-                            Log.e("CREATECHATROOM/POST/ERROR", "500 ERROR ${response.code()}")
-                            onChattingPostFailure()
-                        }
-
-                        else -> {
-                            Log.e("CREATECHATROOM/POST/ERROR", "ERROR ${response.code()}")
-                            onChattingPostFailure()
-                        }
-                    }
-
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    // 네트워크 요청 실패 시 처리
-                    onChattingPostFailure()
-                }
-            } finally {
-                //어쨋든 이 함수하다가 실패하거나 성공안해도 버튼 중복은 false가 되어야하기에
-                requestLock = false
-            }
-        }
-    }
-
-
-//    if (response.isSuccessful && response.body() != null) {
-//        // 성공 시 알림 제거
-//        (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-//        // 채팅방 프래그먼트로 이동
-//        val action = ChatListFragmentDirections.actionToChatFragment(response.body().roomId)
-//        findNavController().navigate(action)
-//    } else {
-//        // 실패 시 처리
-//        onChattingPostFailure()
-//    }
-
 
     private fun handleReject(notification: NotificationMatchingResponse) {
-        //비동기 처리 및 버튼 중복 처리
-        if (requestLock) return // 이미 요청 중이면 함수반환
-        requestLock = true // 요청 시작
+        if (requestLock) return
+        requestLock = true
 
         CoroutineScope(Dispatchers.IO).launch {
-
             val senderId = notification.senderUserId
             val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
+
             try {
-                val readResponse =
-                    notificationReadService.alarmsRead(requireContext(), notification.id)
-                Log.d("NETWORK_SUCCESS_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크성공")
-                when (readResponse.code()) {
-                    200 -> {
-                        onNotificationReadSuccess() // 읽기성공
-                        val matchResponse =
-                            matchingPatchService.rejectMatch(requireContext(), senderId, receiverId)
-                        handleMatchRejectResponse(matchResponse, notification)
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
+                if (readResponse.isSuccessful) {
+                    val matchResponse = matchingPatchService.rejectMatch(requireContext(), senderId, receiverId)
+                    if (matchResponse.isSuccessful) {
+                        withContext(Dispatchers.Main) {
+                            (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+                            showSuccessDialog("매칭 요청을 거절했습니다.")
+                        }
+                    } else {
+                        handleFailure("매칭 거절에 실패했습니다.")
                     }
-
-                    401 -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR ")
-                        onNotificationReadFailure()
-                    }
-
-                    500 -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR  ")
-                        onNotificationReadFailure()
-                    }
-
-                    else -> {
-                        Log.e("NotificationRead/ERROR", " ${readResponse.code()} ERROR ")
-                        onNotificationReadFailure()
-                    }
+                } else {
+                    handleFailure("알람 읽기에 실패했습니다.")
                 }
             } catch (e: Exception) {
-                Log.e("NETWORK_FAILURE_ALARMS_READ", "USER_MATCHING_READ_ALARMS_네트워크실패")
-                withContext(Dispatchers.Main) {
-                    onNotificationReadFailure()
-                }
+                handleFailure("네트워크 요청에 실패했습니다.")
             } finally {
-                //어쨋든 이 함수하다가 실패하거나 성공안해도 버튼 중복은 false가 되어야하기에
                 requestLock = false
             }
         }
-
     }
 
-    private fun handleMatchRejectResponse(
-        matchResponse: Response<MatchingAlarmResponse>,
-        notification: NotificationMatchingResponse
-    ) {
+    private fun handleFailure(message: String) {
         CoroutineScope(Dispatchers.Main).launch {
-
-            when (matchResponse.code()) {
-                200 -> {
-                    (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-                    onMatchingAlarmsRejectSuccess() // 예시: 성공 처리
-                }
-
-                401 -> {
-                    Log.e("NotificationPATCH/거절/ERROR", "401 ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsRejectFailure()
-
-                }
-
-                500 -> {
-                    Log.e("NotificationPATCH/거절/ERROR", "500 ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsRejectFailure()
-                }
-
-                else -> {
-                    Log.e("NotificationPATCH/거절/ERROR", " ERROR ${matchResponse.code()}")
-                    onMatchingAlarmsRejectFailure()
-                }
-            }
-            requestLock = false //요청 잠금해제
-
+            showFailureDialog(message)
         }
     }
 
-//비동기로직
+    private fun showSuccessDialog(message: String) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("성공")
+            setMessage(message)
+            setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            create()
+            show()
+        }
+    }
 
-//    // 매칭 거절 관련 로직 처리
-//    val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L // 현재 사용자의 ID
-//    val senderId = notification.senderUserId // 알림의 발신자 ID
-//
-//    notificationReadService.alarmsRead(requireContext(), notification.id)
-//    matchingPatchService.rejectMatch(requireContext(), senderId, receiverId)
-//
-//    // 알람API 거절 관련 로직 처리
-//    notificationReadService.alarmsRead(requireContext(), notification.id)
-//    (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+    private fun showFailureDialog(message: String) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("오류")
+            setMessage(message)
+            setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            create()
+            show()
+        }
+    }
 
+    private fun getIdFromSharedPreferences(context: Context): Int? {
+        val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getInt("loginId", -1).takeIf { it != -1 }
+    }
+
+    private fun extractProjectId(message: String): Long {
+        val regex = Regex("프로젝트.*번호\\s(\\d+)")
+        val matchResult = regex.find(message)
+        return matchResult?.groupValues?.get(1)?.toLong() ?: -1L
+    }
 
     override fun onNotificationSuccess() {
         Log.d("NOTIFICATION/LIST/GET/SUCCESS", "유저에 대한 알람 리스트 성공")
@@ -352,20 +222,9 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
     override fun onNotificationReadFailure() {
         CoroutineScope(Dispatchers.Main).launch {
-
-            // AlertDialog 생성 및 표시
-            AlertDialog.Builder(requireContext()).apply {
-                setTitle("네트워크 오류")
-                setMessage("네트워크 요청이 실패했습니다.")
-                setPositiveButton("확인") { dialog, which ->
-                    // 여기서 아무 것도 하지 않음
-                }
-                create()
-                show()
-            }
+            showFailureDialog("네트워크 요청이 실패했습니다.")
         }
     }
-
 
     override fun onMatchingAlarmsAccessSuccess() {
         Log.d("NOTIFICATION/USER/매칭/수락", "유저에 대한 매칭 수락 성공")
@@ -373,20 +232,9 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
     override fun onMatchingAlarmsAccessFailure() {
         CoroutineScope(Dispatchers.Main).launch {
-
-            // AlertDialog 생성 및 표시
-            AlertDialog.Builder(requireContext()).apply {
-                setTitle("매칭 수락 네트워크 오류")
-                setMessage("네트워크 요청이 실패했습니다.")
-                setPositiveButton("확인") { dialog, which ->
-                    // 여기서 아무 것도 하지 않음
-                }
-                create()
-                show()
-            }
+            showFailureDialog("매칭 수락 네트워크 오류")
         }
     }
-
 
     override fun onMatchingAlarmsRejectSuccess() {
         Log.d("NOTIFICATION/USER/매칭/거절", "유저에 대한 매칭 거절 성공")
@@ -394,56 +242,18 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
     override fun onMatchingAlarmsRejectFailure() {
         CoroutineScope(Dispatchers.Main).launch {
-
-            // AlertDialog 생성 및 표시
-            AlertDialog.Builder(requireContext()).apply {
-                setTitle("매칭 거절 네트워크 오류")
-                setMessage("네트워크 요청이 실패했습니다.")
-                setPositiveButton("확인") { dialog, which ->
-                    // 여기서 아무 것도 하지 않음
-                }
-                create()
-                show()
-            }
+            showFailureDialog("매칭 거절 네트워크 오류")
         }
     }
 
     override fun onChattingPostSuccess() {
         Log.d("CHATTING/POST/성공", "유저에 대한 채팅방 만들기 성공")
-        Log.d("CHATTING/POST/최종성공", "최종 매칭 성공!")
-        // AlertDialog 생성 및 표시
-        AlertDialog.Builder(requireContext()).apply {
-            setTitle("매칭 성공!")
-            setMessage("매칭이 성공적으로 이루어졌습니다.")
-            setPositiveButton("확인") { dialog, which ->
-                // 여기서 아무 것도 하지 않음
-            }
-            create()
-            show()
-        }
+        showSuccessDialog("최종 매칭 성공!")
     }
 
     override fun onChattingPostFailure() {
         CoroutineScope(Dispatchers.Main).launch {
-            // AlertDialog 생성 및 표시
-            AlertDialog.Builder(requireContext()).apply {
-                setTitle("최종 매칭 네트워크 오류")
-                setMessage("네트워크 요청이 실패했습니다.")
-                setPositiveButton("확인") { dialog, which ->
-                    // 여기서 아무 것도 하지 않음
-                }
-                create()
-                show()
-            }
-            Log.d("CHATTING/POST/실패", "유저에 대한 채팅방 만들기 실패")
+            showFailureDialog("최종 매칭 네트워크 오류")
         }
     }
-
-
-    private fun getIdFromSharedPreferences(context: Context): Int? {
-        val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return sharedPref.getInt("loginId", -1).takeIf { it != -1 }
-    }
-
-
 }

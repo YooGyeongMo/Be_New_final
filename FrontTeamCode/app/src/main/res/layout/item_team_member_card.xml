@@ -29,7 +29,7 @@
                 android:layout_margin="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@color/mainFont2"
+                android:textColor="@color/black"
                 android:textStyle="bold"
                 />
             <TextView
@@ -37,6 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="컴퓨터공학과"
+                android:textColor="@color/black"
                 app:layout_constraintTop_toBottomOf="@id/tv_project_member_name_data"
                 android:layout_marginTop="5dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -45,6 +46,7 @@
             <TextView
                 android:id="@+id/tv_project_member_sex_data"
                 android:text="남"
+                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -56,6 +58,7 @@
                 android:id="@+id/tv_project_memeber_profile_experience"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_project_member_sex_data"
                 android:text="프로젝트 경험: 유"
