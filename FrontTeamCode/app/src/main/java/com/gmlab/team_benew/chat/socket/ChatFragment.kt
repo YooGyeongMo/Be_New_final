@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.auth.getRetrofit
 import com.gmlab.team_benew.databinding.FragmentChatlistBinding
 import com.google.gson.Gson
 import io.reactivex.CompletableObserver
@@ -29,6 +30,9 @@ import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -81,10 +85,8 @@ class ChatFragment : Fragment() {
         val getRoomId = arguments?.getString("roomId").toString()
         val getRoomName = arguments?.getString("roomName").toString()
 
-        // roomId 설정
+        //룸id, senderName 설정
         roomId = getRoomId
-
-        // 테스트용 룸 ID 설정 (삭제 필요)
         val senderName : String? = name
 
         btn_send = view.findViewById(R.id.btn_chatting_send)
@@ -93,6 +95,9 @@ class ChatFragment : Fragment() {
         tv_roomName = view.findViewById(R.id.tv_chattingFragment_roomName)
 
         tv_roomName.text = getRoomName
+
+        //채팅 히스토리 지금은 막아놨음
+        //chatHistory()
 
         // StompClientManager 초기화
         stompClientManager = StompClientManager(token.toString())
@@ -161,5 +166,55 @@ class ChatFragment : Fragment() {
         super.onDestroyView()
         // STOMP 연결 해제
         stompClientManager.disconnect()
+    }
+
+    private fun chatHistory(){
+        // 현재 날짜 및 시간을 LocalDateTime 객체로 가져옴
+        val currentDateTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val sendDate = currentDateTime.format(formatter)
+
+        val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val token = sharedPref?.getString("userToken", "")
+
+        if (token != null) {
+            val authService = getRetrofit().create(getChatHistoryRequest::class.java)
+            authService.getMessages("Bearer $token", roomId, sendDate).enqueue(object :
+                Callback<List<getChatHistoryData>> {
+                override fun onResponse(
+                    call: Call<List<getChatHistoryData>>,
+                    response: Response<List<getChatHistoryData>>
+                ) {
+                    if (response.isSuccessful) {
+                        val chatHistory = response.body()
+
+                        // 채팅 기록을 처리하는 코드 작성
+                        chatHistory?.let {
+                            val sortedHistory = it.sortedBy { messageData -> messageData.sequence }
+                            chatList.addAll(sortedHistory.map { messageData ->
+                                StompMessage(
+                                    message = messageData.message,
+                                    roomId = messageData.roomId,
+                                    sendDate = messageData.sendDate,
+                                    sender = messageData.sender,
+                                    senderName = messageData.senderName
+                                )
+                            })
+                            adapter.notifyDataSetChanged()
+                            chatView.scrollToPosition(chatList.size - 1)
+                        }
+
+
+                    } else {
+                        // 오류 처리 코드 작성
+                        Log.e("ChatFragment", "Error: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<getChatHistoryData>>, t: Throwable) {
+                    // 실패 시 처리 코드 작성
+                }
+            })
+        }
     }
 }
