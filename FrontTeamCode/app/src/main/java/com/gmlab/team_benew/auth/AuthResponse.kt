@@ -56,16 +56,16 @@ data class Role(
 )
 
 data class  AccountCheckGet(
-    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("duplicate") var duplication: Boolean,
     @SerializedName("message") var message: String
 )
 
 data class  EmailCheckGet(
-    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("duplicate") var duplication: Boolean,
     @SerializedName("message") var message: String
 )
 
 data class  PhoneCheckGet(
-    @SerializedName("duplication") var duplication: Boolean,
+    @SerializedName("duplicate") var duplication: Boolean,
     @SerializedName("message") var message: String
 )

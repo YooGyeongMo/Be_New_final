@@ -93,7 +93,8 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
                 destination.id == R.id.navigation_project_post_deatil ||
                 destination.id == R.id.navigation_project_edit_detail ||
                 destination.id == R.id.navigation_chat_intro ||
-                destination.id == R.id.navigation_project_finding_all
+                destination.id == R.id.navigation_project_finding_all ||
+                destination.id == R.id.navigation_chat_post
             ) {
                 //해당 프레그먼트로 이동 시에 툴바의 로고 버튼을 뒤로가기 버튼으로 대체
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)

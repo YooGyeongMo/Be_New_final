@@ -5,11 +5,25 @@ import FriendResponse
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 class ChatIntroViewModel(application: Application) : AndroidViewModel(application) {
 
     private val chatIntroService: ChatIntroService = ChatIntroService(application)
     private var chatIntroView: ChatIntroView? = null
+
+    private val _friendsList = MutableLiveData<List<FriendResponse>>()
+    val friendsList: LiveData<List<FriendResponse>> get() = _friendsList
+
+    private val _chatRooms = MutableLiveData<List<ChatData>>()
+    val chatRooms: LiveData<List<ChatData>> get() = _chatRooms
+
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> get() = _loading
+
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
 
     fun setView(view: ChatIntroView) {
         chatIntroView = view

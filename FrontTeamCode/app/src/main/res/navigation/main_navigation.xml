@@ -126,20 +126,20 @@
         android:name="com.gmlab.team_benew.chat.chatintro.ChatIntroFragment"
         android:label="ChatIntroFragment">
         <action
-            android:id="@+id/action_chat_intro_to_chat_invite"
-            app:destination="@id/navigation_chat_invite" />
-        <action
             android:id="@+id/action_chatListFragment_to_chatRoomFragment"
             app:destination="@id/navigation_chat" />
+        <action
+            android:id="@+id/action_chat_intro_to_chat_post"
+            app:destination="@id/navigation_chat_post" />
     </fragment>
     <fragment
         android:id="@+id/navigation_project_finding_all"
         android:name="com.gmlab.team_benew.matching.projectmatchingfind.ProjectFindingAllFragment"
         android:label="ProjectFindingAllFragment" />
     <fragment
-        android:id="@+id/navigation_chat_invite"
+        android:id="@+id/navigation_chat_post"
         android:name="com.gmlab.team_benew.chat.chatintro.chatinvite.ChatPostFragment"
-        android:label="ChatinviteFragment" />
+        android:label="ChatPostFragment" />
 
 </navigation>
 

@@ -100,7 +100,7 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
             if (recyclerView.adapter == friendsAdapter) {
                 showAddFriendModal()
             } else if (recyclerView.adapter == chatAdapter) {
-
+                findNavController().navigate(R.id.action_chat_intro_to_chat_post)
             }
         }
     }
