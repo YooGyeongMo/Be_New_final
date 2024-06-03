@@ -1,5 +1,6 @@
 package com.gmlab.team_benew.auth.register.screens
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import com.gmlab.team_benew.auth.AuthService
 import com.gmlab.team_benew.auth.RegisterUser
 import com.gmlab.team_benew.auth.SignUpView
 import com.gmlab.team_benew.auth.register.RegisterViewModel
+import com.gmlab.team_benew.start.IntroActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -97,7 +99,6 @@ class Register3Fragment : Fragment(), SignUpView {
         if(emailAuth){
             val authService = AuthService()
             authService.setSignUpView(this)
-
             authService.signUp(getRegisterUser())
         }
         else{
@@ -206,6 +207,9 @@ class Register3Fragment : Fragment(), SignUpView {
     }
 
     override fun onSignUpSuccess() {
+        val intent = Intent(requireContext(), IntroActivity::class.java)
+        intent.putExtra("showAlert", true)
+        startActivity(intent)
         activity?.finish()
     }
 

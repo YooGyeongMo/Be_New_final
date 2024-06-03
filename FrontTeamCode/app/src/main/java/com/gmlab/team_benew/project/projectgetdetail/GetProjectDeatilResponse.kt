@@ -22,7 +22,6 @@ data class Profile(
     val nickname: String,
     val peer: Int,
     val personalLink: String,
-    val photo: String,
     val projectExperience: Boolean,
     val role: String
 )

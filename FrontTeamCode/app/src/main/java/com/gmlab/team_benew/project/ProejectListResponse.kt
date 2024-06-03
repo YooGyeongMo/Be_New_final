@@ -10,7 +10,7 @@ data class ProjectResponse(
     @SerializedName("numberOfMembers") val numberOfMembers: Int,
     @SerializedName("profiles") val profiles: List<Profile>,
     @SerializedName("projectDeadlineDate") val projectDeadlineDate: String,
-    @SerializedName("projectId") val projectId: Int,
+    @SerializedName("projectId") val projectId: Long,
     @SerializedName("projectIntroduction") val projectIntroduction: String,
     @SerializedName("projectName") val projectName: String,
     @SerializedName("projectOneLineIntroduction") val projectOneLineIntroduction: String,

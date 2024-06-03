@@ -8,5 +8,8 @@ import retrofit2.http.Path
 
 interface NotificationMatchingRetrofitInterface {
     @GET("/alarms/{responseId}")
-    fun alarmsGet(@Header("Authorization") bearerToken: String, @Path("responseId") responseId: Long): Call<List<NotificationMatchingResponse>>
+    fun alarmsGet(
+        @Header("Authorization") bearerToken: String,
+        @Path("responseId") responseId: Long
+    ): Call<List<NotificationMatchingResponse>>
 }

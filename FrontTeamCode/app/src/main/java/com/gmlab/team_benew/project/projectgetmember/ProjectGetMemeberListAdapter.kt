@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.project.projectgetdetail.Profile
 
 class ProjectMemberListAdapter(
-    private val members: List<ProjectMemberResponse>
+    private val members: List<Profile>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_MEMBER = 1

@@ -85,7 +85,6 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.navigation_profile_deatil ||
                 destination.id == R.id.navigation_notification ||
-                destination.id == R.id.navigation_chatListFragment ||
                 destination.id == R.id.navigation_chat ||
                 destination.id == R.id.navigation_matching ||
                 destination.id == R.id.navigation_testing ||
@@ -93,7 +92,8 @@ class MainActivity : AppCompatActivity(),MainLiveAlarmsView, SSEService.SSEListe
                 destination.id == R.id.navigation_project_deatil ||
                 destination.id == R.id.navigation_project_post_deatil ||
                 destination.id == R.id.navigation_project_edit_detail ||
-                destination.id == R.id.navigation_chat_intro
+                destination.id == R.id.navigation_chat_intro ||
+                destination.id == R.id.navigation_project_finding_all
             ) {
                 //해당 프레그먼트로 이동 시에 툴바의 로고 버튼을 뒤로가기 버튼으로 대체
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)

@@ -1,5 +1,7 @@
 package com.gmlab.team_benew.chat.chatintro
 
+import ChatData
+import FriendResponse
 import android.content.Context
 import android.util.Log
 import com.gmlab.team_benew.auth.getRetrofit
@@ -11,7 +13,7 @@ class ChatIntroService(private val context: Context) {
 
     interface ServiceCallback<T> {
         fun onSuccess(data: T)
-        fun onFailure(message: String)
+        fun onFailure(message: String, code: Int)
     }
 
     fun getChatRooms(userId: Int, callback: ServiceCallback<List<ChatData>>) {
@@ -21,19 +23,21 @@ class ChatIntroService(private val context: Context) {
             val service = getRetrofit().create(ChatIntroRetrofitInterface::class.java)
             service.getChatRooms(bearerToken, userId).enqueue(object : Callback<List<ChatData>> {
                 override fun onResponse(call: Call<List<ChatData>>, response: Response<List<ChatData>>) {
-                    when (response.code()) {
-                        200 -> callback.onSuccess(response.body() ?: listOf())
-                        401, 403, 404 -> callback.onFailure("Error: ${response.code()}")
-                        else -> callback.onFailure("Unknown error: ${response.code()}")
+                    Log.d("ChatIntroService", "getChatRooms onResponse: ${response.code()}")
+                    if (response.isSuccessful) {
+                        callback.onSuccess(response.body() ?: listOf())
+                    } else {
+                        callback.onFailure("Error: ${response.code()}", response.code())
                     }
                 }
 
                 override fun onFailure(call: Call<List<ChatData>>, t: Throwable) {
-                    callback.onFailure(t.message ?: "Network error")
+                    Log.e("ChatIntroService", "getChatRooms onFailure: ${t.message}")
+                    callback.onFailure(t.message ?: "Network error", 500)
                 }
             })
         } else {
-            callback.onFailure("Token not found")
+            callback.onFailure("Token not found", 401)
         }
     }
 
@@ -44,19 +48,21 @@ class ChatIntroService(private val context: Context) {
             val service = getRetrofit().create(ChatIntroRetrofitInterface::class.java)
             service.getFriendsList(bearerToken, memberId).enqueue(object : Callback<List<FriendResponse>> {
                 override fun onResponse(call: Call<List<FriendResponse>>, response: Response<List<FriendResponse>>) {
-                    when (response.code()) {
-                        200 -> callback.onSuccess(response.body() ?: listOf())
-                        401, 403, 404 -> callback.onFailure("Error: ${response.code()}")
-                        else -> callback.onFailure("Unknown error: ${response.code()}")
+                    Log.d("ChatIntroService", "getFriendsList onResponse: ${response.code()}")
+                    if (response.isSuccessful) {
+                        callback.onSuccess(response.body() ?: listOf())
+                    } else {
+                        callback.onFailure("Error: ${response.code()}", response.code())
                     }
                 }
 
                 override fun onFailure(call: Call<List<FriendResponse>>, t: Throwable) {
-                    callback.onFailure(t.message ?: "Network error")
+                    Log.e("ChatIntroService", "getFriendsList onFailure: ${t.message}")
+                    callback.onFailure(t.message ?: "Network error", 500)
                 }
             })
         } else {
-            callback.onFailure("Token not found")
+            callback.onFailure("Token not found", 401)
         }
     }
 

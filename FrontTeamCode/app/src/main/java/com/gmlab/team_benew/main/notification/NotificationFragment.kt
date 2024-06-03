@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 import com.gmlab.team_benew.main.notification.ProjectMemeberPatch.ProjectMemberPatchService
+import com.gmlab.team_benew.main.notification.chattingpost.ChatUser
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostService
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostView
 import com.gmlab.team_benew.main.notification.matchingalarm.MatchingAlarmsPatchView
@@ -95,41 +96,51 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
         CoroutineScope(Dispatchers.IO).launch {
             val senderId = notification.senderUserId
+            val senderName = extractUserName(notification.message)
             val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
             val projectId = extractProjectId(notification.message)
+            val receiverName = getCachedUserName() ?: "Unknown"
+
+            val chatUsers = listOf(
+                ChatUser(senderId, senderName),
+                ChatUser(receiverId, receiverName)
+            )
 
             try {
+                // 1. 알람 읽기
                 val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
-                if (readResponse.isSuccessful) {
-                    Log.d("NotificationFragment", "알람 읽기 성공: ${readResponse.code()}")
-                    val matchResponse = matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
-                    if (matchResponse.isSuccessful) {
-                        Log.d("NotificationFragment", "매칭 수락 성공: ${matchResponse.code()}")
-                        val patchResponse = projectMemberPatchService.addProjectMember(requireContext(), projectId, receiverId)
-                        if (patchResponse.isSuccessful) {
-                            Log.d("NotificationFragment", "프로젝트 팀원 추가 성공: ${patchResponse.code()}")
-                            val chatResponse = chattingPostService.chattingPost(requireContext(), senderId, receiverId)
-                            if (chatResponse.isSuccessful) {
-                                Log.d("NotificationFragment", "채팅방 생성 성공: ${chatResponse.code()}")
-                                withContext(Dispatchers.Main) {
-                                    showSuccessDialog("해당 프로젝트에 팀원으로 추가되었습니다.\n해당 프로젝트 채팅방이 생성되었습니다.")
-                                    (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-                                }
-                            } else {
-                                Log.e("NotificationFragment", "채팅방 생성 실패: ${chatResponse.code()} - ${chatResponse.errorBody()?.string()}")
-                                handleFailure("채팅방 생성에 실패했습니다. 오류 코드: ${chatResponse.code()}")
-                            }
-                        } else {
-                            Log.e("NotificationFragment", "프로젝트 팀원 추가 실패: ${patchResponse.code()} - ${patchResponse.errorBody()?.string()}")
-                            handleFailure("프로젝트 팀원 추가에 실패했습니다. 오류 코드: ${patchResponse.code()}")
-                        }
-                    } else {
-                        Log.e("NotificationFragment", "매칭 수락 실패: ${matchResponse.code()} - ${matchResponse.errorBody()?.string()}")
-                        handleFailure("매칭 수락에 실패했습니다. 오류 코드: ${matchResponse.code()}")
+                if (!readResponse.isSuccessful) {
+                    handleFailure("알람 읽기에 실패했습니다. 오류 코드: ${readResponse.code()}")
+                    return@launch
+                }
+                Log.d("NotificationFragment", "알람 읽기 성공: ${readResponse.code()}")
+
+                // 2. 매칭 수락
+                val matchResponse = matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
+                if (!matchResponse.isSuccessful) {
+                    handleFailure("매칭 수락에 실패했습니다. 오류 코드: ${matchResponse.code()}")
+                    return@launch
+                }
+                Log.d("NotificationFragment", "매칭 수락 성공: ${matchResponse.code()}")
+
+                // 3. 프로젝트 팀원 추가
+                val patchResponse = projectMemberPatchService.addProjectMember(requireContext(), projectId, receiverId)
+                if (!patchResponse.isSuccessful) {
+                    handleFailure("프로젝트 팀원 추가에 실패했습니다. 오류 코드: ${patchResponse.code()}")
+                    return@launch
+                }
+                Log.d("NotificationFragment", "프로젝트 팀원 추가 성공: ${patchResponse.code()}")
+
+                // 4. 채팅방 생성
+                val chatResponse = chattingPostService.chattingPost(requireContext(), chatUsers)
+                if (chatResponse.isSuccessful) {
+                    Log.d("NotificationFragment", "채팅방 생성 성공: ${chatResponse.code()}")
+                    withContext(Dispatchers.Main) {
+                        showSuccessDialog("해당 프로젝트에 팀원으로 추가되었습니다.\n해당 프로젝트 채팅방이 생성되었습니다.")
+                        (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
                     }
                 } else {
-                    Log.e("NotificationFragment", "알람 읽기 실패: ${readResponse.code()} - ${readResponse.errorBody()?.string()}")
-                    handleFailure("알람 읽기에 실패했습니다. 오류 코드: ${readResponse.code()}")
+                    handleFailure("채팅방 생성에 실패했습니다. 오류 코드: ${chatResponse.code()}")
                 }
             } catch (e: Exception) {
                 Log.e("NotificationFragment", "네트워크 요청에 실패했습니다.", e)
@@ -201,6 +212,18 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPref.getInt("loginId", -1).takeIf { it != -1 }
     }
+
+    private fun getCachedUserName(): String? {
+        val sharedPref = activity?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return sharedPref?.getString("cachedUserName", null)
+    }
+
+    private fun extractUserName(message: String): String {
+        val regex = Regex("(\\S+) 님이")
+        val matchResult = regex.find(message)
+        return matchResult?.groupValues?.get(1) ?: "Unknown"
+    }
+
 
     private fun extractProjectId(message: String): Long {
         val regex = Regex("프로젝트.*번호\\s(\\d+)")

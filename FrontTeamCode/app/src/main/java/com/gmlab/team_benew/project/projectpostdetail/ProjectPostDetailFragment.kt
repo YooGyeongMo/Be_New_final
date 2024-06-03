@@ -8,7 +8,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import com.gmlab.team_benew.databinding.FragmentMyprojectPostBinding
 
 class ProjectPostDetailFragment : Fragment(), ProjectPostDetailView {
@@ -137,6 +140,10 @@ class ProjectPostDetailFragment : Fragment(), ProjectPostDetailView {
 
     override fun onProjectPostSuccess() {
         Log.d("ProjectPostDetail", "PostSucess!!")
+        // 결과 설정
+        setFragmentResult("projectPostResult", bundleOf("isSuccess" to true))
+        // 이전 프래그먼트로 이동
+        findNavController().popBackStack()
     }
 
     override fun onProjectPostFailure(code: Int, message: String) {
@@ -145,7 +152,13 @@ class ProjectPostDetailFragment : Fragment(), ProjectPostDetailView {
             401 -> Log.e("ProjectPostDetail", "Unauthorized: $message")
             403 -> Log.e("ProjectPostDetail", "Forbidden: $message")
             404 -> Log.e("ProjectPostDetail", "Not Found: $message")
-            else -> Log.e("ProjectPostDetail", "Error $code: $message")
+            else -> {
+                Log.e("ProjectPostDetail", "Error $code: $message")
+                // 결과 설정
+                setFragmentResult("projectPostResult", bundleOf("isSuccess" to true))
+                // 이전 프래그먼트로 이동
+                findNavController().popBackStack()
+            }
         }
     }
 }

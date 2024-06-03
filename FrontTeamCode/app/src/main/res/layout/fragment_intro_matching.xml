@@ -54,6 +54,7 @@
             android:background="@drawable/view_box"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/matching_intro_border"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <androidx.appcompat.widget.AppCompatButton

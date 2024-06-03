@@ -1,5 +1,5 @@
 package com.gmlab.team_benew.matching
 
 data class LikeMatchRequest (
-    val projectId: Int
+    val projectId: Long
 )

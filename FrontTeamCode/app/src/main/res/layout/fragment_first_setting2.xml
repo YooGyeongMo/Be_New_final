@@ -54,7 +54,7 @@
                 android:gravity="center_horizontal"
                 android:text="C"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_Cplus"
@@ -64,7 +64,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="C++"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_Csharp"
@@ -74,7 +74,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="C#"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_java"
@@ -84,7 +84,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="java"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_python"
@@ -94,7 +94,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="python"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_html"
@@ -104,7 +104,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="HTML"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_css"
@@ -114,7 +114,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="CSS"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_android"
@@ -124,7 +124,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="android"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_nodejs"
@@ -134,7 +134,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="node js"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_aws"
@@ -144,7 +144,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="aws"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_firstSetting2_springBoot"
@@ -154,7 +154,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="Spring Boot"
                 android:textColor="#3D72FF"
-                android:textSize="10pt" />
+                android:textSize="20sp" />
 
         </com.google.android.material.chip.ChipGroup>
 

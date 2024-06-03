@@ -72,7 +72,7 @@ class HomeProjectListAdapter(
 
                 goToProjectButton.setOnClickListener {
                     val bundle = Bundle().apply {
-                        putInt("projectId", project.projectId)
+                        putInt("projectId", project.projectId.toInt())
                     }
                     navController.navigate(R.id.navigation_project_deatil, bundle)
                 }

@@ -1,5 +1,7 @@
 package com.gmlab.team_benew.project
 
+import android.app.AlertDialog
+import android.app.ProgressDialog.show
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -71,8 +73,27 @@ class ProjectListFragment : Fragment(), ProjectListView {
 
         // Load project data
         projectListViewModel.loadProjects(projectListService)
+
+        // 결과 수신
+        parentFragmentManager.setFragmentResultListener("projectPostResult", this) { key, bundle ->
+            val isSuccess = bundle.getBoolean("isSuccess")
+            if (isSuccess) {
+                showAlert("프로젝트 생성 성공", "프로젝트가 성공적으로 생성되었습니다.")
+            } else {
+                showAlert("프로젝트 생성 실패", "프로젝트 생성에 실패했습니다.")
+            }
+        }
     }
 
+    private fun showAlert(title: String, message: String) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle(title)
+            setMessage(message)
+            setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            create()
+            show()
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

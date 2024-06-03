@@ -125,7 +125,7 @@ class MatchingService private constructor(private val context: Context) {
 //        })
 //    }
 
-    fun likeMatch(matchId: Long, projectId: Int, onResponse: (MatchingResponse) -> Unit) {
+    fun likeMatch(matchId: Long, projectId: Long, onResponse: (MatchingResponse) -> Unit) {
         val token = getTokenFromSharedPreferences(context) ?: return
         val bearerToken = "Bearer $token"
 

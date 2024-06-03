@@ -1,5 +1,7 @@
 package com.gmlab.team_benew.main.home
 
+import android.app.AlertDialog
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -38,6 +40,7 @@ import com.gmlab.team_benew.project.ProjectListView
 import com.gmlab.team_benew.project.ProjectResponse
 import com.gmlab.team_benew.test.CodingTestActivity
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+import okio.ByteString.Companion.decodeBase64
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,13 +48,13 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
-class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectListView {
+class HomeFragment : Fragment(), MainView, UserNameCallback, HomeView, ProjectListView {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var viewPager2: ViewPager2
     private lateinit var textIndicator: TextView
     private lateinit var textIndicatorData: TextView
-    private lateinit var  homeService: HomeService
+    private lateinit var homeService: HomeService
     private lateinit var profileImageView: ImageView
     private lateinit var peerImageView: ImageView
     private lateinit var loadingIndicator: ProgressBar
@@ -65,7 +68,6 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     private val homeViewModel: HomeViewModel by viewModels()
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,6 +75,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
+
     override fun onResume() {
         super.onResume()
         getUserInfo() // 사용자 정보를 새로고침하는 메서드 호출
@@ -125,7 +128,6 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         homeViewModel.mainProjectData.observe(viewLifecycleOwner, Observer { projectData ->
             projectData?.let { updateMainProjectUI(it) }
         })
-
 
 
         // 여기서 사용자 정보를 가져옴
@@ -186,7 +188,27 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
 //        buttonNavMyteamlist.setOnClickListener { onCardClicked(it) }
 //        buttonNavTestIntro.setOnClickListener{ onCardClicked(it) }
 
+        // 결과 수신
+        parentFragmentManager.setFragmentResultListener("projectPostResult", this) { key, bundle ->
+            val isSuccess = bundle.getBoolean("isSuccess")
+            if (isSuccess) {
+                showAlert("프로젝트 생성 성공", "프로젝트가 성공적으로 생성되었습니다.")
+            } else {
+                showAlert("프로젝트 생성 실패", "프로젝트 생성에 실패했습니다.")
+            }
+        }
 
+
+    }
+
+    private fun showAlert(title: String, message: String) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle(title)
+            setMessage(message)
+            setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            create()
+            show()
+        }
     }
 
     private fun loadProjects() {
@@ -229,18 +251,19 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         textIndicatorData.text = currentPosition.toString()
         textIndicator.text = "/$total"
 
-        if(currentPosition == 4) {
+        if (currentPosition == 4) {
             textIndicatorData.setTextColor(resources.getColor(R.color.black, null))
             textIndicator.setTextColor(resources.getColor(R.color.black, null))
-        }
-        else {
+        } else {
             textIndicatorData.setTextColor(resources.getColor(R.color.white, null))
             textIndicator.setTextColor(resources.getColor(R.color.white, null))
         }
     }
 
     private fun updateMainProjectUI(projectData: getMainProjectData) {
-        if(projectData != null) {
+        if (
+            projectData.projectRateOfProgress >= 0
+        ) {
             noMainProjectData.visibility = View.GONE
             mainProjectProgressBar.visibility = View.VISIBLE
             mainProjectDdayTextView.visibility = View.VISIBLE
@@ -252,8 +275,13 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             val progressRate = Math.ceil(projectData.projectRateOfProgress).toInt()
             mainProjectDdayTextView.text = "$progressRate%"
             mainProjectProgressBar.progress = progressRate
-        }
-        else {
+
+        } else if (projectData.projectRateOfProgress < 0) {
+            noMainProjectData.visibility = View.VISIBLE
+            mainProjectProgressBar.visibility = View.GONE
+            mainProjectDdayTextView.visibility = View.GONE
+            mainProjectNameTextView.visibility = View.GONE
+        } else {
             noMainProjectData.visibility = View.VISIBLE
             mainProjectProgressBar.visibility = View.GONE
             mainProjectDdayTextView.visibility = View.GONE
@@ -273,6 +301,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         Log.d("HomeFragment", "메인 프로젝트 데이터 성공: $projectData")
         homeViewModel.setMainProjectData(projectData)
     }
+
     override fun onMainProjectGetFailure(statusCode: Int) {
         mainProjectLoadingIndicator.visibility = View.GONE // 로딩 인디케이터 숨기기
         Log.e("HomeFragment", "메인 프로젝트 데이터 실패:  $statusCode")
@@ -286,6 +315,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
 //            R.id.btn_do_test -> findNavController().navigate(R.id.action_home_to_intro_testing) // testing 화면으로
         }
     }
+
     private fun onButtonClicked(view: View) {
         when (view.id) {
             R.id.btn_skill_test -> {
@@ -295,7 +325,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         }
     }
 
-    private fun getUserProfileInfo(){
+    private fun getUserProfileInfo() {
         homeViewModel.setLoading(true) // 로딩 시작
         homeService = HomeService(requireContext())
         homeService.setHomeView(this)
@@ -316,10 +346,10 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             // photo가 Base64 문자열인 경우
             val bitmap = decodeBase64(photoUrl)
             bitmap?.let {
-               Glide.with(this)
-                   .load(it)
-                   .apply(RequestOptions().circleCrop())
-                   .into(profileImageView)
+                Glide.with(this)
+                    .load(it)
+                    .apply(RequestOptions().circleCrop())
+                    .into(profileImageView)
             }
         }
 
@@ -343,6 +373,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             null
         }
     }
+
     private fun dpToPx(context: Context, dp: Int): Int {
         return (dp * context.resources.displayMetrics.density).toInt()
     }
@@ -385,8 +416,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
                 homeService.setUserNameCallback(this)
                 homeService.getUserName(token, account)
             }
-        }
-        else {
+        } else {
             // 캐시된 사용자 이름이 있으면 UI 업데이트
             updateUserNameUI(cachedUserName)
         }
@@ -405,7 +435,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
         val tvUserData = view?.findViewById<TextView>(R.id.tv_username_data)
         val tvUserData_2 = view?.findViewById<TextView>(R.id.tv_username_data_2)
         tvUserData?.text = "${userName}님,"
-        tvUserData_2?.text ="${userName}님의 프로필"
+        tvUserData_2?.text = "${userName}님의 프로필"
     }
 
     private fun getIdFromSharedPreferences(context: Context): Int? {
@@ -444,15 +474,15 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     }
 
     override fun onMainGetSuccess() {
-        Log.d("USER/GET/SUCCESS","유저정보 획득성공 콜백성공")
+        Log.d("USER/GET/SUCCESS", "유저정보 획득성공 콜백성공")
     }
 
     override fun onMainGetFailure() {
-        Log.d("USER/GET/FAILURE","유저정보 획득성공 콜백실패")
+        Log.d("USER/GET/FAILURE", "유저정보 획득성공 콜백실패")
     }
 
     override fun onHomeGetSuccess(profileData: getProfilePreiviewData) {
-        Log.d("HomeFragment","유저프로필정보 획득성공 콜백성공")
+        Log.d("HomeFragment", "유저프로필정보 획득성공 콜백성공")
         homeViewModel.setProfileData(profileData)
     }
 
@@ -484,7 +514,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
     }
 
     //김대환 : db에서 nickname이 null이면 firstSetting 액티비티를 띄움
-    fun checkNicknameIsEmpty(){
+    fun checkNicknameIsEmpty() {
 
         val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
@@ -496,7 +526,10 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
             val call: Call<getNicknameData> = apiService.getNickname("Bearer $token", memberId)
 
             call.enqueue(object : Callback<getNicknameData> {
-                override fun onResponse(call: Call<getNicknameData>, response: Response<getNicknameData>) {
+                override fun onResponse(
+                    call: Call<getNicknameData>,
+                    response: Response<getNicknameData>
+                ) {
                     if (response.isSuccessful) {
                         val nicknameData = response.body()
 
@@ -517,6 +550,7 @@ class HomeFragment: Fragment(), MainView, UserNameCallback, HomeView,ProjectList
                         Log.e("NicknameCheck", "Response unsuccessful")
                     }
                 }
+
                 override fun onFailure(call: Call<getNicknameData>, t: Throwable) {
 
                 }

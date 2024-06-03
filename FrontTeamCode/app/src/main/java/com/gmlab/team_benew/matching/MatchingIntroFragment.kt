@@ -52,6 +52,7 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
         // 모든 버튼에 같은 클릭 리스너 설정
         buttonNavMatchingDetail.setOnClickListener { showProjectListModal() }
         buttonCreateProject.setOnClickListener { onCreateProjectClicked() }
+        buttonTeamSearchingIntro.setOnClickListener{onProjectAllFindingClicked()}
 
 
         loadGifWithGlide(imageView, progressBar)
@@ -61,10 +62,8 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
         projectListService.getProjects()
     }
 
-    private fun onCardClicked(view: View) {
-        when (view.id) {
-            R.id.btn_coworker_searching_intro -> findNavController().navigate(R.id.action_intro_matching_to_navigation_matching) // 매칭 디테일로 이동
-        }
+    private fun onProjectAllFindingClicked() {
+           findNavController().navigate(R.id.action_matching_intro_to_project_all_finding) //모든프로젝트 찾기로 이동
     }
 
     private fun onCreateProjectClicked() {
@@ -102,6 +101,7 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
     override fun onProjectListEmpty() {
         view?.findViewById<Button>(R.id.btn_if_no_project_show_this_button)?.visibility = View.VISIBLE
         view?.findViewById<Button>(R.id.btn_coworker_searching_intro)?.visibility = View.GONE
+        view?.findViewById<Button>(R.id.btn_team_searching_intro)?.visibility = View.GONE
         Log.e("FragmentMatchingIntro","프로젝트 리스트 불러오기 Null")
     }
 

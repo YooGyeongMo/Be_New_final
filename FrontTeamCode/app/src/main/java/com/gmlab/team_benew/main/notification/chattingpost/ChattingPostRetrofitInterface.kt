@@ -7,11 +7,15 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+data class ChatUser(
+    val userId: Long,
+    val userName: String
+)
+
 interface ChattingPostRetrofitInterface {
 
-    @POST("chat/new/{user1}/{user2}")
+    @POST("chat/new")
     fun chatPost(@Header("Authorization") beaererToken: String,
-                 @Path("user1") user1: Long,
-                 @Path("user2") user2: Long
+                 @Body users: List<ChatUser>
     ): Call<ChattingPostResponse>
 }

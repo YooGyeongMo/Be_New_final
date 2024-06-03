@@ -1,12 +1,17 @@
 package com.gmlab.team_benew.project
 
+
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,14 +24,20 @@ import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailView
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailViewModel
 import com.gmlab.team_benew.project.projectgetmember.ProjectGetMemberViewModel
 import com.gmlab.team_benew.project.projectgetmember.ProjectMemberListAdapter
+import com.gmlab.team_benew.project.projectstartpatch.ProjectDetailStartPatchResponse
+import com.gmlab.team_benew.project.projectstartpatch.ProjectDetailStartPatchService
+import com.gmlab.team_benew.project.projectstartpatch.ProjectDetailStartPatchView
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
-class ProjectDetailFragment:Fragment(), ProjectDetailView {
+class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartPatchView {
 
     private lateinit var projectDetailService: ProjectDetailService
+    private lateinit var projectStartPatchService: ProjectDetailStartPatchService
     private val projectDetailViewModel: ProjectDetailViewModel by viewModels()
-    private val projectGetMemberViewModel: ProjectGetMemberViewModel by viewModels()
+    private val cal = Calendar.getInstance()
 
 
     private lateinit var projectNameTextView: TextView
@@ -38,7 +49,11 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
     private lateinit var loadingIndicator: ProgressBar
     private lateinit var projectDetailContent: View
     private lateinit var memberViewPager: ViewPager2
+    private lateinit var projectmemberCount: TextView
+    private lateinit var dotsIndicator: DotsIndicator
+    private lateinit var projectStartBtn: Button
 
+    private lateinit var selectedDate: String
 
 
     override fun onCreateView(
@@ -52,13 +67,19 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
         projectNameTextView = view.findViewById(R.id.tv_project_title_name_of_detail)
         projectStartDateTextView = view.findViewById(R.id.tv_project_detail_start_date_data)
         projectEndDateTextView = view.findViewById(R.id.tv_project_detail_end_date_data)
-        projectOneLineIntroTextView = view.findViewById(R.id.tv_project_detail_summary_introduction_info_data)
-        projectIntroTextView = view.findViewById(R.id.tv_project_detail_explain_introduction_info_data)
+        projectOneLineIntroTextView =
+            view.findViewById(R.id.tv_project_detail_summary_introduction_info_data)
+        projectIntroTextView =
+            view.findViewById(R.id.tv_project_detail_explain_introduction_info_data)
         projectProgressBar = view.findViewById(R.id.pb_project_detail_state_data)
         loadingIndicator = view.findViewById(R.id.project_detail_loading_indicator)
         memberViewPager = view.findViewById(R.id.viewPager_team_members)
+        projectmemberCount = view.findViewById(R.id.tv_project_team_memeber_count_data)
+        dotsIndicator = view.findViewById(R.id.did_project_member)
+        projectStartBtn = view.findViewById(R.id.btn_project_start)
 
         projectDetailService = ProjectDetailService(requireContext())
+        projectStartPatchService = ProjectDetailStartPatchService(requireContext())
         projectDetailService.setProjectDetailView(this)
 
         projectDetailViewModel.projectDetail.observe(viewLifecycleOwner, Observer { projectDetail ->
@@ -75,31 +96,9 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
             }
         })
 
-        projectGetMemberViewModel.projectMembers.observe(viewLifecycleOwner, Observer { members ->
-            memberViewPager.adapter = ProjectMemberListAdapter(members)
-
-        })
-
-        projectGetMemberViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            if (isLoading) {
-                loadingIndicator.visibility = View.VISIBLE
-                projectDetailContent.visibility = View.GONE
-            } else {
-                loadingIndicator.visibility = View.GONE
-                projectDetailContent.visibility = View.VISIBLE
-            }
-        })
-
-        projectGetMemberViewModel.errorMessage.observe(viewLifecycleOwner, Observer { errorMessage ->
-            if (errorMessage != null) {
-                // 에러 처리 로직을 추가할 수 있습니다.
-                Log.e("ProjectDetailFragment", errorMessage)
-            }
-        })
 
         return view
     }
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -108,23 +107,49 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
         val projectId = arguments?.getInt("projectId")
 
         //project를 UI에 표시하거나 로그에 출력
-        if(projectId != null) {
+        if (projectId != null) {
             // 로그에 출력
             projectDetailViewModel.setLoading(true)
             projectDetailService.getProjectDetail(projectId)
-            projectGetMemberViewModel.getProjectMembers(requireContext(), projectId)  // Context를 전달하여 getProjectMembers 호출
             Log.d("ProjectDetailFragment", "프로젝트 id: $projectId")
-        }
-        else{
+        } else {
             Log.e("ProjectDetailFragment", "No projectId")
         }
+        projectStartBtn.setOnClickListener {
+            DatePickerDialog(
+                requireContext(),
+                { _, y, m, d ->
+                    cal.set(Calendar.YEAR, y)
+                    cal.set(Calendar.MONTH, m)
+                    cal.set(Calendar.DAY_OF_MONTH, d)
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    selectedDate = dateFormat.format(cal.time)
+                    projectEndDateTextView.text = selectedDate
+                    Log.d("ProjectDetailFragment", "선택된 날짜: $selectedDate")
 
+                    // PATCH 요청 보내기
+                    if (projectId != null) {
+                        projectStartPatchService.patchProjectStart(
+                            projectId,
+                            selectedDate,
+                            this@ProjectDetailFragment
+                        )
+                    }
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
     }
 
     override fun onProjectDetailSuccess(projectDetail: GetProjectDeatilResponse) {
         projectDetailViewModel.setLoading(false)
         projectDetailViewModel.setProjectDetail(projectDetail)
         Log.d("ProjectDetailFragment", "프로젝트 상세 정보를 불러오는데 성공!")
+
+        memberViewPager.adapter = ProjectMemberListAdapter(projectDetail.profiles)
+        dotsIndicator.setViewPager2(memberViewPager)
     }
 
     override fun onProjectDetailFailure(statusCode: Int) {
@@ -134,11 +159,47 @@ class ProjectDetailFragment:Fragment(), ProjectDetailView {
 
     private fun updateUI(projectDetail: GetProjectDeatilResponse) {
         projectNameTextView.text = "${projectDetail.projectName} 프로젝트"
-        projectStartDateTextView.text = projectDetail.projectStartDate
-        projectEndDateTextView.text = projectDetail.projectDeadlineDate
+
+        if (projectDetail.projectStartDate.isNullOrEmpty() &&
+            projectDetail.projectDeadlineDate.isNullOrEmpty()
+        ) {
+            projectStartDateTextView.text = "프로젝트 마감일을 정해주세요"
+            projectEndDateTextView.text = "프로젝트 마감일을 정해주세요"
+            projectStartBtn.visibility = View.VISIBLE
+        } else {
+
+            projectStartBtn.visibility = View.GONE
+            projectStartDateTextView.text = projectDetail.projectStartDate
+            projectEndDateTextView.text = projectDetail.projectDeadlineDate
+        }
         projectOneLineIntroTextView.text = projectDetail.projectOneLineIntroduction
         projectIntroTextView.text = projectDetail.projectIntroduction
+        projectmemberCount.text = "${projectDetail.numberOfMembers} 명"
 
+    }
+    override fun onSuccessProjectStartPatch(response: ProjectDetailStartPatchResponse) {
+        // 성공적으로 PATCH 요청이 완료되었을 때
+        showAlert("프로젝트 시작", "프로젝트가 성공적으로 시작되었습니다.")
+    }
+
+    override fun onFailureProjectStartPatch(message: String) {
+        // PATCH 요청이 실패했을 때
+        showAlert("프로젝트 시작 실패", message)
+    }
+
+    private fun showAlert(title: String, message: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("확인") { _, _ ->
+                // 데이터를 새로 불러와서 업데이트
+                val projectId = arguments?.getInt("projectId")
+                if (projectId != null) {
+                    projectDetailViewModel.setLoading(true)
+                    projectDetailService.getProjectDetail(projectId)
+                }
+            }
+            .show()
     }
 
 }

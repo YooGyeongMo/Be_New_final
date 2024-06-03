@@ -1,5 +1,8 @@
 package com.gmlab.team_benew.chat.chatintro
 
+
+import ChatData
+import FriendResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header

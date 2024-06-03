@@ -15,12 +15,12 @@ class ChattingPostService {
         this.chattingPostView = chattingPostView
     }
 
-    suspend fun chattingPost(context: Context,user1Id:Long, user2Id: Long): Response<ChattingPostResponse> {
+    suspend fun chattingPost(context: Context, chatUser : List<ChatUser>): Response<ChattingPostResponse> {
         val token = getTokenFromSharedPreferences(context)
         val bearerToken = "Bearer $token"
         val service = getRetrofit().create(ChattingPostRetrofitInterface::class.java)
 //동기로직
-        return service.chatPost(bearerToken, user1Id, user2Id).execute()
+        return service.chatPost(bearerToken, chatUser).execute()
     }
 
     private fun getTokenFromSharedPreferences(context: Context): String? {

@@ -61,12 +61,50 @@
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager_team_members"
-            android:layout_width="match_parent"
+            android:layout_width="160dp"
             android:layout_height="150dp"
             android:layout_marginTop="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_project_team_memeber_list" />
+
+        <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+            android:id="@+id/did_project_member"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dotsCornerRadius="10dp"
+            app:dotsSize="8sp"
+            app:dotsColor="@color/mainFont2"
+            app:selectedDotColor="@color/mainBlue2"
+            app:layout_constraintTop_toBottomOf="@id/viewPager_team_members"
+            app:layout_constraintStart_toStartOf="@id/viewPager_team_members"
+            app:layout_constraintEnd_toEndOf="@id/viewPager_team_members"
+            android:layout_marginBottom="8dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_project_team_memeber_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="팀원 수"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/tv_project_team_memeber_list"
+            app:layout_constraintTop_toBottomOf="@id/tv_project_kind_of_detail_data"
+            android:layout_marginStart="120dp"/>
+
+        <TextView
+            android:id="@+id/tv_project_team_memeber_count_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="1명"
+            android:textColor="@color/mainFont2"
+            android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@id/tv_project_team_memeber_count"
+            app:layout_constraintStart_toStartOf="@id/tv_project_team_memeber_count"
+            />
 
         <View
             android:id="@+id/v_project_detail_bottom_stackBar"
@@ -91,7 +129,6 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/tv_project_team_memeber_list"
             app:layout_constraintTop_toBottomOf="@id/v_project_detail_bottom_stackBar"
-
             />
 
         <TextView
@@ -241,7 +278,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:theme="@style/Progressbar_color_under_api21"
             />
-
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_project_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/v_project_detail_bottom_stackBar"
+            android:background="@drawable/button_bg"
+            android:text="프로젝트 마감일 정하기"
+            android:padding="5dp"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

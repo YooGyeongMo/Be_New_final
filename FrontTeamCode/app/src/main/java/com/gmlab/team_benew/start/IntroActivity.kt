@@ -1,5 +1,7 @@
 package com.gmlab.team_benew.start
 
+import android.app.AlertDialog
+import android.app.ProgressDialog.show
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -114,6 +116,9 @@ class IntroActivity:AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+
+        // 회원가입 완료 후 알림 확인
+        checkAndShowAlert()
     }
 
     private fun showButtonsWithAnimation() {
@@ -122,5 +127,25 @@ class IntroActivity:AppCompatActivity() {
 
         binding.btnIntroLogin.startAnimation(fadeInAnimBtn)
         binding.btnIntroRegister.startAnimation(fadeInAnimBtn)
+    }
+
+    private fun checkAndShowAlert() {
+        val showAlert = intent.getBooleanExtra("showAlert", false)
+
+        if (showAlert) {
+            // AlertDialog 표시
+            AlertDialog.Builder(this).apply {
+                setTitle("회원가입 성공")
+                setMessage("회원가입이 성공적으로 되었습니다.")
+                setPositiveButton("확인") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                create()
+                show()
+            }
+
+            // 플래그를 초기화하여 다이얼로그가 반복적으로 표시되지 않도록 함
+            intent.removeExtra("showAlert")
+        }
     }
 }

@@ -490,10 +490,10 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:text="새로운 프로젝트를\n만드세요"
+                    android:textSize="12sp"
+                    android:text="새로운 프로젝트를\n시작하세요"
                     android:textAlignment="center"
                     android:textColor="@color/mainBlue2"
-                    android:textStyle="bold"
                     android:visibility="gone"
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
