@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
 
-class ChatAdapter(private val messages: List<ChatMessage>, private val currentUserId: Int) :
+class ChatAdapter(private val messages: List<StompMessage>, private val currentUserId: Int) :
     RecyclerView.Adapter<ChatAdapter.ViewHolder>()  {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,11 +26,11 @@ class ChatAdapter(private val messages: List<ChatMessage>, private val currentUs
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
         holder.messageText.text = message.message
-        holder.senderText.text = message.sender  // 발신자의 이름 설정
+        holder.senderText.text = message.senderName  // 발신자의 이름 설정
 
         // 현재 사용자의 ID와 메시지 송신자의 ID 비교
         // senderId를 사용해야 좌우 정렬이 됨
-        val isCurrentUser = message.senderId == currentUserId
+        val isCurrentUser = message.sender == currentUserId
 
         holder.messageText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
         holder.senderText.gravity = if (isCurrentUser) Gravity.END else Gravity.START
