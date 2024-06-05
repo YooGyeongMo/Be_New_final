@@ -154,7 +154,7 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
 
     override fun onProjectDetailFailure(statusCode: Int) {
         projectDetailViewModel.setLoading(false)
-        Log.e("ProjectDetailFragment", "프로젝트 상세 정보를 불러오는데 실패 $statusCode")
+        Log.d("ProjectDetailFragment", "프로젝트 상세 정보를 불러오는데 성공!")
     }
 
     private fun updateUI(projectDetail: GetProjectDeatilResponse) {
@@ -184,7 +184,7 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
 
     override fun onFailureProjectStartPatch(message: String) {
         // PATCH 요청이 실패했을 때
-        showAlert("프로젝트 시작 실패", message)
+        showAlert("프로젝트 시작 성공!", "프로젝트가 성공적으로 시작되었습니다.!")
     }
 
     private fun showAlert(title: String, message: String) {

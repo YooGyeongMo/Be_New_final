@@ -140,14 +140,14 @@ class ChatFragment : Fragment() {
                         override fun onComplete() {
                             // 메시지 전송 성공 시 UI 피드백
                             activity?.runOnUiThread {
-                                Toast.makeText(requireContext(), "Message sent successfully", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(requireContext(), "Message sent successfully", Toast.LENGTH_SHORT).show()
                             }
                         }
 
                         override fun onError(e: Throwable) {
                             // 메시지 전송 실패 시 UI 피드백
                             activity?.runOnUiThread {
-                                Toast.makeText(requireContext(), "Failed to send message", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(requireContext(), "Failed to send message", Toast.LENGTH_SHORT).show()
                             }
                         }
 
