@@ -94,7 +94,7 @@ class ChatIntroFriendsListAdapter(private val friendsList: MutableList<Friend>) 
 
 data class Friend(
     val name: String,
-    val profileImageUrl: String // URL로 변경
+    val profileImageUrl: String, // URL로 변경
 )
 
 data class FriendResponse(

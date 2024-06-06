@@ -15,10 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.chat.chatintro.friendadd.FriendAddView
 import com.gmlab.team_benew.main.notification.ProjectMemeberPatch.ProjectMemberPatchService
 import com.gmlab.team_benew.main.notification.chattingpost.ChatUser
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostService
 import com.gmlab.team_benew.main.notification.chattingpost.ChattingPostView
+import com.gmlab.team_benew.main.notification.freindaccept.FriendAcceptService
 import com.gmlab.team_benew.main.notification.matchingalarm.MatchingAlarmsPatchView
 import com.gmlab.team_benew.main.notification.matchingalarm.MatchingPatchService
 import com.gmlab.team_benew.main.notification.projectnotiget.GetProjectNotiResponse
@@ -33,7 +35,7 @@ import retrofit2.Response
 
 
 class NotificationFragment : Fragment(), NotificationView, NotificationReadView, ChattingPostView,
-    MatchingAlarmsPatchView, ProjectnotigetView {
+    MatchingAlarmsPatchView, ProjectnotigetView,FriendAddView {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var notificationService: NotificationMatchingService
@@ -42,6 +44,7 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
     private lateinit var chattingPostService: ChattingPostService
     private lateinit var projectMemberPatchService: ProjectMemberPatchService
     private lateinit var projectnotigetService: ProjectnotigetService
+    private lateinit var friendAcceptService: FriendAcceptService
 
     // resquestLock 버튼 중복터치 막기
     private var requestLock = false
@@ -76,6 +79,8 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
         chattingPostService = ChattingPostService()
         chattingPostService.setChattingPostView(this)
 
+        friendAcceptService = FriendAcceptService(requireContext(), this)
+
 
         projectMemberPatchService = ProjectMemberPatchService()
 
@@ -85,26 +90,31 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
     override fun onNotificationListSuccess(notifications: List<NotificationMatchingResponse>) {
         val adapter = NotificationAdapter(notifications.toMutableList(),
-            onAccept = { notification ->
-                // 수락 버튼 클릭 시의 처리
+            onAcceptGeneral = { notification ->
                 Log.d("수락", "수락")
-                handleAccept(notification)
+                handleAcceptGeneral(notification)
             },
-            onReject = { notification ->
-                // 거절 버튼 클릭 시의 처리
+            onRejectGeneral = { notification ->
                 Log.d("거절", "거절")
-                handleReject(notification)
+                handleRejectGeneral(notification)
             },
             onProjectPreview = { projectId ->
                 projectnotigetService.getProjectNoti(projectId)
+            },
+            onAcceptFriend = { notification ->
+                Log.d("친구 수락", "친구 수락")
+                handleAcceptFriend(notification)
+            },
+            onRejectFriend = { notification ->
+                Log.d("친구 거절", "친구 거절")
+                handleRejectFriend(notification)
             }
-
         )
         recyclerView.adapter = adapter
     }
 
 
-    private fun handleAccept(notification: NotificationMatchingResponse) {
+    private fun handleAcceptGeneral(notification: NotificationMatchingResponse) {
         if (requestLock) return
         requestLock = true
 
@@ -121,25 +131,13 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
             )
 
             try {
-                // 1. 알람 읽기
-                val readResponse =
-                    notificationReadService.alarmsRead(requireContext(), notification.id)
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
                 if (!readResponse.isSuccessful) {
                     handleFailure("알람 읽기에 실패했습니다. 오류 코드: ${readResponse.code()}")
                     return@launch
                 }
                 Log.d("NotificationFragment", "알람 읽기 성공: ${readResponse.code()}")
 
-                // 2. 매칭 수락
-                val matchResponse =
-                    matchingPatchService.acceptMatch(requireContext(), senderId, receiverId)
-                if (!matchResponse.isSuccessful) {
-                    handleFailure("매칭 수락에 실패했습니다. 오류 코드: ${matchResponse.code()}")
-                    return@launch
-                }
-                Log.d("NotificationFragment", "매칭 수락 성공: ${matchResponse.code()}")
-
-                // 3. 프로젝트 팀원 추가
                 val patchResponse = projectMemberPatchService.addProjectMember(
                     requireContext(),
                     projectId,
@@ -151,7 +149,6 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
                 }
                 Log.d("NotificationFragment", "프로젝트 팀원 추가 성공: ${patchResponse.code()}")
 
-                // 4. 채팅방 생성
                 val chatResponse = chattingPostService.chattingPost(requireContext(), chatUsers)
                 if (chatResponse.isSuccessful) {
                     Log.d("NotificationFragment", "채팅방 생성 성공: ${chatResponse.code()}")
@@ -171,7 +168,7 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
         }
     }
 
-    private fun handleReject(notification: NotificationMatchingResponse) {
+    private fun handleRejectGeneral(notification: NotificationMatchingResponse) {
         if (requestLock) return
         requestLock = true
 
@@ -180,19 +177,78 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
             val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
 
             try {
-                val readResponse =
-                    notificationReadService.alarmsRead(requireContext(), notification.id)
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
                 if (readResponse.isSuccessful) {
-                    val matchResponse =
-                        matchingPatchService.rejectMatch(requireContext(), senderId, receiverId)
-                    if (matchResponse.isSuccessful) {
-                        withContext(Dispatchers.Main) {
-                            (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
-                            showSuccessDialog("매칭 요청을 거절했습니다.")
-                        }
-                    } else {
-                        handleFailure("매칭 거절에 실패했습니다.")
+                    withContext(Dispatchers.Main) {
+                        (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+                        showSuccessDialog("매칭 요청을 거절했습니다.")
                     }
+//                    val matchResponse = matchingPatchService.rejectMatch(requireContext(), senderId, receiverId)
+//                    if (matchResponse.isSuccessful) {
+//                        withContext(Dispatchers.Main) {
+//                            (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+//                            showSuccessDialog("매칭 요청을 거절했습니다.")
+//                        }
+//                    } else {
+//                        handleFailure("매칭 거절에 실패했습니다.")
+//                    }
+                } else {
+                    handleFailure("알람 읽기에 실패했습니다.")
+                }
+            } catch (e: Exception) {
+                handleFailure("네트워크 요청에 실패했습니다.")
+            } finally {
+                requestLock = false
+            }
+        }
+    }
+
+    private fun handleAcceptFriend(notification: NotificationMatchingResponse) {
+        if (requestLock) return
+        requestLock = true
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val senderUserId = notification.senderUserId
+            val receiverUserId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
+
+            try {
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
+                if (!readResponse.isSuccessful) {
+                    handleFailure("알람 읽기에 실패했습니다. 오류 코드: ${readResponse.code()}")
+                    return@launch
+                }
+                Log.d("NotificationFragment", "알람 읽기 성공: ${readResponse.code()}")
+
+                friendAcceptService.acceptFriend(senderUserId, receiverUserId)
+                withContext(Dispatchers.Main) {
+                    (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+                }
+            } catch (e: Exception) {
+                Log.e("NotificationFragment", "네트워크 요청에 실패했습니다.", e)
+                handleFailure("네트워크 요청에 실패했습니다. ${e.message}")
+            } finally {
+                requestLock = false
+            }
+        }
+    }
+
+    private fun handleRejectFriend(notification: NotificationMatchingResponse) {
+        // 친구 거절에 대한 로직 구현
+        if (requestLock) return
+        requestLock = true
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val senderId = notification.senderUserId
+            val receiverId = getIdFromSharedPreferences(requireContext())?.toLong() ?: -1L
+
+            try {
+                val readResponse = notificationReadService.alarmsRead(requireContext(), notification.id)
+                if (readResponse.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        (recyclerView.adapter as? NotificationAdapter)?.removeItem(notification)
+                        showSuccessDialog("친구 요청을 거절했습니다.")
+                    }
+
                 } else {
                     handleFailure("알람 읽기에 실패했습니다.")
                 }
@@ -334,5 +390,25 @@ class NotificationFragment : Fragment(), NotificationView, NotificationReadView,
 
     override fun onProjectNotiFailure(statusCode: Int) {
         showFailureDialog("프로젝트 정보를 불러오는데 실패했습니다. 오류 코드: $statusCode")
+    }
+
+    override fun onFriendAddSuccess() {
+        showSuccessDialog("친구 요청을 수락했습니다.")
+    }
+
+    override fun onFriendAddFailure(message: String) {
+        showFailureDialog(message)
+    }
+
+    override fun onUnauthorized() {
+        showFailureDialog("Unauthorized: Please login again.")
+    }
+
+    override fun onForbidden() {
+        showFailureDialog("Forbidden: You do not have permission to access this resource.")
+    }
+
+    override fun onNotFound() {
+        showFailureDialog("Not Found: The requested resource could not be found.")
     }
 }

@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -22,9 +23,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.chat.chatintro.friendadd.FriendAddService
+import com.gmlab.team_benew.chat.chatintro.friendadd.FriendAddView
 import com.gmlab.team_benew.chat.socket.ChatFragment
 
-class ChatIntroFragment : Fragment(), ChatIntroView {
+class ChatIntroFragment : Fragment(), ChatIntroView, FriendAddView {
 
     private lateinit var tv_menu_bar_1: TextView
     private lateinit var tv_menu_bar_2: TextView
@@ -98,7 +101,7 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
 
         ivAddFriendOrChat.setOnClickListener {
             if (recyclerView.adapter == friendsAdapter) {
-                showAddFriendModal()
+                showAddFriendModal(userId)
             } else if (recyclerView.adapter == chatAdapter) {
                 findNavController().navigate(R.id.action_chat_intro_to_chat_post)
             }
@@ -173,6 +176,16 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
         progressBar.visibility = View.GONE
     }
 
+    override fun onFriendAddSuccess() {
+        showCompletionDialog("친구 요청 완료")
+        val userId = getUserIdFromSharedPreferences()
+        viewModel.getFriendsList(userId.toLong())
+    }
+
+    override fun onFriendAddFailure(message: String) {
+        showFailureDialog(message)
+    }
+
     override fun onUnauthorized() {
         showFailureDialog("Unauthorized: Please login again.")
         progressBar.visibility = View.GONE
@@ -188,7 +201,7 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
         progressBar.visibility = View.GONE
     }
 
-    private fun showAddFriendModal() {
+    private fun showAddFriendModal(memberId: Int) {
         val builder = AlertDialog.Builder(requireContext())
         val view = LayoutInflater.from(context).inflate(R.layout.modal_add_friends_chatting_room, null)
         builder.setView(view)
@@ -197,11 +210,18 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
 
         val btnAddFriends = view.findViewById<Button>(R.id.btn_add_friends)
         val btnCancel = view.findViewById<Button>(R.id.btn_cancel_add_friends)
+        val editTextFriendId = view.findViewById<EditText>(R.id.tet_ip_id_freind_searching)
 
         btnAddFriends.setOnClickListener {
-            // 친구 추가 로직 구현
-            dialog.dismiss()
-            showCompletionDialog("친구 추가 완료!")
+            val friendId = editTextFriendId.text.toString().toLongOrNull()
+            if(friendId != null){
+                val friendAddService = FriendAddService(requireContext(), this)
+                friendAddService.addFriend(friendId.toInt(),memberId)
+                dialog.dismiss()
+            } else {
+                showFailureDialog("유효한 친구 아이디를 입력하세요")
+            }
+
         }
 
         btnCancel.setOnClickListener {
@@ -239,7 +259,7 @@ class ChatIntroFragment : Fragment(), ChatIntroView {
         btnInviteFriend.setOnClickListener {
             // 채팅방 친구 초대
             dialog.dismiss()
-            showCompletionInviteDialog("친구 초대 완료!")
+            showCompletionInviteDialog("채팅방 초대 요청 완료!")
         }
 
         btnCancel.setOnClickListener {

@@ -126,21 +126,21 @@ class MatchingFragment : Fragment(), MatchingPostView, MatchingAlarmsPostView {
             onFailure = { showRetryDialog("프로젝트 요청을 보내지 못했습니다.") }
         )
 
-        matchingService.likeMatch(currentMatchId, project.projectId) { response ->
-//            Toast.makeText(context, "$currentMatchId 매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
-        }
+//        matchingService.likeMatch(currentMatchId, project.projectId) { response ->
+////            Toast.makeText(context, "$currentMatchId 매칭에 '좋아요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     private fun handleLeftSwipe(currentMatchId: Long) {
-        matchingService.disLikeMatch(currentMatchId,
-            onResponse = {
-//                Toast.makeText(context, "$currentMatchId 매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
-            },
-            onFailure = {
-                Toast.makeText(context, "매칭에 '싫어요'를 보내지 못했습니다.", Toast.LENGTH_SHORT).show()
-                Log.e("MatchingFragment", "disLikeMatch failed", it)
-            }
-        )
+//        matchingService.disLikeMatch(currentMatchId,
+//            onResponse = {
+////                Toast.makeText(context, "$currentMatchId 매칭에 '싫어요'를 보냈습니다.", Toast.LENGTH_SHORT).show()
+//            },
+//            onFailure = {
+//                Toast.makeText(context, "매칭에 '싫어요'를 보내지 못했습니다.", Toast.LENGTH_SHORT).show()
+//                Log.e("MatchingFragment", "disLikeMatch failed", it)
+//            }
+//        )
     }
 
     private fun updateUI(profiles: List<Profile>) {

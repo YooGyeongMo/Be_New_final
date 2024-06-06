@@ -63,6 +63,13 @@ class ProjectListAdapter(
             binding.popupProjectListEditOrDisband.setOnClickListener { view ->
                 showPopupMenu(view.context, view, projectItem)
         }
+
+            binding.ivGoToMyProjectDeatilInProjectList.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putInt("projectId", projectItem.projectId.toInt())
+                }
+                navController.navigate(R.id.action_project_list_to_project_deatil, bundle)
+            }
     }
         private fun showPopupMenu(context: Context, anchorView: View, projectItem: ProjectResponse) {
             val inflater = LayoutInflater.from(context)

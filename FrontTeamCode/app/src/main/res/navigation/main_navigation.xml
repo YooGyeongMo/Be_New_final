@@ -108,6 +108,9 @@
         <action
             android:id="@+id/action_project_list_to_project_edit_detail"
             app:destination="@id/navigation_project_edit_detail" />
+        <action
+            android:id="@+id/action_project_list_to_project_deatil"
+            app:destination="@id/navigation_project_deatil" />
     </fragment>
     <fragment
         android:id="@+id/navigation_project_post_deatil"
