@@ -13,6 +13,8 @@ data class ProjectFindingAllResponse(
     val numberOfMembers: Int,
 
     @SerializedName("projectStartDate")
-    val startDate: String
-) {
-}
+    val startDate: String,
+
+    @SerializedName("projectManager")
+    val projectManager: Long
+)

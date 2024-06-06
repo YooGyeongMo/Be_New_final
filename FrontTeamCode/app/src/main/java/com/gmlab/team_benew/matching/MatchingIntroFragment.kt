@@ -28,6 +28,7 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
 
     private val handler = Handler()
     private val sharedViewModel: SharedViewModel by activityViewModels()
+    private lateinit var imageView: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,9 +46,11 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
 
         val buttonTeamSearchingIntro = view.findViewById<Button>(R.id.btn_team_searching_intro)
         val buttonNavMatchingDetail = view.findViewById<Button>(R.id.btn_coworker_searching_intro)
-        val imageView = view.findViewById<ImageView>(R.id.iv_matching_intro_gif)
+        imageView = view.findViewById<ImageView>(R.id.iv_matching_intro_gif)
         val progressBar = view.findViewById<ProgressBar>(R.id.intro_matching_indicator)
         val buttonCreateProject = view.findViewById<Button>(R.id.btn_if_no_project_show_this_button)
+        // imageView 초기화
+
 
         // 모든 버튼에 같은 클릭 리스너 설정
         buttonNavMatchingDetail.setOnClickListener { showProjectListModal() }
@@ -122,5 +125,9 @@ class MatchingIntroFragment:Fragment(), ProjectListView {
         dialog.show(childFragmentManager, "ProjectListDialogFragment")
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        imageView.setImageDrawable(null) // 이미지뷰의 이미지 리소스 해제
+        handler.removeCallbacksAndMessages(null) // 핸들러의 콜백 및 메시지 제거
+    }
 }

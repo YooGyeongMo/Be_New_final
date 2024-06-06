@@ -75,7 +75,7 @@ class FirstSetting1Fragment : Fragment() {
         //viewPager.setCurrentItem(currentIndex + 1, true)
 
         var nickname = et_nickname.text.toString()
-        var photo = imageButtonToBase64(imgb_picture)
+        var photo = imageButtonToBase64(imgb_picture) ?: ""
 
         val sharedPref = context?.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
@@ -100,7 +100,7 @@ class FirstSetting1Fragment : Fragment() {
                         // 다음 화면으로 이동
                         viewPager.setCurrentItem(currentIndex + 1, true)
                     } else{
-                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "${response.code()}저장 실패", Toast.LENGTH_LONG).show()
                     }
                 }
 
@@ -130,14 +130,14 @@ class FirstSetting1Fragment : Fragment() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    private fun imageButtonToBase64(imageButton: ImageButton): String {
+    private fun imageButtonToBase64(imageButton: ImageButton): String? {
         val drawable = imageButton.drawable
 
         if (drawable is BitmapDrawable) {
             val originalBitmap = drawable.bitmap
             return compressAndEncodeBitmap(originalBitmap)
         } else {
-            return ""
+            return null
         }
     }
 

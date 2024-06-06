@@ -57,6 +57,7 @@ class SettingFragment: Fragment() {
                 editor.apply() // 변경 사항을 적용
 
                 val intent = Intent(requireContext(), IntroActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // 새로운 태스크 시작 후 이전 태스크 종료
                 startActivity(intent)
 
                 requireActivity().finish()

@@ -18,6 +18,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.gmlab.team_benew.R
+import com.gmlab.team_benew.project.projectfinishpatch.ProjectDeatilFinishPatchView
+import com.gmlab.team_benew.project.projectfinishpatch.ProjectDetailFinishPatchResponse
+import com.gmlab.team_benew.project.projectfinishpatch.ProjectDetailFinishPatchService
 import com.gmlab.team_benew.project.projectgetdetail.GetProjectDeatilResponse
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailService
 import com.gmlab.team_benew.project.projectgetdetail.ProjectDetailView
@@ -32,10 +35,12 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartPatchView {
+class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartPatchView,
+    ProjectDeatilFinishPatchView {
 
     private lateinit var projectDetailService: ProjectDetailService
     private lateinit var projectStartPatchService: ProjectDetailStartPatchService
+    private lateinit var projectFinishPatchService: ProjectDetailFinishPatchService
     private val projectDetailViewModel: ProjectDetailViewModel by viewModels()
     private val cal = Calendar.getInstance()
 
@@ -52,6 +57,7 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
     private lateinit var projectmemberCount: TextView
     private lateinit var dotsIndicator: DotsIndicator
     private lateinit var projectStartBtn: Button
+    private lateinit var projectFinishBtn: Button
 
     private lateinit var selectedDate: String
 
@@ -77,9 +83,11 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
         projectmemberCount = view.findViewById(R.id.tv_project_team_memeber_count_data)
         dotsIndicator = view.findViewById(R.id.did_project_member)
         projectStartBtn = view.findViewById(R.id.btn_project_start)
+        projectFinishBtn = view.findViewById(R.id.btn_project_finish)
 
         projectDetailService = ProjectDetailService(requireContext())
         projectStartPatchService = ProjectDetailStartPatchService(requireContext())
+        projectFinishPatchService = ProjectDetailFinishPatchService(requireContext())
         projectDetailService.setProjectDetailView(this)
 
         projectDetailViewModel.projectDetail.observe(viewLifecycleOwner, Observer { projectDetail ->
@@ -141,6 +149,11 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
                 cal.get(Calendar.DAY_OF_MONTH)
             ).show()
         }
+        projectFinishBtn.setOnClickListener {
+            if (projectId != null) {
+                projectFinishPatchService.projectFinishPatch(projectId, this@ProjectDetailFragment)
+            }
+        }
     }
 
     override fun onProjectDetailSuccess(projectDetail: GetProjectDeatilResponse) {
@@ -166,17 +179,25 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
             projectStartDateTextView.text = "프로젝트 마감일을 정해주세요"
             projectEndDateTextView.text = "프로젝트 마감일을 정해주세요"
             projectStartBtn.visibility = View.VISIBLE
+            projectFinishBtn.visibility = View.GONE  // 프로젝트 종료 버튼 숨김
         } else {
 
             projectStartBtn.visibility = View.GONE
             projectStartDateTextView.text = projectDetail.projectStartDate
             projectEndDateTextView.text = projectDetail.projectDeadlineDate
+
+            if (projectDetail.projectStarted) {
+                projectFinishBtn.visibility = View.VISIBLE// 프로젝트 종료버튼보임
+            } else {
+                projectFinishBtn.visibility = View.GONE
+            }
         }
         projectOneLineIntroTextView.text = projectDetail.projectOneLineIntroduction
         projectIntroTextView.text = projectDetail.projectIntroduction
         projectmemberCount.text = "${projectDetail.numberOfMembers} 명"
 
     }
+
     override fun onSuccessProjectStartPatch(response: ProjectDetailStartPatchResponse) {
         // 성공적으로 PATCH 요청이 완료되었을 때
         showAlert("프로젝트 시작", "프로젝트가 성공적으로 시작되었습니다.")
@@ -202,4 +223,13 @@ class ProjectDetailFragment : Fragment(), ProjectDetailView, ProjectDetailStartP
             .show()
     }
 
+    override fun onSuccessProjectFinishPatch(response: ProjectDetailFinishPatchResponse) {
+        val projectName = projectDetailViewModel.projectDetail.value?.projectName
+        showAlert("프로젝트 종료 성공", "${projectName}프로젝트가 성공적으로 종료되었습니다.")
+    }
+
+    override fun onFailureProjectFinishPatch(message: String) {
+        val projectName = projectDetailViewModel.projectDetail.value?.projectName
+        showAlert("프로젝트 종료 실패", "${projectName}프로젝트가 종료 되지 않았습니다.")
+    }
 }

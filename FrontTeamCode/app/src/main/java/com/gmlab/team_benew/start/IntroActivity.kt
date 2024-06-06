@@ -39,6 +39,7 @@ class IntroActivity:AppCompatActivity() {
     private lateinit var fadeInAnimBtn: Animation
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityIntroBinding.inflate(layoutInflater)
@@ -52,14 +53,16 @@ class IntroActivity:AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
-        // ProgressBar 초기 숨김 설정
+        // ProgressBar 로딩 중
         binding.pgIntroProgressBar.visibility = View.VISIBLE
+
+
 
         // GIF 로드 및 재생
         val imageView = findViewById<ImageView>(R.id.iv_intro_gif)
         Glide.with(this)
             .asGif()
-            .load("file:///android_asset/collab_intro.gif")
+            .load("file:///android_asset/collab_intro_2.gif")
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .listener(object
                 : RequestListener<GifDrawable> {

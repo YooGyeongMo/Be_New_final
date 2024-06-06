@@ -93,7 +93,7 @@ dependencies {
 
     //radio 버튼
     implementation ("com.google.android.material:material:<1.9.0>")
-    implementation ("com.airbnb.android:lottie:4.2.0")
+    implementation ("com.airbnb.android:lottie:6.0.1")
 
     //Stomp
     implementation ("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")

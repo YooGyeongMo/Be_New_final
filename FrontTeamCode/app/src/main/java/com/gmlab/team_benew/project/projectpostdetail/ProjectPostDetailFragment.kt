@@ -37,7 +37,8 @@ class ProjectPostDetailFragment : Fragment(), ProjectPostDetailView {
                         projectIntroduction = binding.etInputMyNewProjectExplainIntroductionData.text.toString(),
                         projectName = binding.etInputMyNewProjectTitleData.text.toString(),
                         projectOneLineIntroduction = binding.etInputMyNewProjectSummaryData.text.toString(),
-                        userId = userId
+                        userId = userId,
+                        projectManager = userId.toLong()
                     )
                     postService.postProject(projectRequestDto)
                 } else {

@@ -6,5 +6,5 @@ data class postFirstSettingData(
     @SerializedName("nickname")
     val nickname: String,
     @SerializedName("photo")
-    val photo : String
+    val photo : String?
 )
