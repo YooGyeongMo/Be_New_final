@@ -75,7 +75,7 @@ class ProjectFindingAllFragment : Fragment() {
             }
             loadingAnimation.visibility = View.GONE
             loadingAnimation.pauseAnimation()
-        }, 4000) // 4초 지연
+        }, 4500) // 4초 지연
 
 
 
