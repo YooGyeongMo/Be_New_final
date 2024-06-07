@@ -15,7 +15,7 @@ class SSEService(private val listener: SSEListener, private val token: String) {
     fun startSSE(userId: Int) {
         val client = getOkHttpClient()
         val request = Request.Builder()
-            .url("http://3.34.144.78:8080/alarms/stream/$userId")
+            .url("http://3.34.143.117:8080/alarms/stream/$userId")
             .header("Authorization", "Bearer $token")
             .build()
         Log.d("SSESERVICE","SSE통신완료")

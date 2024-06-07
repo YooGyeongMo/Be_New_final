@@ -101,7 +101,7 @@ class MypageFragment: Fragment() {
         }
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://3.34.144.78:8080/")
+            .baseUrl("http://3.34.143.117:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -134,7 +134,7 @@ class MypageFragment: Fragment() {
         }
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://3.34.144.78:8080/")
+            .baseUrl("http://3.34.143.117:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -171,7 +171,7 @@ class MypageFragment: Fragment() {
         }
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://3.34.144.78:8080/")
+            .baseUrl("http://3.34.143.117:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -204,7 +204,7 @@ class MypageFragment: Fragment() {
         }
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://3.34.144.78:8080/")
+            .baseUrl("http://3.34.143.117:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

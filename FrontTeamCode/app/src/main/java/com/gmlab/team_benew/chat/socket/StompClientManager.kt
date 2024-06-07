@@ -21,7 +21,7 @@ class StompClientManager(var token: String) {
     fun connect() {
         val headers = listOf(StompHeader("Authorization", "Bearer $token"))
 
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://3.34.144.78:8080/stompChat/websocket")
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://3.34.143.117:8080/stompChat/websocket")
         stompClient.connect(headers) // 수정된 부분
 
         stompClient.lifecycle().subscribe { lifecycleEvent ->

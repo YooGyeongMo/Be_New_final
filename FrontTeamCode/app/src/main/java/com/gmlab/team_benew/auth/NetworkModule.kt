@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 //만약 AuthRetrofitInterface에 /를 빼고 선언했다면 BASE_URL에는 /를 붙여줘야한다.
-const val BASE_URL = "http://3.34.144.78:8080"
+const val BASE_URL = "http://3.34.143.117:8080"
 
 fun getOkHttpClient(): OkHttpClient{
     val logging = HttpLoggingInterceptor()
